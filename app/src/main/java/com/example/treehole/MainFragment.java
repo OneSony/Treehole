@@ -1,0 +1,143 @@
+package com.example.treehole;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
+
+public class MainFragment extends Fragment {
+    private ViewPager2 viewPager;
+    private FragmentStateAdapter pagerAdapter;
+
+    private TabLayout tabLayout;
+
+    ArrayList<Fragment> fragmentContainer = new ArrayList<Fragment>();
+    ArrayList<String> titleList = new ArrayList<String>();
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+
+        titleList.add("新发表");
+        titleList.add("新回复");
+        titleList.add("热门");
+        titleList.add("关注");
+        fragmentContainer.add(new MainFragment_sub1());//新发表
+        fragmentContainer.add(new MainFragment_sub2());//新回复
+        fragmentContainer.add(new MainFragment_sub2());//热门
+        fragmentContainer.add(new MainFragment_sub2());//关注
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        update_data_live();
+    }
+
+    public void update_data_live(){
+
+        Fragment activeFragment = getChildFragmentManager().findFragmentByTag("f" + viewPager.getCurrentItem());
+
+        if (activeFragment != null && activeFragment instanceof MainFragment_sub1) {
+            ((MainFragment_sub1) activeFragment).update_data_live();
+        }
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        application app=(application)getActivity().getApplication();
+        View view=inflater.inflate(R.layout.fragment_main, container, false);
+
+        tabLayout = view.findViewById(R.id.main_tab);
+        viewPager = view.findViewById(R.id.main_paper);
+
+        // 先强制设置到指定页面
+
+// 通过数据修改
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {//切换回来的时候更新一下
+                ((application) getActivity().getApplication()).main_frag_pager_id=position;
+                if(position==0){
+                    update_data_live();
+                }
+            }
+        });
+        pagerAdapter = new ScreenSlidePagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
+        pagerAdapter.notifyDataSetChanged();
+
+
+// 切换到指定页面
+        viewPager.setCurrentItem(app.main_frag_pager_id);
+
+
+        new TabLayoutMediator(tabLayout, viewPager, true, (tab, position) -> tab.setText(titleList.get(position))).attach();
+
+        return view;
+    }
+
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+        public ScreenSlidePagerAdapter(MainFragment fa) {
+            super(fa);
+        }
+
+        @Override
+        public Fragment createFragment(int position) {
+            return fragmentContainer.get(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return fragmentContainer.size();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //Toast toast=Toast.makeText(getActivity(),"MainFragment销毁了！",Toast.LENGTH_SHORT);
+        //toast.show();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        // 处理菜单项的点击事件
+        if(item.getItemId() == R.id.action_add){
+
+            Intent intent = new Intent(getActivity(), EditActivity.class);
+            startActivity(intent);
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+}
