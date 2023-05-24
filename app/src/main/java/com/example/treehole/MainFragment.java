@@ -34,6 +34,7 @@ public class MainFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
+        //添加子页面
         titleList.add("新发表");
         titleList.add("新回复");
         titleList.add("热门");
@@ -51,7 +52,7 @@ public class MainFragment extends Fragment {
         update_data_live();
     }
 
-    public void update_data_live(){
+    public void update_data_live(){//可以换成LiveData？
 
         Fragment activeFragment = getChildFragmentManager().findFragmentByTag("f" + viewPager.getCurrentItem());
 
@@ -72,7 +73,7 @@ public class MainFragment extends Fragment {
 
         // 先强制设置到指定页面
 
-// 通过数据修改
+        // 通过数据修改
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {//切换回来的时候更新一下
@@ -87,7 +88,7 @@ public class MainFragment extends Fragment {
         pagerAdapter.notifyDataSetChanged();
 
 
-// 切换到指定页面
+        // 切换到指定页面
         viewPager.setCurrentItem(app.main_frag_pager_id);
 
 
@@ -135,6 +136,12 @@ public class MainFragment extends Fragment {
             Intent intent = new Intent(getActivity(), EditActivity.class);
             startActivity(intent);
 
+            return true;
+        }
+
+        if(item.getItemId() == R.id.action_add){
+
+            update_data_live();
             return true;
         }
 
