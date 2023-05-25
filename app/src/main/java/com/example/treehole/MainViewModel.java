@@ -28,4 +28,6 @@ public class MainViewModel extends AndroidViewModel {
     public void insert(Moment moment){
         mMomentRepository.insert(moment);
     }
+
+    public void deleteAll(){mMomentRepository.deleteAll();}
 }

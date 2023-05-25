@@ -1,6 +1,5 @@
 package com.example.treehole;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,9 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.treehole.room.Moment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -133,8 +134,11 @@ public class MainFragment extends Fragment {
         // 处理菜单项的点击事件
         if(item.getItemId() == R.id.action_add){
 
-            Intent intent = new Intent(getActivity(), EditActivity.class);
-            startActivity(intent);
+            MainViewModel mainViewModel=new ViewModelProvider(this).get(MainViewModel.class);
+            mainViewModel.insert(new Moment("TOPIC_NEW","TEXT"));
+
+            //Intent intent = new Intent(getActivity(), EditActivity.class);
+            //startActivity(intent);
 
             return true;
         }

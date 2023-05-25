@@ -9,9 +9,14 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.treehole.adapter.MomentAdapter;
+import com.example.treehole.room.Moment;
 
 import java.util.List;
 
@@ -20,7 +25,8 @@ public class MainFragment_sub1 extends Fragment {
 
     private dot_list data_list;
     private RecyclerView recyclerView;
-    private dot_list_adapter adapter;
+    //private dot_list_adapter adapter;
+    private MomentAdapter adapter;
     private application app;
 
     @Override
@@ -38,8 +44,16 @@ public class MainFragment_sub1 extends Fragment {
         data_list=app.data_list;
 
         recyclerView=view.findViewById(R.id.recycle_box);
-        adapter=new dot_list_adapter(getActivity(),data_list);
-        adapter.setOnItemClickListener(new dot_list_adapter.OnItemClickListener() {
+        //adapter=new dot_list_adapter(getActivity(),data_list);
+        adapter=new MomentAdapter(getContext());
+        /*adapter.setOnItemClickListener(new dot_list_adapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                launch_info(position);
+            }
+        });*/
+
+        adapter.setOnItemClickListener(new MomentAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 launch_info(position);
@@ -47,6 +61,20 @@ public class MainFragment_sub1 extends Fragment {
         });
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        MainViewModel mainViewModel=new ViewModelProvider(this).get(MainViewModel.class);
+        mainViewModel.deleteAll();
+        mainViewModel.insert(new Moment("TOPIC","TEXT"));
+        mainViewModel.getAllMoment().observe(getViewLifecycleOwner(), new Observer<List<Moment>>() {
+            @Override
+            public void onChanged(List<Moment> moments) {
+                adapter.setMoment(moments);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        mainViewModel.insert(new Moment("TOPIC","TOPIC"));
+
 
         //Toast toast=Toast.makeText(getActivity(),"MainFragment_sub1绘画",Toast.LENGTH_SHORT);
         //toast.show();

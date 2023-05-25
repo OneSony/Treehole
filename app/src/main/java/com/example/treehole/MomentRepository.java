@@ -29,6 +29,8 @@ public class MomentRepository {
         new insertAsyncTask(mMomentDao).execute(moment);
     }
 
+    public void deleteAll(){new deleteAllAsyncTask(mMomentDao).execute();}
+
     private static class insertAsyncTask extends AsyncTask<Moment,Void,Void>{
         private MomentDao mAsyncTaskDao;
 
@@ -39,6 +41,21 @@ public class MomentRepository {
         @Override
         protected Void doInBackground(Moment... moments) {
             mAsyncTaskDao.insert(moments[0]);
+            return null;
+        }
+    }
+
+    private static class deleteAllAsyncTask extends AsyncTask<Void,Void,Void>{
+        private MomentDao mAsyncTaskDao;
+
+        deleteAllAsyncTask(MomentDao dao){
+            mAsyncTaskDao=dao;
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.deleteAll();
             return null;
         }
     }

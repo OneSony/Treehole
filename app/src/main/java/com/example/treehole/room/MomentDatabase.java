@@ -8,7 +8,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Moment.class},version = 1)
+@Database(entities = {Moment.class},version = 1,exportSchema = false)
 public abstract class MomentDatabase extends RoomDatabase {
     public abstract MomentDao momentDao();
     private static MomentDatabase INSTANCE;

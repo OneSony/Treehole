@@ -4,9 +4,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(tableName = "moment_table")
 public class Moment {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int m_index;
 
     @ColumnInfo(name="topic")
@@ -15,4 +15,8 @@ public class Moment {
     @ColumnInfo(name="text")
     public String text;
 
+    public Moment(String topic,String text){
+        this.topic=topic;
+        this.text=text;
+    }
 }

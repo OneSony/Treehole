@@ -1,8 +1,6 @@
 package com.example.treehole;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -39,8 +37,10 @@ public class MainActivity extends AppCompatActivity {
         //如何保证activity切换回来后继续保持原来的navigation
     }
 
-    public void edit_click(View view) {
+    /*public void edit_click(View view) {
+
         Intent intent = new Intent(this, EditActivity.class);
         startActivity(intent);
-    }
+
+    }*/
 }

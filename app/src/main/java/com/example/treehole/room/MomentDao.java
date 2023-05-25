@@ -2,8 +2,8 @@ package com.example.treehole.room;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import java.util.List;
@@ -12,12 +12,12 @@ import java.util.List;
 public interface MomentDao {
 
 
-    @Query("SELECT * FROM moment")
+    @Query("SELECT * FROM moment_table")
     LiveData<List<Moment>> getAll();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(Moment moment);
 
-    @Delete
-    void delete(Moment moment);
+    @Query("DELETE FROM moment_table")
+    void deleteAll();
 }
