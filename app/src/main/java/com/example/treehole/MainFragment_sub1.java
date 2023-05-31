@@ -9,14 +9,12 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.treehole.adapter.MomentAdapter;
-import com.example.treehole.room.Moment;
+import com.example.treehole.paging.MomentPagingAdapter;
 
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class MainFragment_sub1 extends Fragment {
     private dot_list data_list;
     private RecyclerView recyclerView;
     //private dot_list_adapter adapter;
-    private MomentAdapter adapter;
+    private MomentPagingAdapter adapter;
     private application app;
 
     @Override
@@ -40,72 +38,20 @@ public class MainFragment_sub1 extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_main_sub1, container, false);
 
-        app=(application)getActivity().getApplication();
-        data_list=app.data_list;
+        MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         recyclerView=view.findViewById(R.id.recycle_box);
-        //adapter=new dot_list_adapter(getActivity(),data_list);
-        adapter=new MomentAdapter(getContext());
-        /*adapter.setOnItemClickListener(new dot_list_adapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                launch_info(position);
-            }
-        });*/
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter.setOnItemClickListener(new MomentAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                launch_info(position);
-            }
-        });
+
+        adapter=new MomentPagingAdapter();
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        MainViewModel mainViewModel=new ViewModelProvider(this).get(MainViewModel.class);
-        mainViewModel.deleteAll();
-        mainViewModel.insert(new Moment("TOPIC","TEXT"));
-        mainViewModel.getAllMoment().observe(getViewLifecycleOwner(), new Observer<List<Moment>>() {
-            @Override
-            public void onChanged(List<Moment> moments) {
-                adapter.setMoment(moments);
-                adapter.notifyDataSetChanged();
-            }
-        });
-
-        mainViewModel.insert(new Moment("TOPIC","TOPIC"));
+        MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);
+        loadMoreViewModel.getPaging().observe(getViewLifecycleOwner(),
+                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
 
 
-        //Toast toast=Toast.makeText(getActivity(),"MainFragment_sub1绘画",Toast.LENGTH_SHORT);
-        //toast.show();
-        if(recyclerView.getLayoutManager() != null && app.lastPosition >= 0) {
-            /*if(app.button_flag == true){
 
-            } else */{
-                ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(app.lastPosition, app.lastOffset);
-            }
-        }
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                app.button_flag = false;
-                if(recyclerView.getLayoutManager() != null) {
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    //获取可视的第一个view
-                    View topView = layoutManager.getChildAt(0);
-                    if(topView != null) {
-                        //获取与该view的顶部的偏移量
-                        app.lastOffset = topView.getTop();
-                        //得到该View的数组位置
-                        app.lastPosition = layoutManager.getPosition(topView);
-                    }
-                }
-            }
-        });
-        //recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
-        Log.d("CHAT",String.valueOf(data_list.size()));
         return view;
     }
 
