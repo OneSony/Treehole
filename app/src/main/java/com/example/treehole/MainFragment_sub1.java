@@ -43,7 +43,7 @@ public class MainFragment_sub1 extends Fragment {
         MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.deleteAll();
 
-        for(int i=0;i<70;i++){
+        for(int i=0;i<2;i++){
             viewModel.insert(new Moment("TOPIC "+String.valueOf(i),"TEXT "+String.valueOf(i)));
         }
 
@@ -59,7 +59,7 @@ public class MainFragment_sub1 extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-        adapter=new MomentPagingAdapter();
+        adapter=new MomentPagingAdapter(getContext());
         recyclerView.setAdapter(adapter);
         MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);
 
@@ -128,9 +128,11 @@ public class MainFragment_sub1 extends Fragment {
     }
 
     public void update_data_live(){
-        app=(application)getActivity().getApplication();
-        data_list=app.data_list;
-        adapter.notifyDataSetChanged();
+        //app=(application)getActivity().getApplication();
+        //data_list=app.data_list;
+        //adapter.notifyDataSetChanged();
+        adapter.refresh();
+        recyclerView.scrollToPosition(0);
         Log.d("UPDATE","UPDATA!");
     }
 }

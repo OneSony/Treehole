@@ -1,23 +1,31 @@
 package com.example.treehole.paging;
 
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.paging.PagingDataAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.InfoActivity;
 import com.example.treehole.R;
 import com.example.treehole.room.Moment;
 
 import java.util.Objects;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
-    public MomentPagingAdapter() {
+
+    Context context;
+
+    public MomentPagingAdapter(Context context) {
         super(new DiffUtil.ItemCallback<Moment>() {
             @Override
             public boolean areItemsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
@@ -26,9 +34,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
 
             @Override
             public boolean areContentsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
+                Log.d("SAME?",String.valueOf(oldItem.text.equals(newItem.text)&&oldItem.topic.equals(newItem.topic)));
                 return oldItem.text.equals(newItem.text)&&oldItem.topic.equals(newItem.topic);
             }
         });
+
+        this.context=context;
     }
 
 
@@ -50,6 +61,17 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         }else{
             holder.topic_box.setText(moment.topic);
             holder.main_box.setText(moment.text);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // 在这里处理项目点击事件
+                    // 显示项目ID，可以通过Toast或者其他方式展示
+                    Toast.makeText(view.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(context, InfoActivity.class);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 

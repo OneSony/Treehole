@@ -50,7 +50,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        update_data_live();
+        //update_data_live();
     }
 
     public void update_data_live(){//可以换成LiveData？
@@ -144,7 +144,6 @@ public class MainFragment extends Fragment {
         }
 
         if(item.getItemId() == R.id.action_refresh){
-
             update_data_live();
             return true;
         }

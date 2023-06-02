@@ -50,8 +50,12 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<PagingData<Moment>> getPaging(){
         CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
         Pager<Integer, Moment> pager = new Pager<Integer, Moment>(pagingConfig, ()->new MomentPagingSource(MomentDatabase.getDatabase(getApplication().getApplicationContext()).momentDao()));//构造函数根据自己的需要来调整
+
+
         return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager),viewModelScope);
     }
+
+
 
     public int getMomentCount() throws ExecutionException, InterruptedException {
         return mMomentRepository.getMomentCount();
