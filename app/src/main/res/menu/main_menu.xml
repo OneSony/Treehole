@@ -5,15 +5,16 @@
     tools:context=".MainActivity">
 
     <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/collect"
+        android:title="refresh"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_add"
         android:icon="@drawable/add"
         android:title="add"
         app:showAsAction="always"/>
 
-    <item
-        android:id="@+id/action_refresh"
-        android:icon="@drawable/collect"
-        android:title="refresh"
-        app:showAsAction="always"/>
 
 </menu>

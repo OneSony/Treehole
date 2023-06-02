@@ -143,7 +143,7 @@ public class MainFragment extends Fragment {
             return true;
         }
 
-        if(item.getItemId() == R.id.action_add){
+        if(item.getItemId() == R.id.action_refresh){
 
             update_data_live();
             return true;

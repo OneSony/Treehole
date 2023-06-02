@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.paging.MomentPagingAdapter;
+import com.example.treehole.room.Moment;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class MainFragment_sub1 extends Fragment {
@@ -39,6 +41,19 @@ public class MainFragment_sub1 extends Fragment {
         View view=inflater.inflate(R.layout.fragment_main_sub1, container, false);
 
         MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel.deleteAll();
+
+        for(int i=0;i<70;i++){
+            viewModel.insert(new Moment("TOPIC "+String.valueOf(i),"TEXT "+String.valueOf(i)));
+        }
+
+        try {
+            Log.d("SIZE",String.valueOf(viewModel.getMomentCount()));
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         recyclerView=view.findViewById(R.id.recycle_box);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -47,6 +62,8 @@ public class MainFragment_sub1 extends Fragment {
         adapter=new MomentPagingAdapter();
         recyclerView.setAdapter(adapter);
         MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);
+
+
         loadMoreViewModel.getPaging().observe(getViewLifecycleOwner(),
                 dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
 

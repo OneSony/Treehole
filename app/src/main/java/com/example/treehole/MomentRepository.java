@@ -10,6 +10,7 @@ import com.example.treehole.room.MomentDao;
 import com.example.treehole.room.MomentDatabase;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MomentRepository {
     private MomentDao mMomentDao;
@@ -30,6 +31,11 @@ public class MomentRepository {
     }
 
     public void deleteAll(){new deleteAllAsyncTask(mMomentDao).execute();}
+
+    public int getMomentCount() throws ExecutionException, InterruptedException {
+        return new sizeAsyncTask(mMomentDao).execute().get();
+    }
+
 
     private static class insertAsyncTask extends AsyncTask<Moment,Void,Void>{
         private MomentDao mAsyncTaskDao;
@@ -57,6 +63,19 @@ public class MomentRepository {
         protected Void doInBackground(Void... voids) {
             mAsyncTaskDao.deleteAll();
             return null;
+        }
+    }
+
+    private static class sizeAsyncTask extends AsyncTask<Void,Void, Integer>{
+        private MomentDao mAsyncTaskDao;
+
+        sizeAsyncTask(MomentDao dao){
+            mAsyncTaskDao=dao;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return mAsyncTaskDao.getMomentCount();
         }
     }
 

@@ -14,17 +14,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.treehole.R;
 import com.example.treehole.room.Moment;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
-    public MomentPagingAdapter(@NotNull DiffUtil.ItemCallback<Moment> diffCallback) {
-        super(diffCallback);
-    }
-
     public MomentPagingAdapter() {
-        super(DIFF_CALLBACK);
+        super(new DiffUtil.ItemCallback<Moment>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
+                return oldItem.m_index == newItem.m_index;
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
+                return oldItem.text.equals(newItem.text)&&oldItem.topic.equals(newItem.topic);
+            }
+        });
     }
 
 
@@ -41,8 +45,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         Moment moment = getItem(position);
         // Note that item may be null. ViewHolder must support binding a
         // null item as a placeholder.
-        holder.topic_box.setText(moment.topic);
-        holder.main_box.setText(moment.text);
+        if(moment==null){
+            holder.topic_box.setText("loading");
+        }else{
+            holder.topic_box.setText(moment.topic);
+            holder.main_box.setText(moment.text);
+        }
     }
 
     private static final DiffUtil.ItemCallback<Moment> DIFF_CALLBACK = new DiffUtil.ItemCallback<Moment>() {
