@@ -16,7 +16,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@color/white" />
+        app:tint="?attr/colorOnPrimary"
+        app:titleTextColor="?attr/colorOnPrimary" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/Nav"

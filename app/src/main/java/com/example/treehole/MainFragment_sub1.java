@@ -9,18 +9,26 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.example.treehole.paging.MomentPagingAdapter;
+import com.example.treehole.room.Moment;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class MainFragment_sub1 extends Fragment {
 
     private dot_list data_list;
     private RecyclerView recyclerView;
-    private dot_list_adapter adapter;
+    //private dot_list_adapter adapter;
+    private MomentPagingAdapter adapter;
+
     private application app;
 
     @Override
@@ -34,50 +42,47 @@ public class MainFragment_sub1 extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_main_sub1, container, false);
 
-        app=(application)getActivity().getApplication();
-        data_list=app.data_list;
 
-        recyclerView=view.findViewById(R.id.recycle_box);
-        adapter=new dot_list_adapter(getActivity(),data_list);
-        adapter.setOnItemClickListener(new dot_list_adapter.OnItemClickListener() {
+
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                launch_info(position);
+            public void onRefresh() {
+                update_data_live();
+                swipeRefreshLayout.setRefreshing(false);
+                Log.d("REFRESH","YEAH!");
             }
         });
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        //Toast toast=Toast.makeText(getActivity(),"MainFragment_sub1绘画",Toast.LENGTH_SHORT);
-        //toast.show();
-        if(recyclerView.getLayoutManager() != null && app.lastPosition >= 0) {
-            /*if(app.button_flag == true){
+        MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel.deleteAll();
 
-            } else */{
-                ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(app.lastPosition, app.lastOffset);
-            }
+        for(int i=0;i<2;i++){
+            viewModel.insert(new Moment("TOPIC "+String.valueOf(i),"TEXT "+String.valueOf(i)));
         }
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                app.button_flag = false;
-                if(recyclerView.getLayoutManager() != null) {
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    //获取可视的第一个view
-                    View topView = layoutManager.getChildAt(0);
-                    if(topView != null) {
-                        //获取与该view的顶部的偏移量
-                        app.lastOffset = topView.getTop();
-                        //得到该View的数组位置
-                        app.lastPosition = layoutManager.getPosition(topView);
-                    }
-                }
-            }
-        });
-        //recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
-        Log.d("CHAT",String.valueOf(data_list.size()));
+        try {
+            Log.d("SIZE",String.valueOf(viewModel.getMomentCount()));
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        recyclerView=view.findViewById(R.id.recycle_box);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
+        adapter=new MomentPagingAdapter(getContext());
+        recyclerView.setAdapter(adapter);
+        MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);
+
+
+        loadMoreViewModel.getPaging().observe(getViewLifecycleOwner(),
+                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+
+
+
         return view;
     }
 
@@ -137,9 +142,11 @@ public class MainFragment_sub1 extends Fragment {
     }
 
     public void update_data_live(){
-        app=(application)getActivity().getApplication();
-        data_list=app.data_list;
-        adapter.notifyDataSetChanged();
+        //app=(application)getActivity().getApplication();
+        //data_list=app.data_list;
+        //adapter.notifyDataSetChanged();
+        adapter.refresh();
+        recyclerView.scrollToPosition(0);
         Log.d("UPDATE","UPDATA!");
     }
 }

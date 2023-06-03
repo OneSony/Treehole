@@ -143,7 +143,7 @@ public class InfoActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        photo1.setImageBitmap(null);
+        //photo1.setImageBitmap(null);
         //Log.d(LOG_TAG, "onDestroy");
     }
 
