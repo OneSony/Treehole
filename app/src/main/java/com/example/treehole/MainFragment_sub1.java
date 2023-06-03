@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.treehole.paging.MomentPagingAdapter;
 import com.example.treehole.room.Moment;
@@ -27,6 +28,7 @@ public class MainFragment_sub1 extends Fragment {
     private RecyclerView recyclerView;
     //private dot_list_adapter adapter;
     private MomentPagingAdapter adapter;
+
     private application app;
 
     @Override
@@ -39,6 +41,18 @@ public class MainFragment_sub1 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_main_sub1, container, false);
+
+
+
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                update_data_live();
+                swipeRefreshLayout.setRefreshing(false);
+                Log.d("REFRESH","YEAH!");
+            }
+        });
 
         MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.deleteAll();

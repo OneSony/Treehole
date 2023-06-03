@@ -1,5 +1,6 @@
 package com.example.treehole;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -7,13 +8,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.treehole.room.Moment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -24,6 +25,7 @@ public class MainFragment extends Fragment {
     private FragmentStateAdapter pagerAdapter;
 
     private TabLayout tabLayout;
+
 
     ArrayList<Fragment> fragmentContainer = new ArrayList<Fragment>();
     ArrayList<String> titleList = new ArrayList<String>();
@@ -124,6 +126,30 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setQueryHint("输入关键词");
+        searchView.setIconifiedByDefault(true);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // 处理搜索提交事件
+                Toast.makeText(getContext(), query, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // 处理搜索框文本变化事件
+                // 这里可以根据 newText 进行实时搜索或过滤操作
+                return true;
+            }
+        });
+
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -134,20 +160,21 @@ public class MainFragment extends Fragment {
         // 处理菜单项的点击事件
         if(item.getItemId() == R.id.action_add){
 
-            MainViewModel mainViewModel=new ViewModelProvider(this).get(MainViewModel.class);
-            mainViewModel.insert(new Moment("TOPIC_NEW","TEXT"));
+            //MainViewModel mainViewModel=new ViewModelProvider(this).get(MainViewModel.class);
+            //mainViewModel.insert(new Moment("TOPIC_NEW","TEXT"));
 
-            //Intent intent = new Intent(getActivity(), EditActivity.class);
-            //startActivity(intent);
+            Intent intent = new Intent(getActivity(), EditActivity.class);
+            startActivity(intent);
 
             return true;
         }
 
-        if(item.getItemId() == R.id.action_refresh){
+        /*if(item.getItemId() == R.id.action_refresh){
             update_data_live();
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
+
 }
