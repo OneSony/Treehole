@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import me.pushy.sdk.Pushy;
+
 public class MainActivity extends AppCompatActivity {
     //private dot_list data_list=new dot_list();
     private dot_list data_list;

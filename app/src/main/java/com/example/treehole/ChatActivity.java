@@ -3,6 +3,9 @@ package com.example.treehole;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,9 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class ChatActivity extends AppCompatActivity {
 
-    private TextView textView;
+    private TextInputLayout textInput;
+    private Button sendButton;
     private dot curr_data;
 
     private RecyclerView recyclerView;
@@ -25,6 +34,48 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        textInput = (TextInputLayout) findViewById(R.id.textInputLayout);
+        sendButton = (Button) findViewById(R.id.message_send_button);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText editText = textInput.getEditText();
+                String messageText = editText.getText().toString();
+                String receiverUsername = "";
+
+                JSONObject json = new JSONObject();
+                try{
+                    json.put("receiver", receiverUsername);
+                    json.put("type", "string");
+                    json.put("message", messageText);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                WebUtils.sendPost("/messaging/send/", true, json, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+                        Log.d("Message", "Message sent");
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        Log.e("Message", "Message send error: "+t.getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        try {
+                            String message = json.getString("message");
+                            Log.e("Message", "Message send failed: "+message);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+                });
+            }
+        });
 
         setSupportActionBar(findViewById(R.id.chat_toolbar));
         ActionBar bar=getSupportActionBar();

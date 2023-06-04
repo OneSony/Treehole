@@ -21,6 +21,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import me.pushy.sdk.Pushy;
+
 public class LoginActivity extends AppCompatActivity {
     //private String sharedPrefFile ="com.example.android.Treehole";
     private String csrf_token;
@@ -88,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
             switch (msg.what){
                 case 0:
                     Toast.makeText(getApplicationContext(),"登录成功",Toast.LENGTH_SHORT).show();
+                    //new UserUtils.RegisterForPushNotificationsAsync(LoginActivity.this).execute();
                     intent_to_main();
                     break;
                 case -1:
@@ -106,9 +109,11 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        WebUtils.init(getApplicationContext(),"https://rickyvu.pythonanywhere.com");
 
         super.onCreate(savedInstanceState);
+        WebUtils.init(getApplicationContext(),"https://rickyvu.pythonanywhere.com");
+        Pushy.listen(this);
+        new UserUtils.RegisterForPushNotificationsAsync(this).execute();
         setContentView(R.layout.activity_login);
 
         setSupportActionBar(findViewById(R.id.login_toolbar));
