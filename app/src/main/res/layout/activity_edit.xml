@@ -63,6 +63,7 @@
                         android:gravity="start"
                         android:hapticFeedbackEnabled="false"
                         android:hint="正文"
+                        android:maxLength="500"
                         android:minLines="3" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -98,18 +99,37 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <Button
-                    android:id="@+id/photo_button"
+                <ImageButton
+                    android:id="@+id/video_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:onClick="photo_click"
+                    android:padding="10dp"
+                    android:src="@drawable/baseline_slow_motion_video_36"
                     android:text="相册"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.03"
+                    app:layout_constraintHorizontal_bias="0.157"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.99" />
+                    app:layout_constraintVertical_bias="0.997" />
+
+                <ImageButton
+                    android:id="@+id/photo_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:onClick="photo_click"
+                    android:padding="10dp"
+                    android:src="@drawable/baseline_image_36"
+                    android:text="相册"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="1.0" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

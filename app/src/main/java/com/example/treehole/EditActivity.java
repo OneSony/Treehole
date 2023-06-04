@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -37,7 +38,7 @@ public class EditActivity extends AppCompatActivity {
     private TextInputLayout textInputLayout;
     private ImageView photoView;
     private CardView cardView;
-    private Button photoButton;
+    private ImageButton photoButton;
 
     private SharedPreferences mPreferences;
     private String sharedPrefFile ="com.example.android.Treehole";
@@ -59,13 +60,13 @@ public class EditActivity extends AppCompatActivity {
         topicInputLayout=findViewById(R.id.topic_input);
         textInputLayout=findViewById(R.id.text_input);
         photoView=findViewById(R.id.send_photo_view);
-        photoButton=findViewById(R.id.photo_button);
+        photoButton= (ImageButton) findViewById(R.id.photo_button);
 
-        pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+        pickMedia = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(3), uris -> {
                     // Callback is invoked after the user selects a media item or closes the
                     // photo picker.
-                    if (uri != null) {
-                        photoView.setImageURI(uri);
+                    if (uris.size() != 0) {
+                        photoView.setImageURI(uris.get(0));
                         cardView.setVisibility(View.VISIBLE);
                         photo_path="NULL";
                         /*Uri photoUri = uri;
@@ -85,8 +86,8 @@ public class EditActivity extends AppCompatActivity {
                             photoView.setImageBitmap(bitmap);
                             cardView.setVisibility(View.VISIBLE);
                         }*/
-                        Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uri));
-                        Log.d("PhotoPicker", "Selected URI: " + uri);
+                        Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
+                        Log.d("PhotoPicker", "Selected URI: " + uris.get(0));
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                     }
