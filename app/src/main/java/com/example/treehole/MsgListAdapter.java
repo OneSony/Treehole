@@ -66,7 +66,7 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
         theme.resolveAttribute(res, typedValue, true);
         int colorOnSecondary = typedValue.data;
 
-        if(messageNodes.get(position).getUser()==0){
+        if(messageNodes.get(position).getUser()==0){//对方，左侧的
 
             ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,  LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.setMarginEnd(200);
@@ -90,7 +90,7 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
             textView.setTextColor(colorOnSecondary);
 
 
-        }else{
+        }else{//自己，右侧的
 
             ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,  LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.setMarginEnd(20);

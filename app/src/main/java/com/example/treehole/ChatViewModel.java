@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.treehole.room.Message;
+import com.example.treehole.room.MessageNode;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,5 +34,9 @@ public class ChatViewModel extends AndroidViewModel {
 
     public LiveData<Message> getMessageByIndex(int index) throws ExecutionException, InterruptedException {
         return mRepository.getMessageByIndex(index);
+    }
+
+    public void addMessageNode(int index, MessageNode messageNode) {
+        mRepository.addMessageNode(index, messageNode);
     }
 }

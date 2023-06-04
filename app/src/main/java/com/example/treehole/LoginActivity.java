@@ -6,8 +6,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +25,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import me.pushy.sdk.Pushy;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
     //private String sharedPrefFile ="com.example.android.Treehole";
@@ -134,6 +144,18 @@ public class LoginActivity extends AppCompatActivity {
 
         login_button = findViewById(R.id.login_button);
         to_register_button = findViewById(R.id.to_register_button);
+
+
+        password_box.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {   // 按下完成按钮，这里和上面imeOptions对应
+                    login();
+                }
+                return true;
+            }
+        });
+
 /*
         mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
@@ -163,8 +185,7 @@ public class LoginActivity extends AppCompatActivity {
 */
     }
 
-    public void login_click(View view) throws IOException {
-
+    public void login(){
         username_box.setErrorEnabled(false);
         password_box.setErrorEnabled(false);
 
@@ -235,7 +256,11 @@ public class LoginActivity extends AppCompatActivity {
         }
         WebUtils.sendPost("/users/login/", false, json, callback);
 
-        /*
+    }
+
+    public void login_click(View view) throws IOException {
+
+        login();
 
         username_box.setErrorEnabled(false);
         password_box.setErrorEnabled(false);
@@ -295,7 +320,6 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-*/
     }
 
     public void reg_click(View view) throws IOException {
