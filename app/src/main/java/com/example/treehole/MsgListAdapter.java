@@ -15,33 +15,32 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.room.MessageNode;
+
+import java.util.List;
+
 
 public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
-    private final LayoutInflater inflater;
 
-    private dot_list data_list;
+    List<MessageNode> messageNodes;
+
     public interface OnItemClickListener {
         void onItemClick(View view, int position);
     }
-
 
     //public final MainActivity mainPage;
     public Context context;
 
 
-    public MsgListAdapter(Context context, dot_list _dot_list){
-        inflater=LayoutInflater.from(context);
-        data_list=_dot_list;
-        //this.mainPage=main_page;
+    public MsgListAdapter(Context context){
         this.context=context;
     }
 
     @NonNull
     @Override
     public MsgViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View mItemView=inflater.inflate(R.layout.msg_item,parent,false);
-        return new MsgViewHolder(mItemView,this);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.msg_item, parent, false);
+        return new MsgViewHolder(view);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
         theme.resolveAttribute(res, typedValue, true);
         int colorOnSecondary = typedValue.data;
 
-        if(position%2==0){
+        if(messageNodes.get(position).getUser()==0){
 
             ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,  LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.setMarginEnd(200);
@@ -77,6 +76,7 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
 
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(holder.constraintLayout);
+            constraintSet.clear(R.id.msg_card, ConstraintSet.END);
             constraintSet.connect(R.id.msg_card, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
             constraintSet.connect(R.id.msg_card, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
             constraintSet.connect(R.id.msg_card, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
@@ -114,14 +114,22 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
 
         }
 
-        holder.textView.setText(data_list.get(position).getText());
+        holder.textView.setText(messageNodes.get(position).getText());
 
+    }
+
+    public void setMessageNodes(List<MessageNode> messageNodes){
+        this.messageNodes=messageNodes;
     }
 
 
     @Override
     public int getItemCount() {
-        return data_list.size();
+        if(messageNodes==null){
+            return 0;
+        }else{
+            return messageNodes.size();
+        }
         //return 0;
     }
 
@@ -139,7 +147,7 @@ class MsgViewHolder extends RecyclerView.ViewHolder{
     public ConstraintLayout constraintLayout;
     public CardView cardView;
 
-    public MsgViewHolder(@NonNull View itemView, MsgListAdapter chatListAdapter) {
+    public MsgViewHolder(@NonNull View itemView) {
         super(itemView);
 
         textView=itemView.findViewById(R.id.msg_text);

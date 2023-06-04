@@ -37,7 +37,7 @@
             android:name=".PersonActivity"
             android:exported="false" />
         <activity
-            android:name=".ChatActivity"
+            android:name=".MsgActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"

@@ -1,6 +1,5 @@
 package com.example.treehole;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,48 +9,50 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.room.Message;
+import com.example.treehole.room.MessageNode;
+
+import java.util.List;
+
 
 public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
-    private final LayoutInflater inflater;
 
-    private dot_list data_list;
+    private List<Message> messages;
     public interface OnItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(int index);
     }
 
     private OnItemClickListener mOnItemClickListener;
 
-    //public final MainActivity mainPage;
-    public Context context;
 
-
-    public ChatListAdapter(Context context, dot_list _dot_list){
-        inflater=LayoutInflater.from(context);
-        data_list=_dot_list;
-        //this.mainPage=main_page;
-        this.context=context;
-    }
 
     @NonNull
     @Override
     public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item, parent, false);
+        return new ChatViewHolder(view);
+    }
 
-        View mItemView=inflater.inflate(R.layout.chat_item,parent,false);
-        return new ChatViewHolder(mItemView,this);
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
-        holder.chat_user_box.setText(data_list.get(position).getAuth());
-        holder.chat_text_box.setText(data_list.get(position).getText());
-        holder.profile_photo.setImageResource(data_list.get(position).getProfile_index());
+        holder.chat_user_box.setText(messages.get(position).getUser());
+
+        int size=messages.get(position).getNodes().size();
+        if(size!=0){
+            holder.chat_text_box.setText(messages.get(position).getNodes().get(size-1).getText());
+        }
+        //holder.profile_photo.setImageResource(data_list.get(position).getProfile_index());
         holder.itemView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                //Log.d("MainActivity",String.valueOf(getLayoutPosition()));
-                //Intent intent=new Intent(context,InfoActivity.class);
-                //context.startActivity(intent);
-                mOnItemClickListener.onItemClick(holder.itemView, position);
+
+                int index = messages.get(position).getIndex();
+                mOnItemClickListener.onItemClick(index);
+
             }
         });
 
@@ -63,8 +64,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
 
     @Override
     public int getItemCount() {
-        return data_list.size();
-        //return 0;
+        if(messages==null){
+            return 0;
+        }else {
+            return messages.size();
+        }
     }
 
     @Override
@@ -82,9 +86,8 @@ class ChatViewHolder extends RecyclerView.ViewHolder{
     public TextView chat_text_box;
     public ImageView profile_photo;
 
-    public ChatViewHolder(@NonNull View itemView, ChatListAdapter chatListAdapter) {
+    public ChatViewHolder(@NonNull View itemView) {
         super(itemView);
-
         chat_user_box=itemView.findViewById(R.id.chat_user_box);
         chat_text_box=itemView.findViewById(R.id.chat_text_box);
         profile_photo=itemView.findViewById(R.id.chat_profile);

@@ -1,5 +1,6 @@
 package com.example.treehole.room;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -14,5 +15,9 @@ public interface MessageDao {
     void insert(Message message);
 
     @Query("SELECT * FROM message_table ORDER BY `index` ASC")
-    List<Message> getAllMessages();
+    LiveData<List<Message>> getAllMessages();
+
+    @Query("SELECT * FROM message_table WHERE `index` = :index")
+    LiveData<Message> getMessageByIndex(int index);
+
 }

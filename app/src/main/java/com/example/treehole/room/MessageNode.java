@@ -5,6 +5,11 @@ public class MessageNode {
     private int user;
     private String text;
 
+    public MessageNode(int user, String text){
+        this.user=user;
+        this.text=text;
+    }
+
     public int getIndex(){
         return index;
     }

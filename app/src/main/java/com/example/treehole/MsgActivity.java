@@ -6,34 +6,39 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.room.Message;
+import com.example.treehole.room.MessageNode;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ChatActivity extends AppCompatActivity {
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+public class MsgActivity extends AppCompatActivity {
 
     private TextInputLayout textInput;
     private Button sendButton;
-    private dot curr_data;
+
+    private int message_index;
 
     private RecyclerView recyclerView;
     private MsgListAdapter adapter;
 
-    private dot_list data_list;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_msg);
 
         textInput = (TextInputLayout) findViewById(R.id.textInputLayout);
         sendButton = (Button) findViewById(R.id.message_send_button);
@@ -82,29 +87,38 @@ public class ChatActivity extends AppCompatActivity {
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setTitle("私信");
 
-        data_list=new dot_list();
+        recyclerView=findViewById(R.id.msg_list);
+        adapter=new MsgListAdapter(this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
 
         Bundle bundle=getIntent().getBundleExtra("BUNDLE_DATA");
         if (bundle != null) {
+            message_index = (int) bundle.getSerializable("DATA");
+        }
+        ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
-            curr_data = (dot) bundle.getSerializable("DATA");
-
-            Log.d("CHAT in",curr_data.getTopic());
-            Log.d("CHAT in",curr_data.getText());
-
-
-            data_list.insert(curr_data.getTopic(),curr_data.getText(),curr_data.getAuth(),curr_data.getProfile_index());
-            data_list.insert(curr_data.getTopic(),curr_data.getText(),curr_data.getAuth(),curr_data.getProfile_index());
-
-            Log.d("CHAT in",String.valueOf(data_list.size()));
+        LiveData<Message> message= null;
+        try {
+            message = viewModel.getMessageByIndex(message_index);
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-        bar.setTitle(curr_data.getAuth());
+        //bar.setTitle(Objects.requireNonNull(message.getValue()).getUser());
 
-        recyclerView=findViewById(R.id.msg_list);
-        adapter=new MsgListAdapter(this,data_list);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        message.observe(this, message1 -> {
+            if (message1 != null) {
+                List<MessageNode> messageNodes=message1.getNodes();
+                bar.setTitle(message1.getUser());
+                adapter.setMessageNodes(messageNodes);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+
+
 
 
 

@@ -2,7 +2,6 @@ package com.example.treehole;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,9 +11,17 @@ import android.view.ViewGroup;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.treehole.room.Message;
+import com.example.treehole.room.MessageNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ChatFragment extends Fragment {
@@ -44,20 +51,18 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view=inflater.inflate(R.layout.fragment_chat, container, false);
-
         setHasOptionsMenu(true);
 
-        app=(application)getActivity().getApplication();
-        data_list=app.data_list;
+
 
         recyclerView=view.findViewById(R.id.chat_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
 
-        adapter=new ChatListAdapter(getActivity(),data_list);
+        adapter=new ChatListAdapter();
         adapter.setOnItemClickListener(new ChatListAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                launch_msg(position);
+            public void onItemClick(int index) {
+                launch_msg(index);
                 return;
             }
         });
@@ -65,10 +70,27 @@ public class ChatFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        Log.d("CHAT","?");
+        ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+        List<MessageNode> nodes=new ArrayList<>();
+        nodes.add(new MessageNode(1,"msg1 from user1"));
+        nodes.add(new MessageNode(1,"msg2 from user1"));
+        nodes.add(new MessageNode(0,"msg3 from user2"));
+        nodes.add(new MessageNode(1,"msg4 from user1"));
+
+        //viewModel.insert(new Message("USER1",nodes));
 
 
-        // Inflate the layout for this fragment
+
+        LiveData<List<Message>> messages=viewModel.getAllMessage();
+        messages.observe(getViewLifecycleOwner(), messages1 -> {
+            adapter.setMessages(messages1);
+            adapter.notifyDataSetChanged();
+        });
+
+
+
+
         return view;
     }
 
@@ -118,10 +140,9 @@ public class ChatFragment extends Fragment {
 
 
     private void launch_msg(int index) {
-        Intent intent = new Intent(getActivity(), ChatActivity.class);
+        Intent intent = new Intent(getActivity(), MsgActivity.class);
         Bundle bundle=new Bundle();
-        bundle.putSerializable("DATA",data_list.get(index));
-
+        bundle.putSerializable("DATA",index);
         intent.putExtra("BUNDLE_DATA",bundle);
 
         startActivity(intent);
