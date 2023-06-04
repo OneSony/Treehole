@@ -55,6 +55,16 @@ public class MineFragment extends Fragment {
             }
         });
 
+        Button test_button = view.findViewById(R.id.test_btn);
+        test_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 响应事件
+                Intent intent = new Intent(getActivity(), FollowerActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         return view;
     }
@@ -88,6 +98,4 @@ public class MineFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
-
-
 }

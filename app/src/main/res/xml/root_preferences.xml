@@ -5,11 +5,11 @@
         android:title="账户"
         app:iconSpaceReserved="false">
 
-        <EditTextPreference
+        <Preference
             app:iconSpaceReserved="false"
-            app:key="username"
-            app:title="修改用户名"
-            app:useSimpleSummaryProvider="true" />
+            app:key="profile_photo"
+            app:title="修改头像"
+            app:useSimpleSummaryProvider="false" />
 
         <Preference
             app:iconSpaceReserved="false"
