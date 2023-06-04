@@ -1,7 +1,8 @@
 package com.example.treehole;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.content.res.Resources;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,26 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MsgViewHolder holder, int position) {
 
+        Resources.Theme theme = context.getTheme();
+        TypedValue typedValue = new TypedValue();
+
+        int res;
+        res = context.getResources().getIdentifier("colorPrimary", "attr", context.getPackageName());
+        theme.resolveAttribute(res, typedValue, true);
+        int colorPrimary = typedValue.data;
+
+        res = context.getResources().getIdentifier("colorOnPrimary", "attr", context.getPackageName());
+        theme.resolveAttribute(res, typedValue, true);
+        int colorOnPrimary = typedValue.data;
+
+        res = context.getResources().getIdentifier("colorSecondary", "attr", context.getPackageName());
+        theme.resolveAttribute(res, typedValue, true);
+        int colorSecondary = typedValue.data;
+
+        res = context.getResources().getIdentifier("colorOnSecondary", "attr", context.getPackageName());
+        theme.resolveAttribute(res, typedValue, true);
+        int colorOnSecondary = typedValue.data;
+
         if(position%2==0){
 
             ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,  LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -63,7 +84,10 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
 
             constraintSet.applyTo(holder.constraintLayout);
 
-            holder.cardView.setCardBackgroundColor(Color.rgb(245,245,245));
+            holder.cardView.setCardBackgroundColor(colorSecondary);
+
+            TextView textView = holder.cardView.findViewById(R.id.msg_text);
+            textView.setTextColor(colorOnSecondary);
 
 
         }else{
@@ -83,8 +107,10 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
 
             constraintSet.applyTo(holder.constraintLayout);
 
-            holder.cardView.setCardBackgroundColor(Color.rgb(255,192,203));
+            holder.cardView.setCardBackgroundColor(colorPrimary);
 
+            TextView textView = holder.cardView.findViewById(R.id.msg_text);
+            textView.setTextColor(colorOnPrimary);
 
         }
 

@@ -163,12 +163,12 @@ public class WebUtils {
 
             @Override
             public void onError(Throwable t) {
-
+                if (callback!=null) { callback.onError(t);}
             }
 
             @Override
             public void onFailure(JSONObject json) {
-
+                if (callback!=null){ callback.onFailure(json);}
             }
         };
 
@@ -181,12 +181,12 @@ public class WebUtils {
 
             @Override
             public void onError(Throwable t) {
-
+                if (callback!=null) { callback.onError(t);}
             }
 
             @Override
             public void onFailure(JSONObject json) {
-
+                if (callback!=null){ callback.onFailure(json);}
             }
         };
         if (requireLogin && !isLoggedIn()){
@@ -255,12 +255,12 @@ public class WebUtils {
 
             @Override
             public void onError(Throwable t) {
-
+                if (callback!=null) { callback.onError(t);}
             }
 
             @Override
             public void onFailure(JSONObject json) {
-
+                if (callback!=null){ callback.onFailure(json);}
             }
         };
 

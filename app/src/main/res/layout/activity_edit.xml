@@ -15,7 +15,7 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:titleTextColor="@color/white" />
+        app:titleTextColor="?attr/colorOnPrimary" />
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -88,7 +88,8 @@
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0">
+                    app:layout_constraintVertical_bias="1.0"
+                    android:contentDescription="Attached">
 
                     <ImageView
                         android:id="@+id/send_photo_view"
@@ -113,7 +114,8 @@
                     app:layout_constraintHorizontal_bias="0.157"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.997" />
+                    app:layout_constraintVertical_bias="1"
+                    android:contentDescription="Attach video"/>
 
                 <ImageButton
                     android:id="@+id/photo_button"
@@ -129,7 +131,8 @@
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0" />
+                    app:layout_constraintVertical_bias="1.0"
+                    android:contentDescription="Attach image"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

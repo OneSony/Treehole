@@ -1,0 +1,27 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="账户"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="profile_photo"
+            app:title="修改头像"
+            app:useSimpleSummaryProvider="false" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="password"
+            app:title="修改密码"
+            app:useSimpleSummaryProvider="false" />
+
+        <Preference
+            app:key="login_out"
+            app:iconSpaceReserved="false"
+            app:title="退出登录" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
