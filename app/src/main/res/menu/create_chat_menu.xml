@@ -3,10 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_add_chat"
-        android:icon="@drawable/new_chat_white"
+        android:id="@+id/action_create_chat_search"
+        android:icon="@drawable/search"
         android:title="search"
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
-
 </menu>

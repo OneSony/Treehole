@@ -6,9 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -74,6 +76,44 @@ public class ChatFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.chat_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem searchItem = menu.findItem(R.id.action_add_chat);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setQueryHint("输入用户名");
+        searchView.setIconifiedByDefault(true);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // 处理搜索提交事件
+                Intent intent = new Intent(getActivity(), SearchUserActivity.class);
+                intent.putExtra("QUERY",query);
+                startActivity(intent);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // 处理搜索框文本变化事件
+                // 这里可以根据 newText 进行实时搜索或过滤操作
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+/*
+        // 处理菜单项的点击事件
+        if(item.getItemId() == R.id.action_chat_add){
+            Intent intent = new Intent(getActivity(), CreateChatActivity.class);
+            startActivity(intent);
+
+            return true;
+        }*/
+        return super.onOptionsItemSelected(item);
     }
 
 
