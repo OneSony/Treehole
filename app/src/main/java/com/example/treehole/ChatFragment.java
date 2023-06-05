@@ -28,8 +28,6 @@ public class ChatFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ChatListAdapter adapter;
-    private dot_list data_list;
-    private application app;
     public ChatFragment() {
         // Required empty public constructor
     }

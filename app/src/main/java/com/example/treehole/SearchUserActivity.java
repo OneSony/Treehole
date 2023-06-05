@@ -1,15 +1,24 @@
 package com.example.treehole;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.SearchView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchUserActivity extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private SearchUserListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,10 +30,36 @@ public class SearchUserActivity extends AppCompatActivity {
         bar.setDisplayHomeAsUpEnabled(true);
 
         String query=getIntent().getStringExtra("QUERY");
-        if (query != null) {
-            TextView textView=findViewById(R.id.test_textview);
-            textView.setText(query);
-        }
+
+
+        recyclerView=findViewById(R.id.search_user_recyclerview);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),DividerItemDecoration.VERTICAL));
+
+        adapter=new SearchUserListAdapter(getApplicationContext());
+        adapter.setOnItemClickListener(new SearchUserListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(String username) {
+                Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("USERNAME", username);
+                intent.putExtra("BUNDLE_DATA", bundle);
+                startActivity(intent);
+            }
+        });
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+
+        //测试数据！！！！
+        List<SearchUserResult> searchUserResults=new ArrayList<>();
+        searchUserResults.add(new SearchUserResult(query+"1","?"));
+        searchUserResults.add(new SearchUserResult(query+"2","?"));
+        searchUserResults.add(new SearchUserResult(query+"3","?"));
+
+        adapter.setSearchUserResults(searchUserResults);
+        adapter.notifyDataSetChanged();
+
+
 
         SearchView searchView = findViewById(R.id.search_user_searchview);
         searchView.setQuery(query, false);
@@ -32,8 +67,14 @@ public class SearchUserActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // 处理搜索提交事件
-                TextView textView=findViewById(R.id.test_textview);
-                textView.setText(query);
+
+                //测试数据！！！！
+                List<SearchUserResult> searchUserResults=new ArrayList<>();
+                searchUserResults.add(new SearchUserResult(query+"1","?"));
+                searchUserResults.add(new SearchUserResult(query+"2","?"));
+                searchUserResults.add(new SearchUserResult(query+"3","?"));
+                adapter.setSearchUserResults(searchUserResults);
+                adapter.notifyDataSetChanged();
                 return true;
             }
 
