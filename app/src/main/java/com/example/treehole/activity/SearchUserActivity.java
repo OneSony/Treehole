@@ -2,8 +2,10 @@ package com.example.treehole.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -17,6 +19,11 @@ import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
 import com.example.treehole.SearchUserListAdapter;
 import com.example.treehole.SearchUserResult;
+import com.example.treehole.WebUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,10 +76,11 @@ public class SearchUserActivity extends AppCompatActivity {
 
         //测试数据！！！！
         List<SearchUserResult> searchUserResults=new ArrayList<>();
-        searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
+        /*searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
 
         adapter.setSearchUserResults(searchUserResults);
-        adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();*/
+        searchAndInsert(query, searchUserResults, adapter);
 
 
 
@@ -85,9 +93,9 @@ public class SearchUserActivity extends AppCompatActivity {
 
                 //测试数据！！！！
                 List<SearchUserResult> searchUserResults=new ArrayList<>();
-                searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
-                adapter.setSearchUserResults(searchUserResults);
-                adapter.notifyDataSetChanged();
+                //searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
+                searchAndInsert(query, searchUserResults, adapter);
+
                 return true;
             }
 
@@ -108,5 +116,46 @@ public class SearchUserActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void searchAndInsert(String query, List<SearchUserResult> listContainer, SearchUserListAdapter adapter) {
+        Log.d("GET", "HEERE");
+        WebUtils.sendGet("/users/find_users?username="+query, false, new WebUtils.WebCallback() {
+
+            @Override
+            public void onSuccess(JSONObject json) {
+                try {
+                    JSONArray users = json.getJSONArray("message");
+                    for (int i = 0; i < users.length(); i++) {
+                        JSONObject user = users.getJSONObject(i);
+                        String user_id = user.getString("user_id");
+                        String username = user.getString("username");
+                        String profile_picture = user.isNull("profile_picture") ? "" : user.getString("profile_picture");
+                        listContainer.add(new SearchUserResult(user_id, username, profile_picture));
+                    }
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            adapter.setSearchUserResults(listContainer);
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    Log.e("SEARCHUSERACTIVITY", "ERROR: "+e.getMessage());
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("SEARCHUSERACTIVITY", "ERROR: "+t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+
+                Log.e("SEARCHUSERACTIVITY", "FAILURE: "+json.optString("message", "onFailure"));
+            }
+        });
     }
 }
