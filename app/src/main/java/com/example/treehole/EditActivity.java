@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -24,9 +23,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -56,6 +59,72 @@ public class EditActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.edit_toolbar));
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
+
+
+        RecyclerView recyclerView = findViewById(R.id.photo_recyclerview);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3)); // 设置网格布局，3表示每行显示的列数
+
+// 创建适配器并设置给RecyclerView
+        PhotoListAdapter adapter = new PhotoListAdapter(); // 替换为您自己的适配器和数据
+        recyclerView.setAdapter(adapter);
+
+
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
+
+            @Override
+            public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
+
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    // 在拖动开始时应用动画效果
+                    viewHolder.itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(200).start();
+                }
+            }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+
+                // 在拖动结束后清除动画效果
+                viewHolder.itemView.animate().scaleX(1f).scaleY(1f).setDuration(200).start();
+
+            }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+                int swipeFlags = 0;
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+
+                // 处理项目移动事件
+                adapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                // 处理项目滑动事件（如果需要）
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true; // 允许长按拖动
+            }
+        };
+
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        adapter.addUris(Uri.parse("1"));
+
+
+
+
 
         topicInputLayout=findViewById(R.id.topic_input);
         textInputLayout=findViewById(R.id.text_input);
