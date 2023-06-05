@@ -83,7 +83,7 @@ public class ChatFragment extends Fragment {
         nodes.add(new MessageNode(0,"msg3 from user2"));
         nodes.add(new MessageNode(1,"msg4 from user1"));
 
-        viewModel.insert(new Message("USER1",nodes));
+        //viewModel.insert(new Message("USER1",nodes));
 
 
 
