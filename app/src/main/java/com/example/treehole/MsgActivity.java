@@ -1,8 +1,10 @@
 package com.example.treehole;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -36,6 +38,8 @@ public class MsgActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private MsgListAdapter adapter;
+
+    private String username="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +76,8 @@ public class MsgActivity extends AppCompatActivity {
         message.observe(this, message1 -> {
             if (message1 != null) {
                 List<MessageNode> messageNodes=message1.getNodes();
-                bar.setTitle(message1.getUser());
+                username=message1.getUser();
+                bar.setTitle(username);
                 adapter.setMessageNodes(messageNodes);
                 adapter.notifyDataSetChanged();
             }
@@ -201,7 +206,23 @@ public class MsgActivity extends AppCompatActivity {
                 this.finish();
                 // 结束
                 return true;
+
+            case R.id.action_person_page:
+                if(!username.equals("")) {
+                    Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("USERNAME", username);
+                    intent.putExtra("BUNDLE_DATA", bundle);
+                    startActivity(intent);
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.msg_menu, menu);
+        return true;
     }
 }

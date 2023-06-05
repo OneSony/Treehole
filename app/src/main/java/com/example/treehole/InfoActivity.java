@@ -1,5 +1,6 @@
 package com.example.treehole;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -39,6 +40,19 @@ public class InfoActivity extends AppCompatActivity {
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
 
+
+        profile_photo = findViewById(R.id.profile);
+        profile_photo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("USERNAME", "UNKNOWN");
+                intent.putExtra("BUNDLE_DATA", bundle);
+                startActivity(intent);
+            }
+        });
+
         Bundle bundle=getIntent().getBundleExtra("BUNDLE_DATA");
         if (bundle != null) {
             curr_data = (dot) bundle.getSerializable("DATA");
@@ -52,7 +66,6 @@ public class InfoActivity extends AppCompatActivity {
             photo2 = findViewById(R.id.photo2);
             photo3 = findViewById(R.id.photo3);
 
-            profile_photo = findViewById(R.id.profile);
 
 
             topic_box.setText(curr_data.getTopic());
