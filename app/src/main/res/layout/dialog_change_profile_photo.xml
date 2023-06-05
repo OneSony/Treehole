@@ -20,7 +20,7 @@
             app:cardElevation="0dp">
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/change_profile_photo"
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 app:srcCompat="@drawable/photo2" />

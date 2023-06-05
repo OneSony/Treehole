@@ -1,19 +1,15 @@
 package com.example.treehole;
 
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -33,7 +29,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class EditActivity extends AppCompatActivity {
 
@@ -43,10 +41,10 @@ public class EditActivity extends AppCompatActivity {
     private CardView cardView;
     private ImageButton photoButton;
 
+    PhotoListAdapter adapter;
+
     private SharedPreferences mPreferences;
     private String sharedPrefFile ="com.example.android.Treehole";
-
-    private String photo_path="";
 
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
@@ -65,7 +63,7 @@ public class EditActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3)); // 设置网格布局，3表示每行显示的列数
 
 // 创建适配器并设置给RecyclerView
-        PhotoListAdapter adapter = new PhotoListAdapter(); // 替换为您自己的适配器和数据
+        adapter = new PhotoListAdapter(); // 替换为您自己的适配器和数据
         recyclerView.setAdapter(adapter);
 
 
@@ -115,76 +113,101 @@ public class EditActivity extends AppCompatActivity {
                 return true; // 允许长按拖动
             }
         };
-
-
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter.addUris(Uri.parse("1"));
-        adapter.addUris(Uri.parse("2"));
-        adapter.addUris(Uri.parse("3"));
-        adapter.addUris(Uri.parse("4"));
+        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            GestureDetector gestureDetector = new GestureDetector(getApplicationContext(), new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    // 处理单击事件
+                    View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (childView != null) {
+                        int position = recyclerView.getChildAdapterPosition(childView);
+                        // 处理点击位置的操作
+                    }
+                    return true;
+                }
 
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    // 处理双击事件
+                    View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (childView != null) {
+                        int position = recyclerView.getChildAdapterPosition(childView);
+                        // 处理双击位置的操作
+                        Toast.makeText(EditActivity.this, "双击了第" + position + "个项目", Toast.LENGTH_SHORT).show();
+                        adapter.deleteItem(position);
+                    }
+                    return true;
+                }
+            });
 
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+                gestureDetector.onTouchEvent(e);
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+                // 不做任何操作
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+                // 不做任何操作
+            }
+        });
 
 
 
         topicInputLayout=findViewById(R.id.topic_input);
         textInputLayout=findViewById(R.id.text_input);
-        photoView=findViewById(R.id.send_photo_view);
         photoButton= (ImageButton) findViewById(R.id.photo_button);
 
         pickMedia = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(3), uris -> {
                     // Callback is invoked after the user selects a media item or closes the
                     // photo picker.
                     if (uris.size() != 0) {
-                        photoView.setImageURI(uris.get(0));
-                        cardView.setVisibility(View.VISIBLE);
-                        photo_path="NULL";
-                        /*Uri photoUri = uri;
-                        Log.d("PHOTO",String.valueOf(photoUri));
-                        //photoView.setImageURI(photoUri);
 
-                        String[] projection = {MediaStore.Images.Media.DATA};
-                        Cursor cursor = getContentResolver().query(photoUri, projection, null, null, null);
-                        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                        cursor.moveToFirst();
-                        photo_path = cursor.getString(column_index);
-                        cursor.close();
+                        for(int i=0;i<uris.size();i++){
+                            getContentResolver().takePersistableUriPermission(uris.get(i), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            adapter.addUris(uris.get(i));
+                        }
 
-                        File imgFile = new File(photo_path);
-                        if(imgFile.exists()){
-                            Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                            photoView.setImageBitmap(bitmap);
-                            cardView.setVisibility(View.VISIBLE);
-                        }*/
-                        Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
+                        //Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
                         Log.d("PhotoPicker", "Selected URI: " + uris.get(0));
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                     }
                 });
 
-        cardView=findViewById(R.id.send_card_view);
-        cardView.setVisibility(View.GONE);
+
+
         mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
 
         if(mPreferences.getBoolean("SEND_EXIT",true)==false) {//异常退出恢复
             String topic = mPreferences.getString("TOPIC_STR", "");
             String text = mPreferences.getString("TEXT_STR", "");
-            photo_path = mPreferences.getString("PHOTO_PATH","");
+            String uris_str = mPreferences.getString("URIS", "");
 
-            if(!topic.equals("") || !text.equals("")|| !photo_path.equals("")){
+
+            if(!topic.equals("") || !text.equals("")|| !uris_str.equals("")){
                 topicInputLayout.getEditText().setText(topic);
                 textInputLayout.getEditText().setText(text);
 
-                if(!photo_path.equals("")){
-                    File imgFile = new File(photo_path);
-                    if(imgFile.exists()){
-                        Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                        photoView.setImageBitmap(bitmap);
-                        cardView.setVisibility(View.VISIBLE);
+                if(!uris_str.equals("")) {
+                    List<String> uris_str_list = new ArrayList<>(Arrays.asList(uris_str.split(",")));
+
+                    List<Uri> uris = new ArrayList<>();
+
+                    for (String urlString : uris_str_list) {
+                        Uri uri = Uri.parse(urlString);
+                        uris.add(uri);
                     }
+
+                    adapter.setUris(uris);
                 }
 
                 Toast toast=Toast.makeText(this,"已恢复草稿",Toast.LENGTH_SHORT);
@@ -237,69 +260,6 @@ public class EditActivity extends AppCompatActivity {
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageAndVideo.INSTANCE)
                 .build());
 
-
-        /*
-        Intent intent = new Intent(Intent.ACTION_PICK, null);
-        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-        startActivityForResult(intent, 0);*/
-
-        //API 33
-        /*Intent intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
-        startActivityForResult(intent, 0);*/
-
-        /*Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "选择照片"), 0);*/
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
-
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK) {
-            // Handle error
-            return;
-        }
-
-        switch (requestCode) {
-            case 0:
-
-
-                /*
-                Uri selectedImageUri = getPermanentUri(data.getData());
-
-                try {
-                    Log.d("PHOTO",String.valueOf(selectedImageUri));
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
-                    photoView.setImageBitmap(bitmap);
-                    cardView.setVisibility(View.VISIBLE);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                */
-
-
-                Uri photoUri = data.getData();
-                Log.d("PHOTO",String.valueOf(photoUri));
-                //photoView.setImageURI(photoUri);
-
-                String[] projection = {MediaStore.Images.Media.DATA};
-                Cursor cursor = getContentResolver().query(photoUri, projection, null, null, null);
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                photo_path = cursor.getString(column_index);
-                cursor.close();
-
-                File imgFile = new File(photo_path);
-                if(imgFile.exists()){
-                    Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    photoView.setImageBitmap(bitmap);
-                    cardView.setVisibility(View.VISIBLE);
-                }
-
-                return;
-        }
     }
 
     @Override
@@ -308,11 +268,16 @@ public class EditActivity extends AppCompatActivity {
 
         String topic=topicInputLayout.getEditText().getText().toString();
         String text=textInputLayout.getEditText().getText().toString();
+        String uris_str="";
+
+        if(adapter!=null){
+            uris_str = TextUtils.join(",", adapter.getUris());
+        }
 
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putString("TOPIC_STR", topic);
         preferencesEditor.putString("TEXT_STR", text);
-        preferencesEditor.putString("PHOTO_PATH", photo_path);
+        preferencesEditor.putString("URIS", uris_str);
         preferencesEditor.apply();
 
         /*if(mPreferences.getBoolean("SEND_EXIT",false)!=true&&(topic.length()!=0||text.length()!=0)){//发送完了true就不需要保存了
@@ -343,14 +308,7 @@ public class EditActivity extends AppCompatActivity {
             return false;
         }
 
-        application app=(application) getApplication();
-        if(!photo_path.equals("")) {
-            app.data_list.insert(topicInputLayout.getEditText().getText().toString(), textInputLayout.getEditText().getText().toString(), "我", app.getID("user1"),photo_path);
-            //app.data_list.insert(topicInputLayout.getEditText().getText().toString(), textInputLayout.getEditText().getText().toString(), "我", app.getID("user1"));
 
-        }else{
-            app.data_list.insert(topicInputLayout.getEditText().getText().toString(), textInputLayout.getEditText().getText().toString(), "我", app.getID("user1"));
-        }
 
         Toast toast=Toast.makeText(this,"已发布",Toast.LENGTH_SHORT);
         toast.show();
@@ -365,29 +323,8 @@ public class EditActivity extends AppCompatActivity {
 
     public void delete_click(View view) {
         cardView.setVisibility(View.GONE);
-        photo_path="";
-        photoView.setImageBitmap(null);
+        //photo_path="";
+        //photoView.setImageBitmap(null);
     }
-
-    public static String getRealPathFromUri(Context context, Uri uri) {
-        ContentResolver contentResolver = context.getContentResolver();
-        String[] projection = {MediaStore.MediaColumns.DATA};
-        Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(uri, projection, null, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                return cursor.getString(columnIndex);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return null;
-    }
-
 }
 

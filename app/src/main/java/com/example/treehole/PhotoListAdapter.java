@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull PhotoViewHolder holder, int position) {
         holder.textView.setText(uris.get(position).toString());
+        holder.imageView.setImageURI(uris.get(position));
     }
 
     @Override
@@ -46,6 +48,7 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoViewHolder>{
         notifyDataSetChanged();
     }
 
+
     public void addUris(Uri uri){
         this.uris.add(uri);
         notifyDataSetChanged();
@@ -56,16 +59,32 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoViewHolder>{
         uris.add(toPosition, uris.remove(fromPosition));
         notifyItemMoved(fromPosition, toPosition);
     }
+
+    public List<String> getUris(){
+        List<String> urls=new ArrayList<>();
+        for(Uri uri:uris){
+            urls.add(uri.toString());
+        }
+        return urls;
+    }
+
+    public void deleteItem(int position){
+        uris.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position,uris.size()-position);
+    }
 }
 
 class PhotoViewHolder extends RecyclerView.ViewHolder{
 
     public TextView textView;
+    public ImageView imageView;
 
     public PhotoViewHolder(@NonNull View itemView) {
         super(itemView);
 
         textView=itemView.findViewById(R.id.test_textview2);
+        imageView=itemView.findViewById(R.id.edit_photo);
 
     }
 }
