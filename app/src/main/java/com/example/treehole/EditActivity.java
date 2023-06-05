@@ -121,6 +121,9 @@ public class EditActivity extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         adapter.addUris(Uri.parse("1"));
+        adapter.addUris(Uri.parse("2"));
+        adapter.addUris(Uri.parse("3"));
+        adapter.addUris(Uri.parse("4"));
 
 
 
