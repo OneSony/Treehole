@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.treehole.R;
+import com.example.treehole.dot;
 
 public class InfoActivity extends AppCompatActivity {
     private TextView topic_box;

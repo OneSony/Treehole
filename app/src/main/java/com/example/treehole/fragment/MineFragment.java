@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+
+import com.example.treehole.activity.FollowerActivity;
+import com.example.treehole.activity.LoginActivity;
+import com.example.treehole.R;
+import com.example.treehole.activity.SettingsActivity;
+import com.example.treehole.WebUtils;
 
 
 public class MineFragment extends Fragment {

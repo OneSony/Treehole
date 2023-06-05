@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,11 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.ChatListAdapter;
+import com.example.treehole.ChatViewModel;
+import com.example.treehole.R;
+import com.example.treehole.activity.MsgActivity;
+import com.example.treehole.activity.SearchUserActivity;
 import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageNode;
 
@@ -28,6 +33,8 @@ public class ChatFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ChatListAdapter adapter;
+
+    private Menu menu;
     public ChatFragment() {
         // Required empty public constructor
     }
@@ -76,7 +83,7 @@ public class ChatFragment extends Fragment {
         nodes.add(new MessageNode(0,"msg3 from user2"));
         nodes.add(new MessageNode(1,"msg4 from user1"));
 
-        //viewModel.insert(new Message("USER1",nodes));
+        //viewModel.insert(new Message("USERID1","USER1",nodes));
 
 
 
@@ -94,6 +101,7 @@ public class ChatFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        this.menu=menu;
         inflater.inflate(R.menu.chat_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
@@ -145,5 +153,18 @@ public class ChatFragment extends Fragment {
 
         startActivity(intent);
     }
-}
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // 取消菜单项的选中状态
+        MenuItem menuItem = menu.findItem(R.id.action_add_chat);
+        menuItem.setChecked(false);
+        menuItem.collapseActionView();
+
+        // 关闭搜索框
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.clearFocus();
+    }
+}

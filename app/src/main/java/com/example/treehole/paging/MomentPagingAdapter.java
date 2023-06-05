@@ -15,7 +15,7 @@ import androidx.paging.PagingDataAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.treehole.InfoActivity;
+import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.R;
 import com.example.treehole.room.Moment;
 

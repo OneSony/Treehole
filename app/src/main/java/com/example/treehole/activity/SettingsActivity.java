@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +15,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.example.treehole.R;
+import com.example.treehole.WebUtils;
+import com.example.treehole.activity.LoginActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 

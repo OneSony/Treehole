@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.os.Bundle;
 
@@ -8,9 +8,11 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.R;
+import com.example.treehole.application;
+import com.example.treehole.dot_list;
+import com.example.treehole.dot_list_adapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import me.pushy.sdk.Pushy;
 
 public class MainActivity extends AppCompatActivity {
     //private dot_list data_list=new dot_list();
@@ -45,4 +47,5 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
 
     }*/
+
 }

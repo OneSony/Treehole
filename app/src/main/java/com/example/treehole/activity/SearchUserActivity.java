@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,12 +8,19 @@ import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.ChatViewModel;
+import com.example.treehole.R;
+import com.example.treehole.SearchUserListAdapter;
+import com.example.treehole.SearchUserResult;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class SearchUserActivity extends AppCompatActivity {
 
@@ -24,6 +31,8 @@ public class SearchUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_user);
+
+        ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
         setSupportActionBar(findViewById(R.id.search_user_toolbar));
         ActionBar bar=getSupportActionBar();
@@ -38,11 +47,19 @@ public class SearchUserActivity extends AppCompatActivity {
         adapter=new SearchUserListAdapter(getApplicationContext());
         adapter.setOnItemClickListener(new SearchUserListAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(String username) {
-                Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+            public void onItemClick(String user_id,String username) throws ExecutionException, InterruptedException {
+                //Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+
+                Intent intent = new Intent(getApplicationContext(), MsgActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("USERNAME", username);
-                intent.putExtra("BUNDLE_DATA", bundle);
+
+
+                bundle.putSerializable("DATA",viewModel.searchMessage(user_id,username));
+                intent.putExtra("BUNDLE_DATA",bundle);
+
+                /*
+                bundle.putString("USERNAME", user_id);
+                intent.putExtra("BUNDLE_DATA", bundle);*/
                 startActivity(intent);
             }
         });
@@ -52,9 +69,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
         //测试数据！！！！
         List<SearchUserResult> searchUserResults=new ArrayList<>();
-        searchUserResults.add(new SearchUserResult(query+"1","?"));
-        searchUserResults.add(new SearchUserResult(query+"2","?"));
-        searchUserResults.add(new SearchUserResult(query+"3","?"));
+        searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
 
         adapter.setSearchUserResults(searchUserResults);
         adapter.notifyDataSetChanged();
@@ -70,9 +85,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
                 //测试数据！！！！
                 List<SearchUserResult> searchUserResults=new ArrayList<>();
-                searchUserResults.add(new SearchUserResult(query+"1","?"));
-                searchUserResults.add(new SearchUserResult(query+"2","?"));
-                searchUserResults.add(new SearchUserResult(query+"3","?"));
+                searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
                 adapter.setSearchUserResults(searchUserResults);
                 adapter.notifyDataSetChanged();
                 return true;

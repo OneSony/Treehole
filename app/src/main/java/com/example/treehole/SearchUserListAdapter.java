@@ -13,11 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class SearchUserListAdapter extends RecyclerView.Adapter<SearchUserViewHolder>{
 
     public interface OnItemClickListener {
-        void onItemClick(String username);
+        void onItemClick(String user_id,String username) throws ExecutionException, InterruptedException;
     }
 
     private OnItemClickListener mOnItemClickListener;
@@ -44,7 +45,13 @@ public class SearchUserListAdapter extends RecyclerView.Adapter<SearchUserViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                mOnItemClickListener.onItemClick(searchUserResults.get(position).getUsername());
+                try {
+                    mOnItemClickListener.onItemClick(searchUserResults.get(position).getUser_id(),searchUserResults.get(position).getUsername());
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
             }
         });

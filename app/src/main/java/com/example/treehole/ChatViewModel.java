@@ -39,4 +39,8 @@ public class ChatViewModel extends AndroidViewModel {
     public void addMessageNode(int index, MessageNode messageNode) {
         mRepository.addMessageNode(index, messageNode);
     }
+
+    public int searchMessage(String user_id,String username) throws ExecutionException, InterruptedException {
+        return mRepository.searchMessage(user_id,username);
+    }
 }

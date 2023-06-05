@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +19,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.ChatViewModel;
+import com.example.treehole.MsgListAdapter;
+import com.example.treehole.R;
+import com.example.treehole.WebUtils;
 import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageNode;
 import com.google.android.material.textfield.TextInputLayout;
@@ -76,7 +80,7 @@ public class MsgActivity extends AppCompatActivity {
         message.observe(this, message1 -> {
             if (message1 != null) {
                 List<MessageNode> messageNodes=message1.getNodes();
-                username=message1.getUser();
+                username=message1.getUsername();
                 bar.setTitle(username);
                 adapter.setMessageNodes(messageNodes);
                 adapter.notifyDataSetChanged();
@@ -199,17 +203,23 @@ public class MsgActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent;
         switch (item.getItemId()){
             // android.R.id.home 这个是获取ids.xml页面的返回箭头，项目自带的，要加上android
+
             case android.R.id.home:
                 // 返回
-                this.finish();
+                //this.finish();
                 // 结束
+
+                intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 return true;
 
             case R.id.action_person_page:
                 if(!username.equals("")) {
-                    Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+                    intent = new Intent(getApplicationContext(), PersonActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("USERNAME", username);
                     intent.putExtra("BUNDLE_DATA", bundle);

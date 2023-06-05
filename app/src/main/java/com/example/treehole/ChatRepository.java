@@ -39,6 +39,10 @@ public class ChatRepository {
         new insertNodeAsyncTask(messageDao, index, messageNode).execute();
     }
 
+    public int searchMessage(String user_id,String username) throws ExecutionException, InterruptedException {
+        return new searchAsyncTask(messageDao,user_id,username).execute().get();
+    }
+
     private static class insertAsyncTask extends AsyncTask<Message,Void,Void> {
         private MessageDao mAsyncTaskDao;
 
@@ -85,6 +89,23 @@ public class ChatRepository {
 
             mAsyncTaskDao.addMessageNode(index,messageNode);
             return null;
+        }
+    }
+
+    private static class searchAsyncTask extends AsyncTask<Void,Void,Integer> {
+        private MessageDao mAsyncTaskDao;
+        private String user_id;
+        private String username;
+
+        searchAsyncTask(MessageDao dao,String user_id,String username){
+            mAsyncTaskDao=dao;
+            this.user_id=user_id;
+            this.username=username;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return mAsyncTaskDao.searchAndCreateMessage(user_id,username);
         }
     }
 

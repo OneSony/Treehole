@@ -21,29 +21,29 @@
         android:theme="@style/Theme.Treehole"
         tools:targetApi="31">
         <activity
-            android:name=".SearchUserActivity"
+            android:name=".activity.SearchUserActivity"
             android:exported="false" />
         <activity
-            android:name=".CreateChatActivity"
+            android:name=".activity.CreateChatActivity"
             android:exported="false" />
         <activity
-            android:name=".FollowerActivity"
+            android:name=".activity.FollowerActivity"
             android:exported="false" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activity.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".PersonActivity"
+            android:name=".activity.PersonActivity"
             android:exported="false" />
         <activity
-            android:name=".MsgActivity"
+            android:name=".activity.MsgActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activity.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,14 +52,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditActivity"
+            android:name=".activity.EditActivity"
             android:exported="false" />
         <activity
-            android:name=".InfoActivity"
+            android:name=".activity.InfoActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activity.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true">
 
             <!--

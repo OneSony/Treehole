@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.treehole.activity.EditActivity;
+import com.example.treehole.R;
+import com.example.treehole.application;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 

@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.treehole.MainViewModel;
+import com.example.treehole.activity.InfoActivity;
+import com.example.treehole.R;
+import com.example.treehole.application;
+import com.example.treehole.dot_list;
 import com.example.treehole.paging.MomentPagingAdapter;
 import com.example.treehole.room.Moment;
 

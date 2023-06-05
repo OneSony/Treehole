@@ -12,14 +12,18 @@ public class Message implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public int index;
 
-    @ColumnInfo(name="user")
-    private String user;
+    @ColumnInfo(name="user_id")
+    private String user_id;
+
+    @ColumnInfo(name="username")
+    private String username;
 
     @ColumnInfo(name="nodes")
     private List<MessageNode> nodes;
 
-    public Message(String user, List<MessageNode> nodes){
-        this.user=user;
+    public Message(String user_id,String username, List<MessageNode> nodes){
+        this.user_id=user_id;
+        this.username=username;
         this.nodes=nodes;
     }
 
@@ -32,8 +36,12 @@ public class Message implements Serializable {
         return nodes;
     }
 
-    public String getUser(){
-        return user;
+    public String getUser_id(){
+        return user_id;
+    }
+
+    public String getUsername(){
+        return username;
     }
 
     public void addNodes(MessageNode node){

@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +27,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.PhotoListAdapter;
+import com.example.treehole.R;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;

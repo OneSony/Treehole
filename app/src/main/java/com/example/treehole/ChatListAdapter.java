@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.room.Message;
-import com.example.treehole.room.MessageNode;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
-        holder.chat_user_box.setText(messages.get(position).getUser());
+        holder.chat_user_box.setText(messages.get(position).getUsername());
 
         int size=messages.get(position).getNodes().size();
         if(size!=0){

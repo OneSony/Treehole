@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+
+import com.example.treehole.R;
 
 //------------------暂时弃用----------------
 public class CreateChatActivity extends AppCompatActivity {

@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.treehole.MainFragment"
+        android:name="com.example.treehole.fragment.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.treehole.ChatFragment"
+        android:name="com.example.treehole.fragment.ChatFragment"
         android:label="fragment_read"
         tools:layout="@layout/fragment_chat" />
     <fragment
         android:id="@+id/mineFragment"
-        android:name="com.example.treehole.MineFragment"
+        android:name="com.example.treehole.fragment.MineFragment"
         android:label="fragment_mine"
         tools:layout="@layout/fragment_mine" />
 </navigation>
