@@ -455,7 +455,6 @@ public class WebUtils {
             public void onSuccess(JSONObject json) {
                 // Create a Request object for the GET request
                 //Log.d("SENDING GET", "Set-Cookie"+"sessionid=" + sessionDetails.getString(SESSION_ID, "")+", X-CSRFToken:"+sessionDetails.getString(CSRF_TOKEN, ""));
-
                 Request request = new Request.Builder()
                         .url(baseApiUrl+apiPath)
                         //.addHeader("Set-Cookie", "sessionid=" + sessionDetails.getString(SESSION_ID, ""))
