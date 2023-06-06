@@ -28,7 +28,7 @@ public class MainViewModel extends AndroidViewModel {
     private LiveData<List<Moment>> AllMoment;
 
     MutableLiveData<PagingData<Moment>> momentMutableLiveData=new MutableLiveData<>();
-    PagingConfig pagingConfig=new PagingConfig(3,1,false,3);//初始化配置,可以定义最大加载的数据量
+    PagingConfig pagingConfig=new PagingConfig(5,5,false,5);//初始化配置,可以定义最大加载的数据量
 
     public MainViewModel(@NonNull Application application) {
         super(application);

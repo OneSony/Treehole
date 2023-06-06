@@ -63,11 +63,11 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
             keyWords.add("");
 
             queryData.put("start", nextPageNumber);
-            queryData.put("count", 3);
+            queryData.put("count", 5);
             queryData.put("filter_by", "");
             queryData.put("key_words", keyWords);
-            queryData.put("order_by", "");
-            queryData.put("order", "asc");
+            queryData.put("order_by", "date");
+            queryData.put("order", "desc");
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

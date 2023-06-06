@@ -504,6 +504,8 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
+        Log.d("SEND","TEST");
+
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putBoolean("SEND_EXIT", true);//正常发送
         preferencesEditor.apply();
