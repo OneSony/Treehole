@@ -10,8 +10,10 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -40,16 +42,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.PhotoListAdapter;
 import com.example.treehole.R;
+import com.example.treehole.WebUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 public class EditActivity extends AppCompatActivity {
 
@@ -262,7 +273,7 @@ public class EditActivity extends AppCompatActivity {
                 // 在双击事件发生时执行关闭操作
                 // 这里可以添加您的关闭逻辑，例如停止播放、隐藏PlayerView等
                 setView(0);
-                videoUri = null;
+                videoUri=null;
                 player.release();
                 return true;
             }
@@ -277,19 +288,22 @@ public class EditActivity extends AppCompatActivity {
         });
 
 
+
+
+
         mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
 
-        if (mPreferences.getBoolean("SEND_EXIT", true) == false) {//异常退出恢复
+        if(mPreferences.getBoolean("SEND_EXIT",true)==false) {//异常退出恢复
             String topic = mPreferences.getString("TOPIC_STR", "");
             String text = mPreferences.getString("TEXT_STR", "");
             String uris_str = mPreferences.getString("URIS", "");
             selectFlag = mPreferences.getInt("SELECT_FLAG", 0);
 
-            if (!topic.equals("") || !text.equals("") || !uris_str.equals("")) {
+            if(!topic.equals("") || !text.equals("")|| !uris_str.equals("")){
                 topicInputLayout.getEditText().setText(topic);
                 textInputLayout.getEditText().setText(text);
 
-                if (!uris_str.equals("")) {
+                if(!uris_str.equals("")) {
                     List<String> uris_str_list = new ArrayList<>(Arrays.asList(uris_str.split(",")));
 
                     List<Uri> uris = new ArrayList<>();
@@ -299,10 +313,10 @@ public class EditActivity extends AppCompatActivity {
                         uris.add(uri);
                     }
 
-                    if (selectFlag == 1) {
+                    if (selectFlag==1){
                         adapter.setUris(uris);//adapter会自动更新
-                    } else if (selectFlag == 2) {
-                        videoUri = uris.get(0);//video需要提醒
+                    }else if(selectFlag==2){
+                        videoUri=uris.get(0);//video需要提醒
                         player = new ExoPlayer.Builder(getApplicationContext()).build();
                         videoView.setPlayer(player);
                         MediaItem mediaItem = MediaItem.fromUri(videoUri);
@@ -311,7 +325,7 @@ public class EditActivity extends AppCompatActivity {
                     }
                 }
 
-                Toast toast = Toast.makeText(this, "已恢复草稿", Toast.LENGTH_SHORT);
+                Toast toast=Toast.makeText(this,"已恢复草稿",Toast.LENGTH_SHORT);
                 toast.show();
             }
 
@@ -321,32 +335,6 @@ public class EditActivity extends AppCompatActivity {
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putBoolean("SEND_EXIT", false);//默认异常退出
         preferencesEditor.apply();
-
-
-        Geocoder geocoder = new Geocoder(getApplicationContext());
-
-        double latitude = 39.908860;
-        double longitude = 116.397390;
-
-        List<Address> addresses;
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (addresses != null && addresses.size() > 0) {
-            Address address = addresses.get(0);
-
-            String locality = address.getLocality(); // 城市
-            String adminArea = address.getAdminArea(); // 省/州
-            String country = address.getCountryName(); // 国家
-            Log.d("LOCATION", country);
-            // 其他地址信息...
-        }
-
-        Log.d("LOCATION", "out!");
 
 
     }
@@ -359,7 +347,7 @@ public class EditActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
+        switch (item.getItemId()){
             // android.R.id.home 这个是获取ids.xml页面的返回箭头，项目自带的，要加上android
             case android.R.id.home:
                 // 返回
@@ -367,7 +355,7 @@ public class EditActivity extends AppCompatActivity {
                 // 结束
                 return true;
             case R.id.action_send:
-                if (send() == true) {
+                if(send()==true){
                     this.finish();
                 }
                 return true;
@@ -377,32 +365,28 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void send_click(View view) {
-        if (send() == true) {
+        if(send()==true){
             this.finish();
         }
     }
 
     public void photo_click(View view) {
 
-        if (selectFlag == 0 || selectFlag == 1) {
+        if(selectFlag==0||selectFlag==1) {
 
             pickMedia.launch(new PickVisualMediaRequest.Builder()
                     .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                     .build());
-        } else {
-            Toast.makeText(getApplicationContext(), "已选择视频，无法同时选择照片", Toast.LENGTH_SHORT).show();
         }
 
     }
 
     public void video_click(View view) {
 
-        if (selectFlag == 0 || selectFlag == 2) {
+        if(selectFlag==0||selectFlag==2) {
             pickVideo.launch(new PickVisualMediaRequest.Builder()
                     .setMediaType(ActivityResultContracts.PickVisualMedia.VideoOnly.INSTANCE)
                     .build());
-        } else {
-            Toast.makeText(getApplicationContext(), "已选择照片，无法同时选择视频", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -411,9 +395,9 @@ public class EditActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        String topic = topicInputLayout.getEditText().getText().toString();
-        String text = textInputLayout.getEditText().getText().toString();
-        String uris_str = "";
+        String topic=topicInputLayout.getEditText().getText().toString();
+        String text=textInputLayout.getEditText().getText().toString();
+        String uris_str="";
 
         uris_str = TextUtils.join(",", getUris());
 
@@ -431,33 +415,94 @@ public class EditActivity extends AppCompatActivity {
         }*/
     }
 
-    private boolean send() {
-        String topic = topicInputLayout.getEditText().getText().toString();
-        String text = textInputLayout.getEditText().getText().toString();
+    private boolean send(){
+        String topic=topicInputLayout.getEditText().getText().toString();
+        String text=textInputLayout.getEditText().getText().toString();
 
-        if (topic.equals("") && text.equals("")) {
-            Toast toast = Toast.makeText(this, "请输入内容", Toast.LENGTH_SHORT);
+        if(topic.equals("")&&text.equals("")){
+            Toast toast=Toast.makeText(this,"请输入内容",Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
 
-        if (topic.equals("")) {
-            Toast toast = Toast.makeText(this, "请输入主题", Toast.LENGTH_SHORT);
+        if(topic.equals("")){
+            Toast toast=Toast.makeText(this,"请输入主题",Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
 
-        if (text.equals("")) {
-            Toast toast = Toast.makeText(this, "请输入正文", Toast.LENGTH_SHORT);
+        if(text.equals("")){
+            Toast toast=Toast.makeText(this,"请输入正文",Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
 
 
-        Toast toast = Toast.makeText(this, "已发布", Toast.LENGTH_SHORT);
+
+        Toast toast=Toast.makeText(this,"已发布",Toast.LENGTH_SHORT);
         toast.show();
         /*Toast toast=Toast.makeText(this,mPreferences.getString("TOPIC_STR","none"),Toast.LENGTH_SHORT);
         toast.show();*/
+
+        // Setup a multipart body
+        MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+
+        // Add title and text to it
+        RequestBody titleBody = RequestBody.create(topicInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
+        RequestBody textBody = RequestBody.create(textInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
+        requestBodyBuilder.addFormDataPart("title", null, titleBody);
+        requestBodyBuilder.addFormDataPart("text_content", null, textBody);
+
+        List<String> paths = getPaths();
+        List<File> files = new ArrayList<>();
+        for (int i = 0; i < paths.size(); i++) {
+            files.add(new File(paths.get(i)));
+        }
+        // Add image or video to it
+        if (selectFlag==1) {
+            for (int i = 0; i < files.size(); i++) {
+                RequestBody imageBody = RequestBody.create(files.get(i), MediaType.parse("image/jpeg"));
+                requestBodyBuilder.addFormDataPart("image-"+(i+1), files.get(i).getName(), imageBody);
+            }
+        }
+        if (selectFlag==2) {
+            for (int i = 0; i < files.size(); i++) {
+                RequestBody videoBody = RequestBody.create(files.get(i), MediaType.parse("video/mp4"));
+                requestBodyBuilder.addFormDataPart("video"+(i+1), files.get(i).getName(), videoBody);
+            }
+        }
+
+        WebUtils.sendPost("/posts/post/", true, requestBodyBuilder, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                try {
+                    Log.d("SUCCESS", json.getString("message"));
+                    paths.clear();
+                    files.clear();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+                paths.clear();
+                files.clear();
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                    paths.clear();
+                    files.clear();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putBoolean("SEND_EXIT", true);//正常发送
@@ -471,34 +516,34 @@ public class EditActivity extends AppCompatActivity {
         //photoView.setImageBitmap(null);
     }
 
-    public void setView(int flag) {
-        if (flag == 0) {//no data
-            selectFlag = 0;
+    public void setView(int flag){
+        if(flag==0){//no data
+            selectFlag=0;
             recyclerView.setVisibility(View.GONE);
             videoView.setVisibility(View.GONE);
-            Log.d("setView", "0");
-        } else if (flag == 1) {//photo
-            selectFlag = 1;
+            Log.d("setView","0");
+        }else if(flag==1){//photo
+            selectFlag=1;
             recyclerView.setVisibility(View.VISIBLE);
             videoView.setVisibility(View.GONE);
-            Log.d("setView", "1");
-        } else if (flag == 2) {//video
-            selectFlag = 2;
+            Log.d("setView","1");
+        }else if(flag==2){//video
+            selectFlag=2;
             recyclerView.setVisibility(View.GONE);
             videoView.setVisibility(View.VISIBLE);
-            Log.d("setView", "2");
+            Log.d("setView","2");
         }
     }
 
-    public List<String> getUris() {
-        if (selectFlag == 1) {//photo
+    public List<String> getUris(){
+        if(selectFlag==1){//photo
             return adapter.getUris();
-        } else if (selectFlag == 2) {
-            List<String> uris = new ArrayList<>();
+        }else if(selectFlag==2){
+            List<String> uris=new ArrayList<>();
             uris.add(videoUri.toString());
             return uris;
-        } else {
-            List<String> uris = new ArrayList<>();
+        }else {
+            List<String> uris=new ArrayList<>();
             return uris;
         }
     }
@@ -597,6 +642,38 @@ public class EditActivity extends AppCompatActivity {
             locationTextView.setVisibility(View.GONE);
             locationFlag = false;
             locationName="";
+        }
+    }
+
+    private String getPathFromUri(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+
+        String path = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            path = cursor.getString(columnIndex);
+            cursor.close();
+        }
+
+        return path;
+    }
+
+    // Similar to getUris, but converts uri to path first using getPathFromUri
+    public List<String> getPaths() {
+        if(selectFlag==1){//photo
+            List<String> paths = new ArrayList<>();
+            for (String uriString:adapter.getUris()) {
+                paths.add(getPathFromUri(Uri.parse(uriString)));
+            }
+            return paths;
+        }else if(selectFlag==2){
+            List<String> paths=new ArrayList<>();
+            paths.add(getPathFromUri(videoUri));
+            return paths;
+        }else {
+            List<String> uris=new ArrayList<>();
+            return uris;
         }
     }
 }

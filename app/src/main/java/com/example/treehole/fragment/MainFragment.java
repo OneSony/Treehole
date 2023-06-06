@@ -58,15 +58,17 @@ public class MainFragment extends Fragment {
         //update_data_live();
     }
 
+    /*
     public void update_data_live(){//可以换成LiveData？
 
         Fragment activeFragment = getChildFragmentManager().findFragmentByTag("f" + viewPager.getCurrentItem());
 
         if (activeFragment != null && activeFragment instanceof MainFragment_sub1) {
-            ((MainFragment_sub1) activeFragment).update_data_live();
+            //((MainFragment_sub1) activeFragment).refreshPage();
         }
 
     }
+    */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,7 +87,7 @@ public class MainFragment extends Fragment {
             public void onPageSelected(int position) {//切换回来的时候更新一下
                 ((application) getActivity().getApplication()).main_frag_pager_id=position;
                 if(position==0){
-                    update_data_live();
+                    //update_data_live();
                 }
             }
         });

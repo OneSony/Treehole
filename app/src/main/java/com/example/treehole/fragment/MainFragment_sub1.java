@@ -16,12 +16,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.treehole.MainViewModel;
+import com.example.treehole.WebUtils;
+import com.example.treehole.activity.EndlessScrollListener;
 import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.R;
 import com.example.treehole.application;
 import com.example.treehole.dot_list;
 import com.example.treehole.paging.MomentPagingAdapter;
 import com.example.treehole.room.Moment;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -35,10 +43,19 @@ public class MainFragment_sub1 extends Fragment {
     private MomentPagingAdapter adapter;
 
     private application app;
+    private MainViewModel viewModel;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.refresh();
     }
 
     @Override
@@ -49,22 +66,72 @@ public class MainFragment_sub1 extends Fragment {
 
 
 
-        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                update_data_live();
-                swipeRefreshLayout.setRefreshing(false);
+                JSONObject queryData = new JSONObject();
+                try {
+                    JsonArray keyWords = new JsonArray();
+                    keyWords.add("");
+
+                    queryData.put("start", "");
+                    queryData.put("count", 30);
+                    queryData.put("filter_by", "");
+                    queryData.put("key_words", keyWords);
+                    queryData.put("order_by", "");
+                    queryData.put("order", "asc");
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                WebUtils.sendPost("/posts/retrieve/", false, queryData, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JSONArray moments = null;
+                                refreshPage();
+                                try {
+                                    moments = json.getJSONArray("message");
+                                    for (int i = 0; i < moments.length(); i++) {
+                                        JSONObject moment = (JSONObject) moments.get(i);
+                                        String topic = moment.optString("title");
+                                        String text = moment.getString("text");
+                                        Log.d("REFRESH", topic+text);
+                                        insertMoment(new Moment(topic, text));
+                                    }
+                                    adapter.refresh();
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        Log.d("POSTRETRIEVE", t.getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        Log.d("POSTRETRIEVE", json.optString("message", "onFailure"));
+                    }
+                });
+
                 Log.d("REFRESH","YEAH!");
             }
         });
 
-        MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        viewModel.deleteAll();
+        //MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        //viewModel.deleteAll();
 
-        for(int i=0;i<2;i++){
+        /*for(int i=0;i<2;i++){
             viewModel.insert(new Moment("TOPIC "+String.valueOf(i),"TEXT "+String.valueOf(i)));
-        }
+        }*/
 
         try {
             Log.d("SIZE",String.valueOf(viewModel.getMomentCount()));
@@ -75,8 +142,67 @@ public class MainFragment_sub1 extends Fragment {
         }
 
         recyclerView=view.findViewById(R.id.recycle_box);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
 
+        // 想写一个
+        /*
+        EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page) {
+                JSONObject queryData = new JSONObject();
+                try {
+                    JsonArray keyWords = new JsonArray();
+                    keyWords.add("");
+
+                    queryData.put("start", "");
+                    queryData.put("count", 30);
+                    queryData.put("filter_by", "");
+                    queryData.put("key_words", keyWords);
+                    queryData.put("order_by", "");
+                    queryData.put("order", "asc");
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                WebUtils.sendPost("/posts/retrieve/", false, queryData, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+                        Log.d("POSTRETRIEVE", json.toString());
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                JSONArray moments = null;
+                                try {
+                                    moments = json.getJSONArray("message");
+                                    for (int i = 0; i < moments.length(); i++) {
+                                        JSONObject moment = (JSONObject) moments.get(i);
+                                        String topic = moment.optString("title");
+                                        String text = moment.getString("text");
+                                        insertMoment(new Moment(topic, text));
+                                    }
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        //swipeRefreshLayout.setRefreshing(false);
+                        Log.d("POSTRETRIEVE", t.getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        //swipeRefreshLayout.setRefreshing(false);
+                        Log.d("POSTRETRIEVE", json.optString("message", "onFailure"));
+                    }
+                });
+            }
+        };
+        recyclerView.addOnScrollListener(endlessScrollListener);
+        */
 
         adapter=new MomentPagingAdapter(getContext());
         recyclerView.setAdapter(adapter);
@@ -146,12 +272,49 @@ public class MainFragment_sub1 extends Fragment {
         startActivity(intent);
     }
 
-    public void update_data_live(){
+    public void refreshPage(){
         //app=(application)getActivity().getApplication();
         //data_list=app.data_list;
         //adapter.notifyDataSetChanged();
+        viewModel.deleteAll();
         adapter.refresh();
         recyclerView.scrollToPosition(0);
+        swipeRefreshLayout.setRefreshing(false);
         Log.d("UPDATE","UPDATA!");
     }
+
+    public void refreshPage(Moment moment){
+        viewModel.deleteAll();
+        viewModel.insert(moment);
+        adapter.refresh();
+        swipeRefreshLayout.setRefreshing(false);
+        recyclerView.scrollToPosition(0);
+    }
+
+    public void refreshPage(List<Moment> moments){
+        viewModel.deleteAll();
+        for (Moment moment: moments) {
+            viewModel.insert(moment);
+        }
+        adapter.refresh();
+        recyclerView.scrollToPosition(0);
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    public void insertMoment(Moment moment) {
+        viewModel.insert(moment);
+        //adapter.notifyDataSetChanged();
+        adapter.refresh();
+    }
+
+    public void insertMoment(List<Moment> moments) {
+        for (Moment moment: moments) {
+            viewModel.insert(moment);
+        }
+        //adapter.notifyDataSetChanged();
+        adapter.refresh();
+    }
+
+
+
 }
