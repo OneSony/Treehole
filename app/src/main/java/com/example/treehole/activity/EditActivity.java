@@ -346,6 +346,8 @@ public class EditActivity extends AppCompatActivity {
             pickMedia.launch(new PickVisualMediaRequest.Builder()
                     .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                     .build());
+        }else{
+            Toast.makeText(getApplicationContext(),"已选择视频，无法同时选择照片",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -356,6 +358,8 @@ public class EditActivity extends AppCompatActivity {
             pickVideo.launch(new PickVisualMediaRequest.Builder()
                     .setMediaType(ActivityResultContracts.PickVisualMedia.VideoOnly.INSTANCE)
                     .build());
+        }else{
+            Toast.makeText(getApplicationContext(),"已选择照片，无法同时选择视频",Toast.LENGTH_SHORT).show();
         }
 
     }
