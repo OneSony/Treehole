@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -34,12 +35,17 @@ public class SearchUserActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private SearchUserListAdapter adapter;
 
+    private TextView noDataTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_user);
 
         ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+        noDataTextView=findViewById(R.id.search_no_data);
+        noDataTextView.setVisibility(View.GONE);
 
         setSupportActionBar(findViewById(R.id.search_user_toolbar));
         ActionBar bar=getSupportActionBar();
@@ -126,19 +132,24 @@ public class SearchUserActivity extends AppCompatActivity {
             public void onSuccess(JSONObject json) {
                 try {
                     JSONArray users = json.getJSONArray("message");
-                    for (int i = 0; i < users.length(); i++) {
-                        JSONObject user = users.getJSONObject(i);
-                        String user_id = user.getString("user_id");
-                        String username = user.getString("username");
-                        String profile_picture = user.isNull("profile_picture") ? "" : user.getString("profile_picture");
-                        listContainer.add(new SearchUserResult(user_id, username, profile_picture));
-                    }
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            adapter.setSearchUserResults(listContainer);
-                            adapter.notifyDataSetChanged();
+                    if (users.length() == 0) {
+                        Log.d("ADD","NODATA");
+                    }else {
+                        for (int i = 0; i < users.length(); i++) {
+                            JSONObject user = users.getJSONObject(i);
+                            String user_id = user.getString("user_id");
+                            String username = user.getString("username");
+                            String profile_picture = user.isNull("profile_picture") ? "" : user.getString("profile_picture");
+                            listContainer.add(new SearchUserResult(user_id, username, profile_picture));
                         }
-                    });
+
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                adapter.setSearchUserResults(listContainer);
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
 
                 } catch (JSONException e) {
                     Log.e("SEARCHUSERACTIVITY", "ERROR: "+e.getMessage());

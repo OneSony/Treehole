@@ -29,6 +29,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.PhotoListAdapter;
 import com.example.treehole.R;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -48,7 +51,18 @@ public class EditActivity extends AppCompatActivity {
     private SharedPreferences mPreferences;
     private String sharedPrefFile ="com.example.android.Treehole";
 
+    private int selectFlag=0;//当前选择了照片还是视频，0无，1照片，2视频
+
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+    private ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
+
+    private PlayerView videoView;
+
+    RecyclerView recyclerView;
+
+    private Uri videoUri;
+
+    private ExoPlayer player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +74,12 @@ public class EditActivity extends AppCompatActivity {
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
 
+        videoView = findViewById(R.id.edit_video);
+        recyclerView = findViewById(R.id.photo_recyclerview);
 
-        RecyclerView recyclerView = findViewById(R.id.photo_recyclerview);
+        videoView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3)); // 设置网格布局，3表示每行显示的列数
 
 // 创建适配器并设置给RecyclerView
@@ -140,6 +158,11 @@ public class EditActivity extends AppCompatActivity {
                         // 处理双击位置的操作
                         Toast.makeText(EditActivity.this, "双击了第" + position + "个项目", Toast.LENGTH_SHORT).show();
                         adapter.deleteItem(position);
+                        if(adapter.getItemCount()==0){
+                            setView(0);
+                        }else{
+                            setView(1);
+                        }
                     }
                     return true;
                 }
@@ -168,7 +191,7 @@ public class EditActivity extends AppCompatActivity {
         textInputLayout=findViewById(R.id.text_input);
         photoButton= (ImageButton) findViewById(R.id.photo_button);
 
-        pickMedia = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(3), uris -> {
+        pickMedia = registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(9), uris -> {
                     // Callback is invoked after the user selects a media item or closes the
                     // photo picker.
                     if (uris.size() != 0) {
@@ -178,12 +201,62 @@ public class EditActivity extends AppCompatActivity {
                             adapter.addUris(uris.get(i));
                         }
 
+                        setView(1);
+
                         //Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
                         Log.d("PhotoPicker", "Selected URI: " + uris.get(0));
                     } else {
                         Log.d("PhotoPicker", "No media selected");
                     }
                 });
+
+        pickVideo = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+            // Callback is invoked after the user selects a media item or closes the
+            // photo picker.
+
+            if(uri!=null){
+
+                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                videoUri=uri;
+
+                player = new ExoPlayer.Builder(getApplicationContext()).build();
+                videoView.setPlayer(player);
+                // Build the media item.
+                MediaItem mediaItem = MediaItem.fromUri(videoUri);
+// Set the media item to be played.
+                player.setMediaItem(mediaItem);
+// Prepare the player.
+                player.prepare();
+// Start the playback.
+                //player.play();
+
+                setView(2);
+
+            } else {
+            }
+        });
+
+        final GestureDetector gestureDetector = new GestureDetector(getApplicationContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                // 在双击事件发生时执行关闭操作
+                // 这里可以添加您的关闭逻辑，例如停止播放、隐藏PlayerView等
+                setView(0);
+                videoUri=null;
+                player.release();
+                return true;
+            }
+        });
+
+// 将触摸事件分发给GestureDetector处理
+        videoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
+
+
 
 
 
@@ -193,7 +266,7 @@ public class EditActivity extends AppCompatActivity {
             String topic = mPreferences.getString("TOPIC_STR", "");
             String text = mPreferences.getString("TEXT_STR", "");
             String uris_str = mPreferences.getString("URIS", "");
-
+            selectFlag = mPreferences.getInt("SELECT_FLAG", 0);
 
             if(!topic.equals("") || !text.equals("")|| !uris_str.equals("")){
                 topicInputLayout.getEditText().setText(topic);
@@ -209,12 +282,23 @@ public class EditActivity extends AppCompatActivity {
                         uris.add(uri);
                     }
 
-                    adapter.setUris(uris);
+                    if (selectFlag==1){
+                        adapter.setUris(uris);//adapter会自动更新
+                    }else if(selectFlag==2){
+                        videoUri=uris.get(0);//video需要提醒
+                        player = new ExoPlayer.Builder(getApplicationContext()).build();
+                        videoView.setPlayer(player);
+                        MediaItem mediaItem = MediaItem.fromUri(videoUri);
+                        player.setMediaItem(mediaItem);
+                        player.prepare();
+                    }
                 }
 
                 Toast toast=Toast.makeText(this,"已恢复草稿",Toast.LENGTH_SHORT);
                 toast.show();
             }
+
+            setView(selectFlag);
         }
 
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
@@ -257,10 +341,22 @@ public class EditActivity extends AppCompatActivity {
 
     public void photo_click(View view) {
 
+        if(selectFlag==0||selectFlag==1) {
 
-        pickMedia.launch(new PickVisualMediaRequest.Builder()
-                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageAndVideo.INSTANCE)
-                .build());
+            pickMedia.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                    .build());
+        }
+
+    }
+
+    public void video_click(View view) {
+
+        if(selectFlag==0||selectFlag==2) {
+            pickVideo.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.VideoOnly.INSTANCE)
+                    .build());
+        }
 
     }
 
@@ -272,14 +368,14 @@ public class EditActivity extends AppCompatActivity {
         String text=textInputLayout.getEditText().getText().toString();
         String uris_str="";
 
-        if(adapter!=null){
-            uris_str = TextUtils.join(",", adapter.getUris());
-        }
+        uris_str = TextUtils.join(",", getUris());
 
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putString("TOPIC_STR", topic);
         preferencesEditor.putString("TEXT_STR", text);
         preferencesEditor.putString("URIS", uris_str);
+        preferencesEditor.putInt("SELECT_FLAG", selectFlag);
+
         preferencesEditor.apply();
 
         /*if(mPreferences.getBoolean("SEND_EXIT",false)!=true&&(topic.length()!=0||text.length()!=0)){//发送完了true就不需要保存了
@@ -327,6 +423,38 @@ public class EditActivity extends AppCompatActivity {
         cardView.setVisibility(View.GONE);
         //photo_path="";
         //photoView.setImageBitmap(null);
+    }
+
+    public void setView(int flag){
+        if(flag==0){//no data
+            selectFlag=0;
+            recyclerView.setVisibility(View.GONE);
+            videoView.setVisibility(View.GONE);
+            Log.d("setView","0");
+        }else if(flag==1){//photo
+            selectFlag=1;
+            recyclerView.setVisibility(View.VISIBLE);
+            videoView.setVisibility(View.GONE);
+            Log.d("setView","1");
+        }else if(flag==2){//video
+            selectFlag=2;
+            recyclerView.setVisibility(View.GONE);
+            videoView.setVisibility(View.VISIBLE);
+            Log.d("setView","2");
+        }
+    }
+
+    public List<String> getUris(){
+        if(selectFlag==1){//photo
+            return adapter.getUris();
+        }else if(selectFlag==2){
+            List<String> uris=new ArrayList<>();
+            uris.add(videoUri.toString());
+            return uris;
+        }else {
+            List<String> uris=new ArrayList<>();
+            return uris;
+        }
     }
 }
 

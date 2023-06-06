@@ -176,11 +176,14 @@
                 android:layout_marginBottom="10dp"
                 android:nestedScrollingEnabled="false" />
 
-            <VideoView
-                android:id="@+id/videoView"
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/edit_video"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="invisible" />
+                android:layout_height="200dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="15dp" />
 
         </LinearLayout>
     </ScrollView>
@@ -231,10 +234,10 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:contentDescription="Attach video"
-                    android:onClick="photo_click"
+                    android:onClick="video_click"
                     android:padding="10dp"
                     android:src="@drawable/baseline_slow_motion_video_36"
-                    android:text="相册" />
+                    android:text="视频" />
 
             </LinearLayout>
 
