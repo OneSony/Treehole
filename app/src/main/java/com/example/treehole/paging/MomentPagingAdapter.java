@@ -2,6 +2,7 @@ package com.example.treehole.paging;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.R;
+import com.example.treehole.activity.MsgActivity;
 import com.example.treehole.room.Moment;
 
 import java.util.Objects;
@@ -29,7 +31,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         super(new DiffUtil.ItemCallback<Moment>() {
             @Override
             public boolean areItemsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
-                return oldItem.m_index == newItem.m_index;
+                return oldItem.id.equals(newItem.id);
             }
 
             @Override
@@ -68,7 +70,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                     // 在这里处理项目点击事件
                     // 显示项目ID，可以通过Toast或者其他方式展示
                     Toast.makeText(view.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
-                    Intent intent=new Intent(context, InfoActivity.class);
+
+                    Intent intent = new Intent(context, InfoActivity.class);
+                    Bundle bundle=new Bundle();
+                    bundle.putSerializable("MOMENT",moment);
+                    intent.putExtra("BUNDLE_DATA",bundle);
+
                     context.startActivity(intent);
                 }
             });

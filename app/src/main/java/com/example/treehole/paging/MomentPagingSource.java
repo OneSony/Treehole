@@ -8,72 +8,91 @@ import androidx.annotation.Nullable;
 import androidx.paging.ListenableFuturePagingSource;
 import androidx.paging.PagingState;
 
+import com.example.treehole.WebUtils;
 import com.example.treehole.room.Moment;
-import com.example.treehole.room.MomentDao;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import com.google.gson.JsonArray;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class MomentPagingSource extends ListenableFuturePagingSource<Integer, Moment> {
+public class MomentPagingSource extends ListenableFuturePagingSource<String, Moment> {
     //需要用到线程池
     private ListeningExecutorService executorService= MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     String query;
-    MomentDao myDao;
+    //MomentDao myDao;
     /*public MomentPagingSource(String query){
         this.query=query;//查询内容所需参数
     }*/
 
-    public MomentPagingSource(MomentDao myDao) {
+    /*public MomentPagingSource(MomentDao myDao) {
         this.myDao = myDao;
-    }
+    }*/
 
     @NotNull
     @Override
-    public ListenableFuture<LoadResult<Integer, Moment>> loadFuture(@NotNull LoadParams<Integer> params) {
+    public ListenableFuture<LoadResult<String, Moment>> loadFuture(@NotNull LoadParams<String> params) {
 
-        Integer nextPageNumber = params.getKey();
+        String nextPageNumber = params.getKey();
         Log.d("KEY",String.valueOf(nextPageNumber));
         if (nextPageNumber == null) {
-            nextPageNumber = 1;
+            nextPageNumber = "";
         }
 
-        Log.d("NEXTPAGE", nextPageNumber.toString());
+        Log.d("NEXTPAGE","next is "+nextPageNumber);
+
+        SettableFuture<LoadResult<String, Moment>> future = SettableFuture.create();
+
+        List<Moment> moments= new ArrayList<>();
 
 
+        JSONObject queryData = new JSONObject();
+        try {
+            Log.d("NEXTPAGE","sending "+nextPageNumber);
+            JsonArray keyWords = new JsonArray();
+            keyWords.add("");
 
+            queryData.put("start", nextPageNumber);
+            queryData.put("count", 3);
+            queryData.put("filter_by", "");
+            queryData.put("key_words", keyWords);
+            queryData.put("order_by", "");
+            queryData.put("order", "asc");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        WebUtils.sendPost("/posts/retrieve/", false, queryData, new WebUtils.WebCallback() {
 
-
-        SettableFuture<LoadResult<Integer, Moment>> future = SettableFuture.create();
-
-        Integer finalNextPageNumber = nextPageNumber;
-
-        /*ListenableFuture<List<Moment>> momentsFuture = executorService.submit(() -> {
-            return myDao.getMomentsFromIndex(finalNextPageNumber);
-        });*/
-
-        ListenableFuture<List<Moment>> momentsFuture = executorService.submit(() -> {
-            List<Moment> moments = myDao.getNextMoments(finalNextPageNumber);
-            boolean reachedLastPage = moments.isEmpty(); // 检查是否已经到达最后一页
-            if (reachedLastPage) {
-                return Collections.emptyList(); // 返回空的列表表示没有更多的数据
-            } else {
-                return moments;
-            }
-        });
-
-        Futures.addCallback(momentsFuture, new FutureCallback<List<Moment>>() {
             @Override
-            public void onSuccess(@Nullable List<Moment> moments) {
-                LoadResult<Integer, Moment> result;
+            public void onSuccess(JSONObject json) {
+                JSONArray moments_json = null;
+                try {
+                    moments_json = json.getJSONArray("message");
+                    for (int i = 0; i < moments_json.length(); i++) {
+                        JSONObject moment = (JSONObject) moments_json.get(i);
+                        String topic = moment.optString("title");
+                        String text = moment.getString("text");
+                        String id = moment.getString("id");
+                        Log.d("NEXTPAGE","id "+id);
+                        moments.add(new Moment(id,topic,text));
+                    }
+                    Log.d("NEXTPAGE","we got "+moments_json.length());
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+                LoadResult<String, Moment> result;
 
                 if (moments.isEmpty()) {
                     result = new LoadResult.Page<>(Collections.emptyList(), null, null);
@@ -82,7 +101,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<Integer, Mo
                     result = new LoadResult.Page<>(
                             moments, // 当前页的数据
                             null,
-                            moments.get(moments.size() - 1).m_index,
+                            String.valueOf(moments.get(moments.size() - 1).id),
                             LoadResult.Page.COUNT_UNDEFINED,
                             LoadResult.Page.COUNT_UNDEFINED
                     );
@@ -91,10 +110,24 @@ public class MomentPagingSource extends ListenableFuturePagingSource<Integer, Mo
             }
 
             @Override
-            public void onFailure(Throwable t) {
-                future.setException(t);
+            public void onError(Throwable t) {
+                Log.d("POSTRETRIEVE", t.getMessage());
             }
-        }, executorService);
+
+            @Override
+            public void onFailure(JSONObject json) {
+                Log.d("POSTRETRIEVE", json.optString("message", "onFailure"));
+            }
+        });
+
+        /*
+        //List<Moment> moments = myDao.getNextMoments(finalNextPageNumber);
+        boolean reachedLastPage = moments.isEmpty(); // 检查是否已经到达最后一页
+        if (reachedLastPage) {
+            return Collections.emptyList(); // 返回空的列表表示没有更多的数据
+        } else {
+            return moments;
+        }*/
 
         return future;
 
@@ -136,7 +169,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<Integer, Mo
 
     @Nullable
     @Override
-    public Integer getRefreshKey(@NonNull PagingState<Integer, Moment> pagingState) {
+    public String getRefreshKey(@NonNull PagingState<String, Moment> pagingState) {
         return null;
     }
 }

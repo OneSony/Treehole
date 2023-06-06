@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.treehole.MainViewModel;
-import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.R;
+import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.application;
 import com.example.treehole.dot_list;
 import com.example.treehole.paging.MomentPagingAdapter;
@@ -59,12 +59,14 @@ public class MainFragment_sub1 extends Fragment {
             }
         });
 
+
         MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.deleteAll();
 
         for(int i=0;i<2;i++){
             viewModel.insert(new Moment("TOPIC "+String.valueOf(i),"TEXT "+String.valueOf(i)));
         }
+
 
         try {
             Log.d("SIZE",String.valueOf(viewModel.getMomentCount()));

@@ -14,7 +14,6 @@ import androidx.paging.PagingLiveData;
 
 import com.example.treehole.paging.MomentPagingSource;
 import com.example.treehole.room.Moment;
-import com.example.treehole.room.MomentDatabase;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -29,7 +28,7 @@ public class MainViewModel extends AndroidViewModel {
     private LiveData<List<Moment>> AllMoment;
 
     MutableLiveData<PagingData<Moment>> momentMutableLiveData=new MutableLiveData<>();
-    PagingConfig pagingConfig=new PagingConfig(10,10,false,10);//初始化配置,可以定义最大加载的数据量
+    PagingConfig pagingConfig=new PagingConfig(3,1,false,3);//初始化配置,可以定义最大加载的数据量
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -49,7 +48,8 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<PagingData<Moment>> getPaging(){
         CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
-        Pager<Integer, Moment> pager = new Pager<Integer, Moment>(pagingConfig, ()->new MomentPagingSource(MomentDatabase.getDatabase(getApplication().getApplicationContext()).momentDao()));//构造函数根据自己的需要来调整
+        //Pager<Integer, Moment> pager = new Pager<Integer, Moment>(pagingConfig, ()->new MomentPagingSource(MomentDatabase.getDatabase(getApplication().getApplicationContext()).momentDao()));//构造函数根据自己的需要来调整
+        Pager<String, Moment> pager = new Pager<String, Moment>(pagingConfig, ()->new MomentPagingSource());//构造函数根据自己的需要来调整
 
 
         return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager),viewModelScope);
