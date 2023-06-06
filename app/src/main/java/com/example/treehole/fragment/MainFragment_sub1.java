@@ -25,7 +25,9 @@ import com.example.treehole.dot_list;
 import com.example.treehole.paging.MomentPagingAdapter;
 import com.example.treehole.room.Moment;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,7 +55,6 @@ public class MainFragment_sub1 extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("RESUMEMOMENT", "resumed");
         adapter.refresh();
     }
 
@@ -69,7 +70,6 @@ public class MainFragment_sub1 extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Log.e("GEEASF", "gargesrh");
                 JSONObject queryData = new JSONObject();
                 try {
                     JsonArray keyWords = new JsonArray();
@@ -87,13 +87,24 @@ public class MainFragment_sub1 extends Fragment {
                 WebUtils.sendPost("/posts/retrieve/", false, queryData, new WebUtils.WebCallback() {
                     @Override
                     public void onSuccess(JSONObject json) {
-                        Log.d("POSTRETRIEVE", json.toString());
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                //viewModel.insert();
-                                refreshPage(new Moment("RETRIEVED","RETRIEVED"));
-                                //swipeRefreshLayout.setRefreshing(false);
+                                JSONArray moments = null;
+                                refreshPage();
+                                try {
+                                    moments = json.getJSONArray("message");
+                                    for (int i = 0; i < moments.length(); i++) {
+                                        JSONObject moment = (JSONObject) moments.get(i);
+                                        String topic = moment.optString("title");
+                                        String text = moment.getString("text");
+                                        Log.d("REFRESH", topic+text);
+                                        insertMoment(new Moment(topic, text));
+                                    }
+                                    adapter.refresh();
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                         });
                     }
@@ -133,6 +144,9 @@ public class MainFragment_sub1 extends Fragment {
         recyclerView=view.findViewById(R.id.recycle_box);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
+
+        // 想写一个
+        /*
         EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page) {
@@ -157,10 +171,18 @@ public class MainFragment_sub1 extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                //viewModel.insert();
-                                //refreshPage(new Moment("RETRIEVED","RETRIEVED"));
-                                //swipeRefreshLayout.setRefreshing(false);
-                                insertMoment(new Moment("RETRIEVED","RETRIEVED"));
+                                JSONArray moments = null;
+                                try {
+                                    moments = json.getJSONArray("message");
+                                    for (int i = 0; i < moments.length(); i++) {
+                                        JSONObject moment = (JSONObject) moments.get(i);
+                                        String topic = moment.optString("title");
+                                        String text = moment.getString("text");
+                                        insertMoment(new Moment(topic, text));
+                                    }
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                         });
                     }
@@ -180,7 +202,7 @@ public class MainFragment_sub1 extends Fragment {
             }
         };
         recyclerView.addOnScrollListener(endlessScrollListener);
-
+        */
 
         adapter=new MomentPagingAdapter(getContext());
         recyclerView.setAdapter(adapter);
@@ -281,14 +303,16 @@ public class MainFragment_sub1 extends Fragment {
 
     public void insertMoment(Moment moment) {
         viewModel.insert(moment);
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
+        adapter.refresh();
     }
 
     public void insertMoment(List<Moment> moments) {
         for (Moment moment: moments) {
             viewModel.insert(moment);
         }
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
+        adapter.refresh();
     }
 
 
