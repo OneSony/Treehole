@@ -78,13 +78,15 @@ public class SettingsActivity extends AppCompatActivity {
             pickImage = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                 //getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
+                if (uri != null) {
 
+                    getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                newProfilePictureUri = uri;
-                changeProfilePictureImageView.setImageURI(uri);
-                //Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
-                Log.d("PhotoPicker", "Selected URI: " + uri);
+                    newProfilePictureUri = uri;
+                    changeProfilePictureImageView.setImageURI(uri);
+                    //Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
+                    Log.d("PhotoPicker", "Selected URI: " + uri);
+                }
             });
         }
 
