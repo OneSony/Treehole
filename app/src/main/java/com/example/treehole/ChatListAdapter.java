@@ -1,8 +1,12 @@
 package com.example.treehole;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -70,11 +74,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
         }
     }
 
-    @Override
-    public void onViewRecycled(ChatViewHolder holder) {
-        // 清除 ViewHolder 中的内存
-        //holder.photo1.setImageBitmap(null);
+    public int getIndex(int position){
+        return messages.get(position).getIndex();
     }
+
+    public void deleteItem(int position){
+        messages.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position,getItemCount());
+    }
+
 
 }
 

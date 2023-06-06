@@ -12,6 +12,21 @@
             app:useSimpleSummaryProvider="false" />
 
         <Preference
+            android:key="username"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="修改用户名"
+            app:iconSpaceReserved="false"/>
+
+        <Preference
+            android:key="about"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"
+            android:title="修改个人介绍"
+            app:iconSpaceReserved="false"/>
+
+
+        <Preference
             app:iconSpaceReserved="false"
             app:key="password"
             app:title="修改密码"
@@ -21,6 +36,16 @@
             app:key="login_out"
             app:iconSpaceReserved="false"
             app:title="退出登录" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="本地信息"
+        app:iconSpaceReserved="false">
+        <Preference
+            app:key="delete_message"
+            app:iconSpaceReserved="false"
+            app:title="清空所有聊天记录" />
 
     </PreferenceCategory>
 

@@ -43,6 +43,14 @@ public class ChatRepository {
         return new searchAsyncTask(messageDao,user_id,username).execute().get();
     }
 
+    public void deleteMessageByIndex(int index){
+        new deleteIndexAsyncTask(messageDao,index).execute();
+    }
+
+    public void deleteAllMessage(){
+        new deleteAllAsyncTask(messageDao).execute();
+    }
+
     private static class insertAsyncTask extends AsyncTask<Message,Void,Void> {
         private MessageDao mAsyncTaskDao;
 
@@ -106,6 +114,37 @@ public class ChatRepository {
         @Override
         protected Integer doInBackground(Void... voids) {
             return mAsyncTaskDao.searchAndCreateMessage(user_id,username);
+        }
+    }
+
+
+    private static class deleteIndexAsyncTask extends AsyncTask<Void,Void,Void> {
+        private MessageDao mAsyncTaskDao;
+        private int index;
+
+        deleteIndexAsyncTask(MessageDao dao,int index){
+            mAsyncTaskDao=dao;
+            this.index=index;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.deleteMessageByIndex(index);
+            return null;
+        }
+    }
+
+    private static class deleteAllAsyncTask extends AsyncTask<Void,Void,Void> {
+        private MessageDao mAsyncTaskDao;
+
+        deleteAllAsyncTask(MessageDao dao){
+            mAsyncTaskDao=dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.deleteAllMessages();
+            return null;
         }
     }
 

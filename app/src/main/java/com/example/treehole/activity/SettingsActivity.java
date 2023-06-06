@@ -7,20 +7,24 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
-import com.example.treehole.activity.LoginActivity;
 
 public class SettingsActivity extends AppCompatActivity {
+
+    static ChatViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,8 @@ public class SettingsActivity extends AppCompatActivity {
         ActionBar bar=getSupportActionBar();
         bar.setTitle("Settings");
         bar.setDisplayHomeAsUpEnabled(true);
+
+        viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
@@ -86,6 +92,76 @@ public class SettingsActivity extends AppCompatActivity {
                     return false;
                 }
             });
+
+            findPreference("username").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("修改用户名");
+
+                    // 创建一个 EditText 作为对话框中的文本输入框
+                    final EditText editText = new EditText(getActivity());
+                    editText.setSingleLine(true);
+                    builder.setView(editText);
+
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String enteredText = editText.getText().toString();
+                            // 在这里获取到文本框的字符串 enteredText，并进行相应的操作
+                            Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
+                            //连接服务器！！！
+                        }
+                    });
+
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // 处理点击取消按钮的逻辑
+                        }
+                    });
+
+                    builder.show();
+
+                    return false;
+                }
+            });
+
+            findPreference("about").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("修改个人介绍");
+
+                    // 创建一个 EditText 作为对话框中的文本输入框
+                    final EditText editText = new EditText(getActivity());
+                    editText.setSingleLine(true);
+                    builder.setView(editText);
+
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String enteredText = editText.getText().toString();
+                            // 在这里获取到文本框的字符串 enteredText，并进行相应的操作
+                            Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
+                            //连接服务器！！！
+                        }
+                    });
+
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // 处理点击取消按钮的逻辑
+                        }
+                    });
+
+                    builder.show();
+
+                    return false;
+                }
+            });
+
+
 
             findPreference("password").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -145,6 +221,31 @@ public class SettingsActivity extends AppCompatActivity {
 
                                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                                     startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 处理点击取消按钮的逻辑
+                                }
+                            })
+                            .show();
+
+                    return false;
+                }
+            });
+
+            findPreference("delete_message").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("清空所有聊天记录")
+                            .setMessage("确定要清空所有聊天记录吗？")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    viewModel.deleteAllMessage();
                                 }
                             })
                             .setNegativeButton("取消", new DialogInterface.OnClickListener() {

@@ -43,4 +43,12 @@ public class ChatViewModel extends AndroidViewModel {
     public int searchMessage(String user_id,String username) throws ExecutionException, InterruptedException {
         return mRepository.searchMessage(user_id,username);
     }
+
+    public void deleteMessageByIndex(int index){
+        mRepository.deleteMessageByIndex(index);
+    }
+
+    public void deleteAllMessage(){
+        mRepository.deleteAllMessage();
+    }
 }

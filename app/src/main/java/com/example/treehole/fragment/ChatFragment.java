@@ -1,6 +1,9 @@
 package com.example.treehole.fragment;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,11 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -58,11 +63,11 @@ public class ChatFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_chat, container, false);
         setHasOptionsMenu(true);
 
+        ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
 
         recyclerView=view.findViewById(R.id.chat_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
-
         adapter=new ChatListAdapter();
         adapter.setOnItemClickListener(new ChatListAdapter.OnItemClickListener() {
             @Override
@@ -71,11 +76,60 @@ public class ChatFragment extends Fragment {
                 return;
             }
         });
+
         recyclerView.setAdapter(adapter);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+
+            private final ColorDrawable background = new ColorDrawable(Color.RED);
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                // 在这里处理向左滑动删除某一项的逻辑
+                int position = viewHolder.getAdapterPosition();
+                // 执行删除操作，例如：
+                viewModel.deleteMessageByIndex(adapter.getIndex(position));
+                adapter.deleteItem(position);
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View itemView = viewHolder.itemView;
+                    int itemHeight = itemView.getHeight();
+
+                    // 根据滑动距离 dX 的值绘制背景色
+                    if (dX < 0) {
+                        background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
+                    } else {
+                        background.setBounds(0, 0, 0, 0);
+                    }
+                    background.draw(c);
+
+                    // 绘制文本或其他视觉效果
+                    // ...
+
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+
+
+
+
+
 
         List<MessageNode> nodes=new ArrayList<>();
         nodes.add(new MessageNode(1,"msg1 from user1"));

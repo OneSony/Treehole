@@ -55,4 +55,10 @@ public interface MessageDao {
         }
     }
 
+    @Query("DELETE FROM message_table WHERE `index` = :index")
+    void deleteMessageByIndex(int index);
+
+    @Query("DELETE FROM message_table")
+    void deleteAllMessages();
+
 }
