@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -39,6 +40,8 @@ public class ChatFragment extends Fragment {
     private RecyclerView recyclerView;
     private ChatListAdapter adapter;
 
+    private TextView noDataTextView;
+
     private Menu menu;
     public ChatFragment() {
         // Required empty public constructor
@@ -65,10 +68,23 @@ public class ChatFragment extends Fragment {
 
         ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
+        noDataTextView=view.findViewById(R.id.chat_no_data);
 
         recyclerView=view.findViewById(R.id.chat_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
         adapter=new ChatListAdapter();
+        adapter.setAdapterCallback(new ChatListAdapter.AdapterCallback() {
+            @Override
+            public void onDataEmpty(boolean isEmpty) {
+                if (isEmpty) {
+                    recyclerView.setVisibility(View.GONE);
+                    noDataTextView.setVisibility(View.VISIBLE);
+                } else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    noDataTextView.setVisibility(View.GONE);
+                }
+            }
+        });
         adapter.setOnItemClickListener(new ChatListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {

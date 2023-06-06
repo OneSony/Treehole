@@ -25,6 +25,16 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
         void onItemClick(int index);
     }
 
+    private AdapterCallback adapterCallback;
+
+    public interface AdapterCallback {
+        void onDataEmpty(boolean isEmpty);
+    }
+
+    public void setAdapterCallback(AdapterCallback callback) {
+        this.adapterCallback = callback;
+    }
+
     private OnItemClickListener mOnItemClickListener;
 
 
@@ -38,6 +48,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+        adapterCallback.onDataEmpty(getItemCount()==0);
     }
 
     @Override
@@ -80,6 +91,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
 
     public void deleteItem(int position){
         messages.remove(position);
+        adapterCallback.onDataEmpty(getItemCount()==0);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,getItemCount());
     }
