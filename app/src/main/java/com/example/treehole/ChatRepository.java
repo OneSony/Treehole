@@ -47,6 +47,10 @@ public class ChatRepository {
         new newMessageNodeAsyncTask(messageDao, user_id,username, messageNode).execute();
     }
 
+    public void cleanMessageUnread(int index){
+        new cleanMessageUnreadAsyncTask(messageDao,index).execute();
+    }
+
     public void deleteMessageByIndex(int index){
         new deleteIndexAsyncTask(messageDao,index).execute();
     }
@@ -169,6 +173,21 @@ public class ChatRepository {
         protected Void doInBackground(Void... voids) {
             int message_index=mAsyncTaskDao.searchAndCreateMessage(user_id,username);
             mAsyncTaskDao.addMessageNode(message_index,messageNode);
+            return null;
+        }
+    }
+
+    private static class cleanMessageUnreadAsyncTask extends AsyncTask<Void,Void,Void> {
+        private MessageDao mAsyncTaskDao;
+        private int index;
+        cleanMessageUnreadAsyncTask(MessageDao dao,int index){
+            this.mAsyncTaskDao=dao;
+            this.index=index;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.cleanMessageUnread(index);
             return null;
         }
     }

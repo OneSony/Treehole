@@ -48,6 +48,10 @@ public class ChatViewModel extends AndroidViewModel {
         mRepository.receiveMessageNode(user_id,username, messageNode);
     }
 
+    public void cleanMessageUnread(int index){
+        mRepository.cleanMessageUnread(index);
+    }
+
     public void deleteMessageByIndex(int index){
         mRepository.deleteMessageByIndex(index);
     }

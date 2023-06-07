@@ -21,6 +21,9 @@ public class Message implements Serializable {
     @ColumnInfo(name="nodes")
     private List<MessageNode> nodes;
 
+    @ColumnInfo(name="unread")
+    private int unread;
+
     public Message(String user_id,String username, List<MessageNode> nodes){
         this.user_id=user_id;
         this.username=username;
@@ -46,5 +49,21 @@ public class Message implements Serializable {
 
     public void addNodes(MessageNode node){
         nodes.add(node);
+    }
+
+    public void plusUnread(){
+        unread++;
+    }
+
+    public void cleanUnread(){
+        unread=0;
+    }
+
+    public int getUnread(){
+        return unread;
+    }
+
+    public void setUnread(int unread){
+        this.unread=unread;
     }
 }

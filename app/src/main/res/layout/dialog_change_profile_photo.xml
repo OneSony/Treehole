@@ -23,6 +23,8 @@
                 android:id="@+id/change_profile_photo"
                 android:layout_width="140dp"
                 android:layout_height="140dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintDimensionRatio="H,1:1"
                 app:srcCompat="@drawable/photo2" />
 
         </androidx.cardview.widget.CardView>

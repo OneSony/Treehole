@@ -1,6 +1,7 @@
 package com.example.treehole.room;
 
 import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -150,8 +151,44 @@ public class Moment implements Serializable {
                 return hoursDifference + "小时前";
             }
 
-            long daysDifference = TimeUnit.MILLISECONDS.toDays(millisecondsDifference);
-            return daysDifference + "天前";
+
+            Calendar currentCalendar = Calendar.getInstance();
+            currentCalendar.setTime(currentDate);
+
+            Calendar givenCalendar = Calendar.getInstance();
+            givenCalendar.setTime(date);
+
+            if (currentCalendar.get(Calendar.YEAR) == givenCalendar.get(Calendar.YEAR)) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM'月'dd'日'");
+                return dateFormat.format(date);
+            }
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'年'MM'月'dd'日'");
+            return dateFormat.format(date);
+
+        }else {
+            return date_str;
+        }
+    }
+
+    public String getFullDate(){
+        if(date!=null) {
+            Date currentDate = new Date(); // 当前时间的Date对象
+
+            Calendar currentCalendar = Calendar.getInstance();
+            currentCalendar.setTime(currentDate);
+
+            Calendar givenCalendar = Calendar.getInstance();
+            givenCalendar.setTime(date);
+
+            if (currentCalendar.get(Calendar.YEAR) == givenCalendar.get(Calendar.YEAR)) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM'月'dd'日' HH:mm");
+                return dateFormat.format(date);
+            }
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy'年'MM'月'dd'日' HH:mm");
+            return dateFormat.format(date);
+
         }else {
             return date_str;
         }

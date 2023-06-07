@@ -71,7 +71,7 @@ public class InfoActivity extends AppCompatActivity {
         topic_box.setText(current_moment.getTopic());
         main_box.setText(current_moment.getText());
         auth_box.setText(current_moment.getUsername());
-        date_box.setText(current_moment.getDate());
+        date_box.setText(current_moment.getFullDate());
 
 
             /*

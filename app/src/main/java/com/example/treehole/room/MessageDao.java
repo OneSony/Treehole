@@ -30,10 +30,11 @@ public interface MessageDao {
     void updateMessage(Message message);
 
     @Transaction
-    default void addMessageNode(int index, MessageNode messageNode) {
+    default void addMessageNode(int index, MessageNode messageNode) {//吧message的index传进来
         Message message = _getMessageByIndex(index);
         if (message != null) {
             message.getNodes().add(messageNode);
+            message.plusUnread();
             updateMessage(message);
         }
     }
@@ -55,10 +56,22 @@ public interface MessageDao {
         }
     }
 
+    @Transaction
+    default void cleanMessageUnread(int index) {
+        Message existingMessage = _getMessageByIndex(index);
+        if (existingMessage == null) {
+
+        } else {
+            existingMessage.cleanUnread();
+            updateMessage(existingMessage);
+        }
+    }
+
     @Query("DELETE FROM message_table WHERE `index` = :index")
     void deleteMessageByIndex(int index);
 
     @Query("DELETE FROM message_table")
     void deleteAllMessages();
+
 
 }

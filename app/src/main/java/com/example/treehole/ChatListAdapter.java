@@ -1,16 +1,13 @@
 package com.example.treehole;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.room.Message;
@@ -54,6 +51,17 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         holder.chat_user_box.setText(messages.get(position).getUsername());
+
+
+        int unread=messages.get(position).getUnread();
+        holder.chat_unread_box.setText(String.valueOf(unread));
+        if(unread==0) {
+            holder.chat_unread_card.setVisibility(View.GONE);
+        }else{
+            holder.chat_unread_card.setVisibility(View.VISIBLE);
+        }
+
+
 
         int size=messages.get(position).getNodes().size();
         if(size!=0){
@@ -104,13 +112,21 @@ class ChatViewHolder extends RecyclerView.ViewHolder{
 
     public TextView chat_user_box;
     public TextView chat_text_box;
+
+    public TextView chat_unread_box;
     public ImageView profile_photo;
+    public CardView chat_unread_card;
 
     public ChatViewHolder(@NonNull View itemView) {
         super(itemView);
         chat_user_box=itemView.findViewById(R.id.chat_user_box);
         chat_text_box=itemView.findViewById(R.id.chat_text_box);
+        chat_unread_box=itemView.findViewById(R.id.chat_unread);
+
         profile_photo=itemView.findViewById(R.id.chat_profile);
+
+        chat_unread_card=itemView.findViewById(R.id.chat_unread_card);
+
 
 
     }

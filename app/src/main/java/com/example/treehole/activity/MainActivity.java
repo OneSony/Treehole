@@ -12,6 +12,9 @@ import com.example.treehole.R;
 import com.example.treehole.application;
 import com.example.treehole.dot_list;
 import com.example.treehole.dot_list_adapter;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationItemView;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,10 +38,25 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.BottomNav);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-        app=(application)getApplication();
-        navController.navigate(app.main_navigation_id);//先导航到默认主页
+        BottomNavigationMenuView menuView = (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
+        BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(1);
 
-        //如何保证activity切换回来后继续保持原来的navigation
+        BadgeDrawable badgeDrawable = bottomNavigationView.getOrCreateBadge(itemView.getId());
+        badgeDrawable.setVisible(true);
+        //badgeDrawable.setNumber(10); // 设置气泡的数字或文本内容
+
+/*
+        final BottomNavigationMenuView menuView = (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
+        final View mTab = menuView.getChildAt(1);
+        final BottomNavigationItemView itemView = (BottomNavigationItemView) mTab;
+        View mBadge = itemView.getChildAt(3);//?
+        if (mBadge == null) {
+            //避免重复添加创建
+            mBadge = LayoutInflater.from(bottomNavigationView.getContext()).inflate(R.layout.nav_dot, menuView, false);
+            itemView.addView(mBadge);
+        }
+*/
+
     }
 
     /*public void edit_click(View view) {

@@ -66,6 +66,7 @@ public class MsgActivity extends AppCompatActivity {
         Bundle bundle=getIntent().getBundleExtra("BUNDLE_DATA");
         if (bundle != null) {
             message_index = (int) bundle.getSerializable("DATA");
+            viewModel.cleanMessageUnread(message_index);
         }
 
         LiveData<Message> message= null;
