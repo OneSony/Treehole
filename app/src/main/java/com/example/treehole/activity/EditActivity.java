@@ -667,6 +667,9 @@ public class EditActivity extends AppCompatActivity {
             List<String> paths = new ArrayList<>();
             for (String uriString:adapter.getUris()) {
                 paths.add(getPathFromUri(Uri.parse(uriString)));
+                if(getPathFromUri(Uri.parse(uriString))==null) {
+                    Log.d("PATH", "NULL");
+                }
             }
             return paths;
         }else if(selectFlag==2){

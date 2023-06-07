@@ -2,7 +2,6 @@ package com.example.treehole.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
-import com.example.treehole.dot;
+import com.example.treehole.room.Moment;
 
 public class InfoActivity extends AppCompatActivity {
     private TextView topic_box;
@@ -24,7 +23,7 @@ public class InfoActivity extends AppCompatActivity {
     private TextView date_box;
     private ImageView profile_photo;
 
-    private dot curr_data;
+    private Moment current_moment;
 
     public ImageView photo1;
 
@@ -42,6 +41,11 @@ public class InfoActivity extends AppCompatActivity {
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
 
+        Bundle bundle=getIntent().getBundleExtra("BUNDLE_DATA");
+        if (bundle != null) {
+            current_moment = (Moment) bundle.getSerializable("MOMENT");
+        }
+
 
         profile_photo = findViewById(R.id.profile);
         profile_photo.setOnClickListener(new View.OnClickListener() {
@@ -55,8 +59,23 @@ public class InfoActivity extends AppCompatActivity {
             }
         });
 
-        Bundle bundle=getIntent().getBundleExtra("BUNDLE_DATA");
-        if (bundle != null) {
+        String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+current_moment.getUser_id();
+        Glide.with(getApplicationContext()).load(profile_photo_url).into(profile_photo);
+
+
+        topic_box = findViewById(R.id.topic_box);
+        main_box = findViewById(R.id.main_box);
+        auth_box = findViewById(R.id.auth_box);
+        date_box = findViewById(R.id.date_box);
+
+        topic_box.setText(current_moment.getTopic());
+        main_box.setText(current_moment.getText());
+        auth_box.setText(current_moment.getUsername());
+        date_box.setText(current_moment.getDate());
+
+
+            /*
+
             curr_data = (dot) bundle.getSerializable("DATA");
 
             topic_box = findViewById(R.id.topic_box);
@@ -103,13 +122,19 @@ public class InfoActivity extends AppCompatActivity {
                 photo3.setImageResource(curr_data.getPhoto_index(2));
             }
 
+
+             */
+
+            /*
+
             if(curr_data.isPath_flag()==true){
                 photo1.setVisibility(View.VISIBLE);
                 Log.d("PATH","in!!");
 
                 Glide.with(this).load("https://rickyvu.pythonanywhere.com/static/images/test1.png").into(photo1);
 
-                Log.d("PATH","out!!");
+                Log.d("PATH","out!!");*/
+
 
                 /*File imgFile = new File(curr_data.getPhoto_path());
                 if(imgFile.exists()){
@@ -118,12 +143,11 @@ public class InfoActivity extends AppCompatActivity {
                 }*/
                 //holder.photo1.setImageResource(R.drawable.photo1);
             }
-        }
 
         /*photo1.setImageResource(R.drawable.photo);
         photo2.setImageResource(R.drawable.photo);
         photo3.setImageResource(R.drawable.photo);*/
-    }
+    //}
 
     /*public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);

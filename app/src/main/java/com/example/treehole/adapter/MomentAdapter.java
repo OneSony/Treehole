@@ -1,22 +1,6 @@
 package com.example.treehole.adapter;
 
-import android.content.Context;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.treehole.R;
-import com.example.treehole.room.Moment;
-
-import java.util.List;
-
-public class MomentAdapter extends RecyclerView.Adapter<MomentViewHolder> {
+/*public class MomentAdapter extends RecyclerView.Adapter<MomentViewHolder> {
 
     public List<Moment> moment_list;
     private final LayoutInflater inflater;
@@ -52,8 +36,8 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MomentViewHolder holder, int position) {
-        holder.topic_box.setText(moment_list.get(position).topic);
-        holder.main_box.setText(moment_list.get(position).text);
+        holder.topic_box.setText(moment_list.get(position).getTopic());
+        holder.main_box.setText(moment_list.get(position).getText());
 
         holder.auth_box.setText("null");
         holder.date_box.setText("null");
@@ -98,7 +82,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentViewHolder> {
             String url = "https://rickyvu.pythonanywhere.com/static/images/test1.png";
             Glide.with(holder.itemView.getContext()).load(url).into(holder.photo1);
         }*/
-
+/*
         holder.itemView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -154,4 +138,4 @@ class MomentViewHolder extends RecyclerView.ViewHolder{
         photo2=itemView.findViewById(R.id.photo2);
         photo3=itemView.findViewById(R.id.photo3);
     }
-}
+}*/

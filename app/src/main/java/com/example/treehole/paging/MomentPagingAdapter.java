@@ -8,20 +8,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.paging.PagingDataAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.treehole.activity.InfoActivity;
+import com.bumptech.glide.Glide;
 import com.example.treehole.R;
-import com.example.treehole.activity.MsgActivity;
+import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.room.Moment;
-
-import java.util.Objects;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
 
@@ -31,13 +32,13 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         super(new DiffUtil.ItemCallback<Moment>() {
             @Override
             public boolean areItemsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
-                return oldItem.id.equals(newItem.id);
+                return oldItem.getId().equals(newItem.getId());
             }
 
             @Override
             public boolean areContentsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
-                Log.d("SAME?",String.valueOf(oldItem.text.equals(newItem.text)&&oldItem.topic.equals(newItem.topic)));
-                return oldItem.text.equals(newItem.text)&&oldItem.topic.equals(newItem.topic);
+                //Log.d("SAME?",String.valueOf(oldItem.getText().equals(newItem.getText())&&oldItem.topic.equals(newItem.topic)));
+                return oldItem.getText().equals(newItem.getText())&&oldItem.getTopic().equals(newItem.getTopic());
             }
         });
 
@@ -61,8 +62,29 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         if(moment==null){
             holder.topic_box.setText("loading");
         }else{
-            holder.topic_box.setText(moment.topic);
-            holder.main_box.setText(moment.text);
+            String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+moment.getUser_id();
+            Log.d("PROFILE URL",profile_photo_url);
+            Glide.with(holder.itemView.getContext()).load(profile_photo_url).into(holder.profile_box);
+            holder.auth_box.setText(moment.getUsername());
+            holder.date_box.setText(moment.getDate());
+            holder.topic_box.setText(moment.getTopic());
+            holder.main_box.setText(moment.getText());
+
+            if(moment.getImages().size()==0){
+                holder.photos.setVisibility(View.GONE);
+            }
+
+            if(moment.getVideos().size()==0){
+                holder.video.setVisibility(View.GONE);
+            }
+
+            if(moment.getTags().size()==0){
+                holder.tags_card.setVisibility(View.GONE);
+            }
+
+            holder.like_box.setText(String.valueOf(moment.getLikes_num()));
+            holder.collect_box.setText(String.valueOf(moment.getFavourite_num()));
+
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -82,17 +104,19 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         }
     }
 
+    /*
+
     private static final DiffUtil.ItemCallback<Moment> DIFF_CALLBACK = new DiffUtil.ItemCallback<Moment>() {
         @Override
         public boolean areItemsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
-            return oldItem.m_index == newItem.m_index;
+            return oldItem.id.equals(newItem.id);
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
             return Objects.equals(oldItem, newItem);
         }
-    };
+    };*/
 
 }
 
@@ -110,6 +134,10 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
     public final ImageView photo2;
     public final ImageView photo3;
 
+    public final LinearLayout photos;
+    public final PlayerView video;
+    public final CardView tags_card;
+
     public MomentPagingViewHolder(@NonNull View itemView) {
         super(itemView);
         topic_box=itemView.findViewById(R.id.topic_box);
@@ -123,6 +151,10 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
         photo1=itemView.findViewById(R.id.photo1);
         photo2=itemView.findViewById(R.id.photo2);
         photo3=itemView.findViewById(R.id.photo3);
+
+        photos=itemView.findViewById(R.id.moment_photos);
+        video=itemView.findViewById(R.id.moment_video);
+        tags_card=itemView.findViewById(R.id.moment_tag_card);
     }
 
 }

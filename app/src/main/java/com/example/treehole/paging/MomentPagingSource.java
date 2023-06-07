@@ -1,6 +1,7 @@
 package com.example.treehole.paging;
 
 
+import android.icu.text.SimpleDateFormat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -21,8 +22,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -80,11 +83,52 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                     moments_json = json.getJSONArray("message");
                     for (int i = 0; i < moments_json.length(); i++) {
                         JSONObject moment = (JSONObject) moments_json.get(i);
+                        String id = moment.getString("id");
+                        String user_id = moment.getString("user_id");
+                        String username = moment.getString("user");
                         String topic = moment.optString("title");
                         String text = moment.getString("text");
-                        String id = moment.getString("id");
+                        String date = moment.getString("pub_date");
+
                         Log.d("NEXTPAGE","id "+id);
-                        moments.add(new Moment(id,topic,text));
+
+                        Moment tempMoment=new Moment(id,user_id,username,topic,text,date);
+
+                        int likes_num = moment.getInt("likes");
+                        int favourites_num = moment.getInt("favourites");
+                        tempMoment.setNum(likes_num,favourites_num);
+
+
+                        Object imagesObject = moment.get("images");
+                        List<String> imagesList = new ArrayList<>();
+                        if (imagesObject instanceof JSONArray) {
+                            JSONArray nestedArray = (JSONArray) imagesObject;
+
+                            // 处理列表中的数据
+                            for (int ii = 0; ii < nestedArray.length(); ii++) {
+                                Object listItem = nestedArray.get(i);
+                                // 将列表项转换为字符串并添加到 List<String> 中
+                                imagesList.add(String.valueOf(listItem));
+                            }
+                        }
+
+                        Object videoObject = moment.get("videos");
+                        List<String> videosList = new ArrayList<>();
+                        if (imagesObject instanceof JSONArray) {
+                            JSONArray nestedArray = (JSONArray) videoObject;
+
+                            // 处理列表中的数据
+                            for (int ii = 0; ii < nestedArray.length(); ii++) {
+                                Object listItem = nestedArray.get(i);
+                                // 将列表项转换为字符串并添加到 List<String> 中
+                                videosList.add(String.valueOf(listItem));
+                            }
+                        }
+
+                        tempMoment.setMedias(imagesList,videosList);
+
+
+                        moments.add(tempMoment);
                     }
                     Log.d("NEXTPAGE","we got "+moments_json.length());
                 } catch (JSONException e) {
@@ -101,7 +145,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                     result = new LoadResult.Page<>(
                             moments, // 当前页的数据
                             null,
-                            String.valueOf(moments.get(moments.size() - 1).id),
+                            String.valueOf(moments.get(moments.size() - 1).getId()),
                             LoadResult.Page.COUNT_UNDEFINED,
                             LoadResult.Page.COUNT_UNDEFINED
                     );
