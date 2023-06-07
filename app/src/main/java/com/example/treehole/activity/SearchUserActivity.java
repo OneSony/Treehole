@@ -38,7 +38,6 @@ public class SearchUserActivity extends AppCompatActivity {
 
     private TextView noDataTextView;
 
-    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +49,7 @@ public class SearchUserActivity extends AppCompatActivity {
         noDataTextView=findViewById(R.id.search_no_data);
         noDataTextView.setVisibility(View.GONE);
 
-        progressBar=findViewById(R.id.search_progress);
+        ProgressBar progressBar=findViewById(R.id.search_progress);
         progressBar.setVisibility(View.GONE);
 
         setSupportActionBar(findViewById(R.id.search_user_toolbar));
@@ -89,8 +88,8 @@ public class SearchUserActivity extends AppCompatActivity {
         noDataTextView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
-        adapter.setSearchUserResults(new ArrayList<>());
-        adapter.notifyDataSetChanged();
+
+
         List<SearchUserResult> searchUserResults=new ArrayList<>();
         searchAndInsert(query, searchUserResults, adapter);
 
@@ -126,6 +125,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
         switch (item.getItemId()){
             case android.R.id.home:
                 this.finish();
@@ -141,6 +141,7 @@ public class SearchUserActivity extends AppCompatActivity {
             @Override
             public void onSuccess(JSONObject json) {
                 try {
+                    ProgressBar progressBar=findViewById(R.id.edit_location_progress);
                     progressBar.setVisibility(View.GONE);
                     JSONArray users = json.getJSONArray("message");
                     if (users.length() == 0) {
@@ -176,13 +177,13 @@ public class SearchUserActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable t) {
-                progressBar.setVisibility(View.GONE);
+                //progressBar.setVisibility(View.GONE);
                 Log.e("SEARCHUSERACTIVITY", "ERROR: "+t.getMessage());
             }
 
             @Override
             public void onFailure(JSONObject json) {
-                progressBar.setVisibility(View.GONE);
+                //progressBar.setVisibility(View.GONE);
                 Log.e("SEARCHUSERACTIVITY", "FAILURE: "+json.optString("message", "onFailure"));
             }
         });

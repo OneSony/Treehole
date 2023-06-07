@@ -630,9 +630,8 @@ public class EditActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             // 在主线程中处理返回的城市名称
-
-                                            locationTextView.setVisibility(View.VISIBLE);
                                             locationTextView.setText("定位失败");
+                                            locationTextView.setVisibility(View.VISIBLE);
                                             progressBar.setVisibility(View.GONE);
                                             locationFlag = false;
 

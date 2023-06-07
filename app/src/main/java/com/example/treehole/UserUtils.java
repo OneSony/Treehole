@@ -154,6 +154,12 @@ public class UserUtils {
         editor.apply();
     }
 
+    public void setUsername(String username){
+        SharedPreferences.Editor editor = userDetails.edit();
+        editor.putString(USERNAME, username);
+        editor.apply();
+    }
+
     public static String getUsername(){
         return userDetails.getString(USERNAME, "");
     }

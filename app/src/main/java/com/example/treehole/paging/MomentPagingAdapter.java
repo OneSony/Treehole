@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,13 +15,13 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.paging.PagingDataAdapter;
@@ -28,6 +29,10 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.treehole.R;
 import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.room.Moment;
@@ -83,11 +88,15 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             Log.d("PHOTO_SIZE",String.valueOf(moment.getImages().size()));
 
             int photo_num=moment.getImages().size();
+
+            String invisible="null";
             if(photo_num==0){
                 holder.photos.setVisibility(View.GONE);
             }else{
                 holder.photos.setVisibility(View.VISIBLE);
+
                 for(int i=0;i<photo_num;i++){
+                    holder.constraintLayouts[i].setVisibility(View.VISIBLE);
                     holder.imageViewArray[i].setVisibility(View.VISIBLE);
                     int finalI = i;
                     holder.imageViewArray[i].setOnClickListener(new View.OnClickListener() {
@@ -133,25 +142,61 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                     });
 
 
-
                     Log.d("PHOTO_URL",String.valueOf(i)+moment.getImages().get(i));
-                    Glide.with(holder.itemView.getContext()).load(moment.getImages().get(i)).centerCrop().into(holder.imageViewArray[i]);
+                    Glide.with(holder.itemView.getContext()).load(moment.getImages().get(i)).listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            // 图片加载失败时的处理逻辑
+                            Log.d("Glide!!!!","WW");
+
+                            return false; // 返回false表示未处理，Glide会继续处理后续的回调
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            // 图片加载成功时的处理逻辑
+                            return false; // 返回false表示未处理，Glide会继续处理后续的回调
+                        }
+                    }).into(holder.imageViewArray[i]);
+
                 }
 
-                if(photo_num<=3){
-                    for(int i=photo_num;i<9;i++){
-                        holder.imageViewArray[i].setVisibility(View.GONE);
-                    }
-                    for(int i=photo_num;i<3;i++){
+
+                Log.d("PHOTO",moment.getTopic()+" "+moment.getText()+" "+String.valueOf(photo_num));
+/*
+                for(int i=photo_num;i<9;i++){
+                    holder.imageViewArray[i].setVisibility(View.GONE);
+                    Log.d("DISMISS",String.valueOf(i));
+                }
+
+*/
+                for(int i=photo_num;i<9;i++){
+                    invisible+=String.valueOf(i);
+                    holder.constraintLayouts[i].setVisibility(View.GONE);
+                }
+
+                if(photo_num<=3) {
+                    for (int i = photo_num; i < 3; i++) {
                         holder.constraintLayouts[i].setVisibility(View.GONE);
                     }
-                }else{
-                    for(int i=photo_num;i<9;i++){
-                        holder.imageViewArray[i].setVisibility(View.GONE);
+
+                    for (int i = 3; i < 9; i++) {
+                        holder.constraintLayouts[i].setVisibility(View.GONE);
+                    }
+                }else if(photo_num<=6){
+                    for (int i = photo_num; i < 6; i++) {
+                        holder.constraintLayouts[i].setVisibility(View.INVISIBLE);
+                    }
+
+                    for (int i = 6; i < 9; i++) {
+                        holder.constraintLayouts[i].setVisibility(View.GONE);
+                    }
+                }else if(photo_num<=9){
+                    for (int i = photo_num; i < 9; i++) {
+                        holder.constraintLayouts[i].setVisibility(View.INVISIBLE);
                     }
                 }
             }
-
 
             if(moment.getVideos().size()==0){
                 holder.video.setVisibility(View.GONE);
@@ -225,6 +270,7 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
     public final ConstraintLayout[] constraintLayouts;
 
 
+
     public final LinearLayout photos;
     public final PlayerView video;
     public final CardView tags_card;
@@ -253,10 +299,18 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
         imageViewArray[7]=itemView.findViewById(R.id.moment_photo8);
         imageViewArray[8]=itemView.findViewById(R.id.moment_photo9);
 
-        constraintLayouts = new ConstraintLayout[3];
-        constraintLayouts[0]=itemView.findViewById(R.id.moment_photo1_layout);
-        constraintLayouts[1]=itemView.findViewById(R.id.moment_photo2_layout);
-        constraintLayouts[2]=itemView.findViewById(R.id.moment_photo3_layout);
+        constraintLayouts = new ConstraintLayout[9];
+        constraintLayouts[0]=itemView.findViewById(R.id.moment_photo_layout1);
+        constraintLayouts[1]=itemView.findViewById(R.id.moment_photo_layout2);
+        constraintLayouts[2]=itemView.findViewById(R.id.moment_photo_layout3);
+        constraintLayouts[3]=itemView.findViewById(R.id.moment_photo_layout4);
+        constraintLayouts[4]=itemView.findViewById(R.id.moment_photo_layout5);
+        constraintLayouts[5]=itemView.findViewById(R.id.moment_photo_layout6);
+        constraintLayouts[6]=itemView.findViewById(R.id.moment_photo_layout7);
+        constraintLayouts[7]=itemView.findViewById(R.id.moment_photo_layout8);
+        constraintLayouts[8]=itemView.findViewById(R.id.moment_photo_layout9);
+
+
 
 
 
