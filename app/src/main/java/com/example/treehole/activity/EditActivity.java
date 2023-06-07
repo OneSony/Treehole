@@ -10,10 +10,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -40,6 +38,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.FileUtils;
 import com.example.treehole.PhotoListAdapter;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
@@ -80,7 +79,7 @@ public class EditActivity extends AppCompatActivity {
     private int selectFlag = 0;//当前选择了照片还是视频，0无，1照片，2视频
     private boolean locationFlag = false;
 
-    private String locationName="";
+    private String locationName = "";
 
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
     private ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
@@ -228,7 +227,7 @@ public class EditActivity extends AppCompatActivity {
             if (uris.size() != 0) {
 
                 for (int i = 0; i < uris.size(); i++) {
-                    getContentResolver().takePersistableUriPermission(uris.get(i), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    getContentResolver().takePersistableUriPermission(uris.get(i), Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                     adapter.addUris(uris.get(i));
                 }
 
@@ -273,7 +272,7 @@ public class EditActivity extends AppCompatActivity {
                 // 在双击事件发生时执行关闭操作
                 // 这里可以添加您的关闭逻辑，例如停止播放、隐藏PlayerView等
                 setView(0);
-                videoUri=null;
+                videoUri = null;
                 player.release();
                 return true;
             }
@@ -288,22 +287,19 @@ public class EditActivity extends AppCompatActivity {
         });
 
 
-
-
-
         mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
 
-        if(mPreferences.getBoolean("SEND_EXIT",true)==false) {//异常退出恢复
+        if (mPreferences.getBoolean("SEND_EXIT", true) == false) {//异常退出恢复
             String topic = mPreferences.getString("TOPIC_STR", "");
             String text = mPreferences.getString("TEXT_STR", "");
             String uris_str = mPreferences.getString("URIS", "");
             selectFlag = mPreferences.getInt("SELECT_FLAG", 0);
 
-            if(!topic.equals("") || !text.equals("")|| !uris_str.equals("")){
+            if (!topic.equals("") || !text.equals("") || !uris_str.equals("")) {
                 topicInputLayout.getEditText().setText(topic);
                 textInputLayout.getEditText().setText(text);
 
-                if(!uris_str.equals("")) {
+                if (!uris_str.equals("")) {
                     List<String> uris_str_list = new ArrayList<>(Arrays.asList(uris_str.split(",")));
 
                     List<Uri> uris = new ArrayList<>();
@@ -313,10 +309,10 @@ public class EditActivity extends AppCompatActivity {
                         uris.add(uri);
                     }
 
-                    if (selectFlag==1){
+                    if (selectFlag == 1) {
                         adapter.setUris(uris);//adapter会自动更新
-                    }else if(selectFlag==2){
-                        videoUri=uris.get(0);//video需要提醒
+                    } else if (selectFlag == 2) {
+                        videoUri = uris.get(0);//video需要提醒
                         player = new ExoPlayer.Builder(getApplicationContext()).build();
                         videoView.setPlayer(player);
                         MediaItem mediaItem = MediaItem.fromUri(videoUri);
@@ -325,7 +321,7 @@ public class EditActivity extends AppCompatActivity {
                     }
                 }
 
-                Toast toast=Toast.makeText(this,"已恢复草稿",Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(this, "已恢复草稿", Toast.LENGTH_SHORT);
                 toast.show();
             }
 
@@ -347,7 +343,7 @@ public class EditActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             // android.R.id.home 这个是获取ids.xml页面的返回箭头，项目自带的，要加上android
             case android.R.id.home:
                 // 返回
@@ -355,7 +351,7 @@ public class EditActivity extends AppCompatActivity {
                 // 结束
                 return true;
             case R.id.action_send:
-                if(send()==true){
+                if (send() == true) {
                     this.finish();
                 }
                 return true;
@@ -365,28 +361,40 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void send_click(View view) {
-        if(send()==true){
+        if (send() == true) {
             this.finish();
         }
     }
 
     public void photo_click(View view) {
 
-        if(selectFlag==0||selectFlag==1) {
+        if(checkFilePermission()==true) {
 
-            pickMedia.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                    .build());
+            if (selectFlag == 0 || selectFlag == 1) {
+
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build());
+            }
+        }else{
+            Toast toast = Toast.makeText(this, "请授予文件读写权限", Toast.LENGTH_SHORT);
+            toast.show();
         }
 
     }
 
     public void video_click(View view) {
 
-        if(selectFlag==0||selectFlag==2) {
-            pickVideo.launch(new PickVisualMediaRequest.Builder()
-                    .setMediaType(ActivityResultContracts.PickVisualMedia.VideoOnly.INSTANCE)
-                    .build());
+        if(checkFilePermission()==true) {
+
+            if (selectFlag == 0 || selectFlag == 2) {
+                pickVideo.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.VideoOnly.INSTANCE)
+                        .build());
+            }
+        }else{
+            Toast toast = Toast.makeText(this, "请授予文件读写权限", Toast.LENGTH_SHORT);
+            toast.show();
         }
 
     }
@@ -395,9 +403,9 @@ public class EditActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        String topic=topicInputLayout.getEditText().getText().toString();
-        String text=textInputLayout.getEditText().getText().toString();
-        String uris_str="";
+        String topic = topicInputLayout.getEditText().getText().toString();
+        String text = textInputLayout.getEditText().getText().toString();
+        String uris_str = "";
 
         uris_str = TextUtils.join(",", getUris());
 
@@ -415,31 +423,30 @@ public class EditActivity extends AppCompatActivity {
         }*/
     }
 
-    private boolean send(){
-        String topic=topicInputLayout.getEditText().getText().toString();
-        String text=textInputLayout.getEditText().getText().toString();
+    private boolean send() {
+        String topic = topicInputLayout.getEditText().getText().toString();
+        String text = textInputLayout.getEditText().getText().toString();
 
-        if(topic.equals("")&&text.equals("")){
-            Toast toast=Toast.makeText(this,"请输入内容",Toast.LENGTH_SHORT);
+        if (topic.equals("") && text.equals("")) {
+            Toast toast = Toast.makeText(this, "请输入内容", Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
 
-        if(topic.equals("")){
-            Toast toast=Toast.makeText(this,"请输入主题",Toast.LENGTH_SHORT);
+        if (topic.equals("")) {
+            Toast toast = Toast.makeText(this, "请输入主题", Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
 
-        if(text.equals("")){
-            Toast toast=Toast.makeText(this,"请输入正文",Toast.LENGTH_SHORT);
+        if (text.equals("")) {
+            Toast toast = Toast.makeText(this, "请输入正文", Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
 
 
-
-        Toast toast=Toast.makeText(this,"已发布",Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(this, "已发布", Toast.LENGTH_SHORT);
         toast.show();
         /*Toast toast=Toast.makeText(this,mPreferences.getString("TOPIC_STR","none"),Toast.LENGTH_SHORT);
         toast.show();*/
@@ -460,16 +467,16 @@ public class EditActivity extends AppCompatActivity {
             files.add(new File(paths.get(i)));
         }
         // Add image or video to it
-        if (selectFlag==1) {
+        if (selectFlag == 1) {
             for (int i = 0; i < files.size(); i++) {
                 RequestBody imageBody = RequestBody.create(files.get(i), MediaType.parse("image/jpeg"));
-                requestBodyBuilder.addFormDataPart("image-"+(i+1), files.get(i).getName(), imageBody);
+                requestBodyBuilder.addFormDataPart("image-" + (i + 1), files.get(i).getName(), imageBody);
             }
         }
-        if (selectFlag==2) {
+        if (selectFlag == 2) {
             for (int i = 0; i < files.size(); i++) {
                 RequestBody videoBody = RequestBody.create(files.get(i), MediaType.parse("video/mp4"));
-                requestBodyBuilder.addFormDataPart("video"+(i+1), files.get(i).getName(), videoBody);
+                requestBodyBuilder.addFormDataPart("video" + (i + 1), files.get(i).getName(), videoBody);
             }
         }
 
@@ -504,7 +511,7 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-        Log.d("SEND","TEST");
+        Log.d("SEND", "TEST");
 
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putBoolean("SEND_EXIT", true);//正常发送
@@ -518,34 +525,34 @@ public class EditActivity extends AppCompatActivity {
         //photoView.setImageBitmap(null);
     }
 
-    public void setView(int flag){
-        if(flag==0){//no data
-            selectFlag=0;
+    public void setView(int flag) {
+        if (flag == 0) {//no data
+            selectFlag = 0;
             recyclerView.setVisibility(View.GONE);
             videoView.setVisibility(View.GONE);
-            Log.d("setView","0");
-        }else if(flag==1){//photo
-            selectFlag=1;
+            Log.d("setView", "0");
+        } else if (flag == 1) {//photo
+            selectFlag = 1;
             recyclerView.setVisibility(View.VISIBLE);
             videoView.setVisibility(View.GONE);
-            Log.d("setView","1");
-        }else if(flag==2){//video
-            selectFlag=2;
+            Log.d("setView", "1");
+        } else if (flag == 2) {//video
+            selectFlag = 2;
             recyclerView.setVisibility(View.GONE);
             videoView.setVisibility(View.VISIBLE);
-            Log.d("setView","2");
+            Log.d("setView", "2");
         }
     }
 
-    public List<String> getUris(){
-        if(selectFlag==1){//photo
+    public List<String> getUris() {
+        if (selectFlag == 1) {//photo
             return adapter.getUris();
-        }else if(selectFlag==2){
-            List<String> uris=new ArrayList<>();
+        } else if (selectFlag == 2) {
+            List<String> uris = new ArrayList<>();
             uris.add(videoUri.toString());
             return uris;
-        }else {
-            List<String> uris=new ArrayList<>();
+        } else {
+            List<String> uris = new ArrayList<>();
             return uris;
         }
     }
@@ -598,7 +605,7 @@ public class EditActivity extends AppCompatActivity {
                                                 // 在主线程中处理返回的城市名称
                                                 locationFlag = true;
                                                 locationTextView.setText(cityName);
-                                                locationName=cityName;
+                                                locationName = cityName;
                                                 Log.d("LOCATION", "City Name: " + cityName);
 
                                                 // 在这里进行UI更新或其他操作
@@ -608,7 +615,7 @@ public class EditActivity extends AppCompatActivity {
                                 } catch (IOException e) {
                                     Log.e("LOCATION", "Error: " + e.getMessage());
                                     locationTextView.setVisibility(View.GONE);
-                                    locationFlag=false;
+                                    locationFlag = false;
                                     e.printStackTrace();
                                 }
                             }
@@ -643,10 +650,11 @@ public class EditActivity extends AppCompatActivity {
             locationTextView.setText("定位中");
             locationTextView.setVisibility(View.GONE);
             locationFlag = false;
-            locationName="";
+            locationName = "";
         }
     }
 
+/*
     private String getPathFromUri(Uri uri) {
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
@@ -661,20 +669,35 @@ public class EditActivity extends AppCompatActivity {
         return path;
     }
 
+*/
+
+    public String getPathFromUri(Context context,Uri uri){
+
+        String filePath = FileUtils.getUriFilePath(context, uri);
+        if(filePath !=null){
+            Log.d("PATH", filePath);
+            return filePath;
+        } else {
+            Log.d("PATH", "null");
+            return "";
+        }
+
+    }
+
     // Similar to getUris, but converts uri to path first using getPathFromUri
     public List<String> getPaths() {
         if(selectFlag==1){//photo
             List<String> paths = new ArrayList<>();
             for (String uriString:adapter.getUris()) {
-                paths.add(getPathFromUri(Uri.parse(uriString)));
-                if(getPathFromUri(Uri.parse(uriString))==null) {
+                paths.add(getPathFromUri(getApplicationContext(),Uri.parse(uriString)));
+                if(getPathFromUri(getApplicationContext(),Uri.parse(uriString))==null) {
                     Log.d("PATH", "NULL");
                 }
             }
             return paths;
         }else if(selectFlag==2){
             List<String> paths=new ArrayList<>();
-            paths.add(getPathFromUri(videoUri));
+            paths.add(getPathFromUri(getApplicationContext(),videoUri));
             return paths;
         }else {
             List<String> uris=new ArrayList<>();
@@ -682,5 +705,18 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
+
+    private boolean checkFilePermission(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // 如果未被授予权限，需要请求权限
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    3);
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
 

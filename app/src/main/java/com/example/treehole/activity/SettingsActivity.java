@@ -1,11 +1,12 @@
 package com.example.treehole.activity;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -23,11 +24,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.treehole.ChatViewModel;
+import com.example.treehole.FileUtils;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
 import com.google.android.material.textfield.TextInputLayout;
@@ -110,6 +114,10 @@ public class SettingsActivity extends AppCompatActivity {
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+
+                            if(checkFilePermission()==false){
+                                Toast.makeText(getContext(), "请授予文件读写权限", Toast.LENGTH_SHORT).show();
+                            }else {
                             /*ActivityResultLauncher<Intent> pickImage = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                                 // Callback is invoked after the user selects a media item or closes the
                                 // photo picker.
@@ -124,10 +132,11 @@ public class SettingsActivity extends AppCompatActivity {
                                     Log.d("PhotoPicker", "No media selected");
                                 }
                             });*/
-                            //Toast.makeText(getContext(), "打开相册", Toast.LENGTH_SHORT).show();
-                            pickImage.launch(new PickVisualMediaRequest.Builder()
-                                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                                    .build());
+                                //Toast.makeText(getContext(), "打开相册", Toast.LENGTH_SHORT).show();
+                                pickImage.launch(new PickVisualMediaRequest.Builder()
+                                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                                        .build());
+                            }
                         }
                     });
 
@@ -136,11 +145,12 @@ public class SettingsActivity extends AppCompatActivity {
                     builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+
                             // Handle OK button click
 
                             // Do something with the entered text
                             // ...
-                            RequestBody imageBody = RequestBody.create(new File(getPathFromUri(newProfilePictureUri)), MediaType.parse("image/jpeg"));
+                            RequestBody imageBody = RequestBody.create(new File(getPathFromUri(getContext(),newProfilePictureUri)), MediaType.parse("image/jpeg"));
                             MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
                                     .setType(MultipartBody.FORM)
                                     .addFormDataPart("image", "profile_picture", imageBody);
@@ -376,6 +386,8 @@ public class SettingsActivity extends AppCompatActivity {
             });
 
         }
+
+        /*
         private String getPathFromUri(Uri uri) {
             String[] projection = {MediaStore.Images.Media.DATA};
             Cursor cursor = getContext().getContentResolver().query(uri, projection, null, null, null);
@@ -388,6 +400,32 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             return path;
+        }*/
+
+        public String getPathFromUri(Context context, Uri uri){
+
+            String filePath = FileUtils.getUriFilePath(context, uri);
+            if(filePath !=null){
+                Log.d("PATH", filePath);
+                return filePath;
+            } else {
+                Log.d("PATH", "null");
+                return "";
+            }
+
+        }
+
+        private boolean checkFilePermission(){
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // 如果未被授予权限，需要请求权限
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        3);
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
@@ -405,4 +443,5 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
