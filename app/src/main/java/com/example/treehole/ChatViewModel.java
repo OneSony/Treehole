@@ -40,8 +40,12 @@ public class ChatViewModel extends AndroidViewModel {
         mRepository.addMessageNode(index, messageNode);
     }
 
-    public int searchMessage(String user_id,String username) throws ExecutionException, InterruptedException {
+    public int searchMessage(String user_id,String username) throws ExecutionException, InterruptedException {//按照user_id搜索已有聊天记录，如果有返回对应Message，如果没有则创建并返回Message
         return mRepository.searchMessage(user_id,username);
+    }
+
+    public void receiveMessageNode(String user_id, String username, MessageNode messageNode) {//收到消息的接口
+        mRepository.receiveMessageNode(user_id,username, messageNode);
     }
 
     public void deleteMessageByIndex(int index){

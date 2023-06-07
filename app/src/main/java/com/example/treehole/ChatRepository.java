@@ -43,6 +43,10 @@ public class ChatRepository {
         return new searchAsyncTask(messageDao,user_id,username).execute().get();
     }
 
+    public void receiveMessageNode(String user_id, String username, MessageNode messageNode) {//收到消息的接口
+        new newMessageNodeAsyncTask(messageDao, user_id,username, messageNode).execute();
+    }
+
     public void deleteMessageByIndex(int index){
         new deleteIndexAsyncTask(messageDao,index).execute();
     }
@@ -144,6 +148,27 @@ public class ChatRepository {
         @Override
         protected Void doInBackground(Void... voids) {
             mAsyncTaskDao.deleteAllMessages();
+            return null;
+        }
+    }
+
+    private static class newMessageNodeAsyncTask extends AsyncTask<Void,Void,Void> {
+        private MessageDao mAsyncTaskDao;
+        private MessageNode messageNode;
+        private String user_id;
+        private String username;
+
+        newMessageNodeAsyncTask(MessageDao dao,String user_id,String username,MessageNode messageNode){
+            this.mAsyncTaskDao=dao;
+            this.messageNode=messageNode;
+            this.user_id=user_id;
+            this.username=username;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            int message_index=mAsyncTaskDao.searchAndCreateMessage(user_id,username);
+            mAsyncTaskDao.addMessageNode(message_index,messageNode);
             return null;
         }
     }

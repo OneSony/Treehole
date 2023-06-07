@@ -19,5 +19,12 @@
         android:layout_gravity="center_horizontal|center_vertical"
         android:text="没有消息" />
 
+    <Button
+        android:id="@+id/chat_temp_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="receive msg from test_user" />
+
 
 </FrameLayout>

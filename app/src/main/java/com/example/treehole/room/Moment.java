@@ -63,7 +63,7 @@ public class Moment implements Serializable {
         this.favourite_num=0;
 
 
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'");
         try {
             this.date = inputFormat.parse(date_str);
         } catch (ParseException e) {

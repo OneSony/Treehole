@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -67,6 +68,14 @@ public class ChatFragment extends Fragment {
         setHasOptionsMenu(true);
 
         ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+        Button button = view.findViewById(R.id.chat_temp_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewModel.receiveMessageNode("test_user", "test_user", new MessageNode(0, "test"));
+            }
+        });
 
         noDataTextView=view.findViewById(R.id.chat_no_data);
 
@@ -237,4 +246,5 @@ public class ChatFragment extends Fragment {
         SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.clearFocus();
     }
+
 }
