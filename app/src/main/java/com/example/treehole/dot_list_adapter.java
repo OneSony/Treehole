@@ -148,11 +148,11 @@ class dot_view_holder extends RecyclerView.ViewHolder{
     public final TextView comment_box;
     public final TextView collect_box;
 
-    public final ImageView photo1;
+    public  ImageView photo1;
 
-    public final ImageView photo2;
+    public  ImageView photo2;
 
-    public final ImageView photo3;
+    public  ImageView photo3;
     public dot_view_holder(@NonNull View itemView, dot_list_adapter dot_list_adapter) {
         super(itemView);
         topic_box=itemView.findViewById(R.id.topic_box);
@@ -163,9 +163,7 @@ class dot_view_holder extends RecyclerView.ViewHolder{
         like_box =itemView.findViewById(R.id.like_box);
         comment_box=itemView.findViewById(R.id.comment_box);
         collect_box=itemView.findViewById(R.id.collect_box);
-        photo1=itemView.findViewById(R.id.photo1);
-        photo2=itemView.findViewById(R.id.photo2);
-        photo3=itemView.findViewById(R.id.photo3);
+
 
         /*itemView.setOnClickListener(new View.OnClickListener(){
             @Override
