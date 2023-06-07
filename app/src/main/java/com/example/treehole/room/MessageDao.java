@@ -39,6 +39,15 @@ public interface MessageDao {
         }
     }
 
+    @Transaction
+    default void addMessageNodeWithoutUnread(int index, MessageNode messageNode) {//吧message的index传进来
+        Message message = _getMessageByIndex(index);
+        if (message != null) {
+            message.getNodes().add(messageNode);
+            updateMessage(message);
+        }
+    }
+
     @Query("SELECT * FROM message_table WHERE user_id = :userId")
     Message getMessageByUserId(String userId);
 

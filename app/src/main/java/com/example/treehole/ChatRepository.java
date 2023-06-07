@@ -35,7 +35,7 @@ public class ChatRepository {
         return new getAsyncTask(messageDao,index).execute().get();
     }
 
-    public void addMessageNode(int index, MessageNode messageNode) {
+    public void addMessageNode(int index, MessageNode messageNode) {//自己发送消息的接口
         new insertNodeAsyncTask(messageDao, index, messageNode).execute();
     }
 
@@ -103,7 +103,7 @@ public class ChatRepository {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            mAsyncTaskDao.addMessageNode(index,messageNode);
+            mAsyncTaskDao.addMessageNodeWithoutUnread(index,messageNode);
             return null;
         }
     }
