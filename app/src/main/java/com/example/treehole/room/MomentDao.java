@@ -1,15 +1,6 @@
 package com.example.treehole.room;
 
-import androidx.lifecycle.LiveData;
-import androidx.paging.DataSource;
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-
-import java.util.List;
-
-@Dao
+/*@Dao
 public interface MomentDao {
 
 
@@ -37,3 +28,4 @@ public interface MomentDao {
     List<Moment> getNextMoments(int currentIndex);
 
 }
+*/

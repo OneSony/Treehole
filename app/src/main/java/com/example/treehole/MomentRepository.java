@@ -1,19 +1,7 @@
 package com.example.treehole;
 
-import android.app.Application;
-import android.os.AsyncTask;
-
-import androidx.lifecycle.LiveData;
-
-import com.example.treehole.room.Moment;
-import com.example.treehole.room.MomentDao;
-import com.example.treehole.room.MomentDatabase;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-public class MomentRepository {
-    private MomentDao mMomentDao;
+/*public class MomentRepository {
+    //private MomentDao mMomentDao;
     private LiveData<List<Moment>> mAllMoment;
 
     MomentRepository(Application application){
@@ -21,6 +9,7 @@ public class MomentRepository {
         mMomentDao=db.momentDao();
         mAllMoment=mMomentDao.getAll();
     }
+
 
     public LiveData<List<Moment>> getAllMoment(){
         return mAllMoment;
@@ -80,3 +69,4 @@ public class MomentRepository {
     }
 
 }
+*/

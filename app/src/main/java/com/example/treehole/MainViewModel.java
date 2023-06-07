@@ -16,14 +16,13 @@ import com.example.treehole.paging.MomentPagingSource;
 import com.example.treehole.room.Moment;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import kotlinx.coroutines.CoroutineScope;
 
 public class MainViewModel extends AndroidViewModel {
 
 
-    private MomentRepository mMomentRepository;
+    //private MomentRepository mMomentRepository;
 
     private LiveData<List<Moment>> AllMoment;
 
@@ -32,10 +31,11 @@ public class MainViewModel extends AndroidViewModel {
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        mMomentRepository=new MomentRepository(application);
+        //mMomentRepository=new MomentRepository(application);
         //AllMoment=mMomentRepository.getAllMoment();
     }
 
+    /*
     public LiveData<List<Moment>> getAllMoment(){
         return AllMoment;
     }
@@ -44,7 +44,7 @@ public class MainViewModel extends AndroidViewModel {
         mMomentRepository.insert(moment);
     }
 
-    public void deleteAll(){mMomentRepository.deleteAll();}
+    public void deleteAll(){mMomentRepository.deleteAll();}*/
 
     public LiveData<PagingData<Moment>> getPaging(){
         CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
@@ -56,8 +56,8 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-
+/*
     public int getMomentCount() throws ExecutionException, InterruptedException {
         return mMomentRepository.getMomentCount();
-    }
+    }*/
 }

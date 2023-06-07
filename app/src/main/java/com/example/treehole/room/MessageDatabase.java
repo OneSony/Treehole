@@ -17,7 +17,7 @@ public abstract class MessageDatabase extends RoomDatabase {
 
     public static MessageDatabase getDatabase(final Context context){
         if(INSTANCE==null){
-            synchronized (MomentDatabase.class){
+            synchronized (MessageDatabase.class){
                 if(INSTANCE==null){
                     INSTANCE= Room.databaseBuilder(context.getApplicationContext(),MessageDatabase.class,"message_database").addCallback(sOnOpenCallback).fallbackToDestructiveMigration().build();
                 }

@@ -21,10 +21,8 @@ import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.application;
 import com.example.treehole.dot_list;
 import com.example.treehole.paging.MomentPagingAdapter;
-import com.example.treehole.room.Moment;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 
 public class MainFragment_sub1 extends Fragment {
@@ -61,13 +59,15 @@ public class MainFragment_sub1 extends Fragment {
 
 
         MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        viewModel.deleteAll();
-
+        //viewModel.deleteAll();
+/*
         for(int i=0;i<2;i++){
             viewModel.insert(new Moment("TOPIC "+String.valueOf(i),"TEXT "+String.valueOf(i)));
         }
 
+ */
 
+/*
         try {
             Log.d("SIZE",String.valueOf(viewModel.getMomentCount()));
         } catch (ExecutionException e) {
@@ -75,7 +75,7 @@ public class MainFragment_sub1 extends Fragment {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
+*/
         recyclerView=view.findViewById(R.id.recycle_box);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

@@ -130,40 +130,6 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
         }*/
 
         return future;
-
-        // 在这里进行网络请求，从服务器获取Moment结构体数据
-        // 这里假设你使用的是某个网络库或框架进行网络请求
-
-        /*
-
-        WebUtils.WebCallback callback = new WebUtils.WebCallback() {
-            @Override
-            public void onSuccess(JSONObject json) {
-                Log.e("OkHttp", "?");
-
-                List<Moment> moments = null;//需要把json翻译成moments
-
-                LoadResult<Integer, Moment> result = new LoadResult.Page<>(
-                        moments,  // 当前页的数据
-                        null,     // 上一页的键（可选，如果没有上一页则为null）
-                        null      // 下一页的键（可选，如果没有下一页则为null），应该要写当前的最后一个的index
-                );
-                future.set(result); // 设置异步任务的结果
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                future.setException(t);
-            }
-
-            @Override
-            public void onFailure(JSONObject json) {
-
-            }
-        };*/
-        //使用网络！！
-        //WebUtils.sendGet(,,);
     }
 
 
