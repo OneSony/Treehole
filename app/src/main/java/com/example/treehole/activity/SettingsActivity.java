@@ -207,6 +207,29 @@ public class SettingsActivity extends AppCompatActivity {
                             // 在这里获取到文本框的字符串 enteredText，并进行相应的操作
                             Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
                             //连接服务器！！！
+                            JSONObject jsonObject = new JSONObject();
+                            try {
+                                jsonObject.put("username", enteredText);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            WebUtils.sendPost("/users/change_username/", true, jsonObject, new WebUtils.WebCallback() {
+                                @Override
+                                public void onSuccess(JSONObject json) {
+                                    Log.d("CHANGEUSERNAME", "successful");
+                                }
+
+                                @Override
+                                public void onError(Throwable t) {
+                                    Log.d("CHANGEUSERNAME", t.getMessage());
+                                }
+
+                                @Override
+                                public void onFailure(JSONObject json) {
+                                    Log.d("CHANGEUSERNAME", json.optString("message", "onFailure"));
+                                }
+                            });
                         }
                     });
 
@@ -241,6 +264,29 @@ public class SettingsActivity extends AppCompatActivity {
                             // 在这里获取到文本框的字符串 enteredText，并进行相应的操作
                             Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
                             //连接服务器！！！
+                            JSONObject jsonObject = new JSONObject();
+                            try {
+                                jsonObject.put("description", enteredText);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            WebUtils.sendPost("/users/change_description/", true, jsonObject, new WebUtils.WebCallback() {
+                                @Override
+                                public void onSuccess(JSONObject json) {
+                                    Log.d("CHANGEDESCRIPTION", "successful");
+                                }
+
+                                @Override
+                                public void onError(Throwable t) {
+                                    Log.d("CHANGEDESCRIPTION", t.getMessage());
+                                }
+
+                                @Override
+                                public void onFailure(JSONObject json) {
+                                    Log.d("CHANGEDESCRIPTION", json.optString("message", "onFailure"));
+                                }
+                            });
                         }
                     });
 
