@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -37,6 +38,8 @@ public class SearchUserActivity extends AppCompatActivity {
 
     private TextView noDataTextView;
 
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +49,9 @@ public class SearchUserActivity extends AppCompatActivity {
 
         noDataTextView=findViewById(R.id.search_no_data);
         noDataTextView.setVisibility(View.GONE);
+
+        progressBar=findViewById(R.id.search_progress);
+        progressBar.setVisibility(View.GONE);
 
         setSupportActionBar(findViewById(R.id.search_user_toolbar));
         ActionBar bar=getSupportActionBar();
@@ -79,13 +85,13 @@ public class SearchUserActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
+        //刚进来的时候就要提交搜索
+        noDataTextView.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
 
-        //测试数据！！！！
+        adapter.setSearchUserResults(new ArrayList<>());
+        adapter.notifyDataSetChanged();
         List<SearchUserResult> searchUserResults=new ArrayList<>();
-        /*searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
-
-        adapter.setSearchUserResults(searchUserResults);
-        adapter.notifyDataSetChanged();*/
         searchAndInsert(query, searchUserResults, adapter);
 
 
@@ -96,11 +102,15 @@ public class SearchUserActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // 处理搜索提交事件
+                noDataTextView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
 
-                //测试数据！！！！
+                adapter.setSearchUserResults(new ArrayList<>());
+                adapter.notifyDataSetChanged();
+
                 List<SearchUserResult> searchUserResults=new ArrayList<>();
-                //searchUserResults.add(new SearchUserResult(query,query+"'s username","?"));
                 searchAndInsert(query, searchUserResults, adapter);
+
 
                 return true;
             }
@@ -131,16 +141,23 @@ public class SearchUserActivity extends AppCompatActivity {
             @Override
             public void onSuccess(JSONObject json) {
                 try {
+                    progressBar.setVisibility(View.GONE);
                     JSONArray users = json.getJSONArray("message");
                     if (users.length() == 0) {
                         Log.d("ADD","NODATA");
+
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                noDataTextView.setVisibility(View.VISIBLE);
+                            }
+                        });
+
                     }else {
                         for (int i = 0; i < users.length(); i++) {
                             JSONObject user = users.getJSONObject(i);
                             String user_id = user.getString("user_id");
                             String username = user.getString("username");
-                            String profile_picture = user.isNull("profile_picture") ? "" : user.getString("profile_picture");
-                            listContainer.add(new SearchUserResult(user_id, username, profile_picture));
+                            listContainer.add(new SearchUserResult(user_id, username));
                         }
 
                         runOnUiThread(new Runnable() {
@@ -159,12 +176,13 @@ public class SearchUserActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable t) {
+                progressBar.setVisibility(View.GONE);
                 Log.e("SEARCHUSERACTIVITY", "ERROR: "+t.getMessage());
             }
 
             @Override
             public void onFailure(JSONObject json) {
-
+                progressBar.setVisibility(View.GONE);
                 Log.e("SEARCHUSERACTIVITY", "FAILURE: "+json.optString("message", "onFailure"));
             }
         });

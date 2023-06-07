@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,11 +93,15 @@ public class EditActivity extends AppCompatActivity {
 
     private ExoPlayer player;
 
+    ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
+        progressBar=findViewById(R.id.edit_location_progress);
+        progressBar.setVisibility(View.GONE);
 
         setSupportActionBar(findViewById(R.id.edit_toolbar));
         ActionBar bar = getSupportActionBar();
@@ -571,7 +576,9 @@ public class EditActivity extends AppCompatActivity {
 
                 TextView locationTextView = findViewById(R.id.edit_location);
                 locationTextView.setText("定位中");
-                locationTextView.setVisibility(View.VISIBLE);
+
+                locationTextView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
 
                 LocationManager locationManager;
                 LocationListener locationListener;
@@ -603,9 +610,13 @@ public class EditActivity extends AppCompatActivity {
                                             @Override
                                             public void run() {
                                                 // 在主线程中处理返回的城市名称
+
+                                                locationTextView.setVisibility(View.VISIBLE);
                                                 locationFlag = true;
                                                 locationTextView.setText(cityName);
                                                 locationName = cityName;
+
+                                                progressBar.setVisibility(View.GONE);
                                                 Log.d("LOCATION", "City Name: " + cityName);
 
                                                 // 在这里进行UI更新或其他操作
@@ -614,8 +625,21 @@ public class EditActivity extends AppCompatActivity {
                                     }
                                 } catch (IOException e) {
                                     Log.e("LOCATION", "Error: " + e.getMessage());
-                                    locationTextView.setVisibility(View.GONE);
-                                    locationFlag = false;
+
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // 在主线程中处理返回的城市名称
+
+                                            locationTextView.setVisibility(View.VISIBLE);
+                                            locationTextView.setText("定位失败");
+                                            progressBar.setVisibility(View.GONE);
+                                            locationFlag = false;
+
+                                            // 在这里进行UI更新或其他操作
+                                        }
+                                    });
+
                                     e.printStackTrace();
                                 }
                             }

@@ -1,5 +1,6 @@
 package com.example.treehole;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.treehole.room.Message;
 
 import java.util.List;
@@ -60,6 +62,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatViewHolder> {
         }else{
             holder.chat_unread_card.setVisibility(View.VISIBLE);
         }
+
+
+        String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+messages.get(position).getUser_id();
+        Log.d("PROFILE URL",profile_photo_url);
+        Glide.with(holder.itemView.getContext()).load(profile_photo_url).into(holder.profile_photo);
 
 
 

@@ -153,4 +153,8 @@ public class UserUtils {
         editor.clear();
         editor.apply();
     }
+
+    public static String getUsername(){
+        return userDetails.getString(USERNAME, "");
+    }
 }

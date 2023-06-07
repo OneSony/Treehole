@@ -1,6 +1,7 @@
 package com.example.treehole;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,10 @@ public class SearchUserListAdapter extends RecyclerView.Adapter<SearchUserViewHo
     @Override
     public void onBindViewHolder(@NonNull SearchUserViewHolder holder, int position) {
         holder.textView.setText(searchUserResults.get(position).getUsername());
-        Glide.with(context).load(searchUserResults.get(position).getPhoto()).into(holder.imageView);
+
+        String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+searchUserResults.get(position).getUser_id();
+        Log.d("PROFILE URL",profile_photo_url);
+        Glide.with(holder.itemView.getContext()).load(profile_photo_url).into(holder.imageView);
 
         holder.itemView.setOnClickListener(new View.OnClickListener(){
             @Override

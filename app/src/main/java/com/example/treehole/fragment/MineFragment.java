@@ -9,15 +9,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.treehole.R;
+import com.example.treehole.WebUtils;
 import com.example.treehole.activity.FollowerActivity;
 import com.example.treehole.activity.LoginActivity;
-import com.example.treehole.R;
 import com.example.treehole.activity.SettingsActivity;
-import com.example.treehole.WebUtils;
 
 
 public class MineFragment extends Fragment {
@@ -70,6 +71,8 @@ public class MineFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        TextView my_username = view.findViewById(R.id.mine_my_username);
 
 
         return view;
