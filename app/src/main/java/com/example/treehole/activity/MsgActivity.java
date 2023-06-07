@@ -45,6 +45,8 @@ public class MsgActivity extends AppCompatActivity {
 
     private String username="";
 
+    boolean isFirstLoad = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +87,16 @@ public class MsgActivity extends AppCompatActivity {
                 bar.setTitle(username);
                 adapter.setMessageNodes(messageNodes);
                 adapter.notifyDataSetChanged();
+
+                if (isFirstLoad) { // 只在第一次加载数据时滑动到最下面
+                    isFirstLoad = false; // 将标志设置为false，避免以后每次更新数据都滑动到最下面
+
+                    // 滑动RecyclerView到最下面
+                    int lastItemPosition = adapter.getItemCount() - 1;
+                    recyclerView.scrollToPosition(lastItemPosition);
+                    // 或者使用平滑滚动
+                    // recyclerView.smoothScrollToPosition(lastItemPosition);
+                }
             }
         });
 

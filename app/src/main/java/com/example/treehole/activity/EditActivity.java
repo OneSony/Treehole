@@ -552,93 +552,20 @@ public class EditActivity extends AppCompatActivity {
 
     public void location_click(View view) {
 
-        if (locationFlag == false) {
-
-
+        if (locationFlag == false) {//没有添加定位信息
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // 请求获取定位权限
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);//?
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+
             } else {
-                // 已经具有定位权限，可以开始使用定位服务
-                TextView locationTextView = findViewById(R.id.edit_location);
-                locationTextView.setText("定位中");
-                locationTextView.setVisibility(View.VISIBLE);
 
-                LocationManager locationManager;
-                LocationListener locationListener;
-
-                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-                // 初始化 LocationListener
-                locationListener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-
-                        Thread locationThread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // 调用定位服务获取位置信息
-                                // 这里假设已经获取到了位置信息，包括经纬度
-
-                                // 查询地理位置
-                                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                                try {
-                                    List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                                    if (addresses != null && addresses.size() > 0) {
-                                        Address address = addresses.get(0);
-                                        String cityName = address.getLocality(); // 获取城市名称
-
-                                        // 在新线程中获取到城市名称后，通过回调将结果返回
-
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                // 在主线程中处理返回的城市名称
-                                                locationFlag = true;
-                                                locationTextView.setText(cityName);
-                                                locationName=cityName;
-                                                Log.d("LOCATION", "City Name: " + cityName);
-
-                                                // 在这里进行UI更新或其他操作
-                                            }
-                                        });
-                                    }
-                                } catch (IOException e) {
-                                    Log.e("LOCATION", "Error: " + e.getMessage());
-                                    locationTextView.setVisibility(View.GONE);
-                                    locationFlag=false;
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                        locationThread.start(); // 启动线程
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-                        // 处理位置提供者状态更改
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String provider) {
-                        // 处理位置提供者启用
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String provider) {
-                        // 处理位置提供者禁用
-                    }
-                };
-
-                // 请求一次位置更新
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-                }
+                location();
 
             }
-        } else {
+        } else {//添加了定位信息，要取消
             TextView locationTextView = findViewById(R.id.edit_location);
             locationTextView.setText("定位中");
             locationTextView.setVisibility(View.GONE);
@@ -680,6 +607,98 @@ public class EditActivity extends AppCompatActivity {
             List<String> uris=new ArrayList<>();
             return uris;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                location();
+            } else {
+                // 用户拒绝授予权限
+                // 在这里处理拒绝权限的情况，例如显示一个提示信息或提供其他解决方案
+            }
+        }
+    }
+
+    private void location(){
+        TextView locationTextView = findViewById(R.id.edit_location);
+        locationTextView.setText("定位中");
+        locationTextView.setVisibility(View.VISIBLE);
+
+        LocationManager locationManager;
+        LocationListener locationListener;
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        // 初始化 LocationListener
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                Thread locationThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 调用定位服务获取位置信息
+                        // 这里假设已经获取到了位置信息，包括经纬度
+
+                        // 查询地理位置
+                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                            if (addresses != null && addresses.size() > 0) {
+                                Address address = addresses.get(0);
+                                String cityName = address.getLocality(); // 获取城市名称
+
+                                // 在新线程中获取到城市名称后，通过回调将结果返回
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // 在主线程中处理返回的城市名称
+                                        locationFlag = true;
+                                        locationTextView.setText(cityName);
+                                        locationName=cityName;
+                                        Log.d("LOCATION", "City Name: " + cityName);
+
+                                        // 在这里进行UI更新或其他操作
+                                    }
+                                });
+                            }
+                        } catch (IOException e) {
+                            Log.e("LOCATION", "Error: " + e.getMessage());
+                            locationTextView.setVisibility(View.GONE);
+                            locationFlag=false;
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                locationThread.start(); // 启动线程
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                // 处理位置提供者状态更改
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                // 处理位置提供者启用
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                // 处理位置提供者禁用
+            }
+        };
+
+        // 请求一次位置更新
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+        }
+
     }
 }
 
