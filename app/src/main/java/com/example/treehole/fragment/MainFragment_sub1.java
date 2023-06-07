@@ -81,6 +81,7 @@ public class MainFragment_sub1 extends Fragment {
 
 
         adapter=new MomentPagingAdapter(getContext());
+
         recyclerView.setAdapter(adapter);
         MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);
 
@@ -111,6 +112,7 @@ public class MainFragment_sub1 extends Fragment {
                 break;
             }
         }
+
 
         app=(application)getActivity().getApplication();
         if (currentFragment instanceof MainFragment) {
@@ -153,6 +155,7 @@ public class MainFragment_sub1 extends Fragment {
         //data_list=app.data_list;
         //adapter.notifyDataSetChanged();
         adapter.refresh();
+
         recyclerView.scrollToPosition(0);
         Log.d("UPDATE","UPDATA!");
     }

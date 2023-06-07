@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 
 public class MomentPagingSource extends ListenableFuturePagingSource<String, Moment> {
+
+
     //需要用到线程池
     private ListeningExecutorService executorService= MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     String query;
@@ -37,6 +39,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
     /*public MomentPagingSource(MomentDao myDao) {
         this.myDao = myDao;
+
     }*/
 
     @NotNull

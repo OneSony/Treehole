@@ -1,19 +1,32 @@
 package com.example.treehole.activity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
 import com.example.treehole.room.Moment;
+import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 public class InfoActivity extends AppCompatActivity {
     private TextView topic_box;
@@ -25,11 +38,13 @@ public class InfoActivity extends AppCompatActivity {
 
     private Moment current_moment;
 
-    public ImageView photo1;
 
-    public ImageView photo2;
+    public ImageView[] imageViewArray;
+    public ConstraintLayout[] constraintLayouts;
 
-    public ImageView photo3;
+    public LinearLayout photos;
+
+    public PlayerView video;
 
 
     @Override
@@ -73,6 +88,129 @@ public class InfoActivity extends AppCompatActivity {
         auth_box.setText(current_moment.getUsername());
         date_box.setText(current_moment.getFullDate());
 
+
+
+        imageViewArray = new ImageView[9];
+        imageViewArray[0]=findViewById(R.id.info_photo1);
+        imageViewArray[1]=findViewById(R.id.info_photo2);
+        imageViewArray[2]=findViewById(R.id.info_photo3);
+        imageViewArray[3]=findViewById(R.id.info_photo4);
+        imageViewArray[4]=findViewById(R.id.info_photo5);
+        imageViewArray[5]=findViewById(R.id.info_photo6);
+        imageViewArray[6]=findViewById(R.id.info_photo7);
+        imageViewArray[7]=findViewById(R.id.info_photo8);
+        imageViewArray[8]=findViewById(R.id.info_photo9);
+
+        constraintLayouts = new ConstraintLayout[9];
+        constraintLayouts[0]=findViewById(R.id.info_photo_layout1);
+        constraintLayouts[1]=findViewById(R.id.info_photo_layout2);
+        constraintLayouts[2]=findViewById(R.id.info_photo_layout3);
+        constraintLayouts[3]=findViewById(R.id.info_photo_layout4);
+        constraintLayouts[4]=findViewById(R.id.info_photo_layout5);
+        constraintLayouts[5]=findViewById(R.id.info_photo_layout6);
+        constraintLayouts[6]=findViewById(R.id.info_photo_layout7);
+        constraintLayouts[7]=findViewById(R.id.info_photo_layout8);
+        constraintLayouts[8]=findViewById(R.id.info_photo_layout9);
+
+        photos=findViewById(R.id.info_photos);
+        video=findViewById(R.id.info_video);
+
+        int photo_num=current_moment.getImages().size();
+
+
+
+        if(photo_num==0){
+            photos.setVisibility(View.GONE);
+        }else{
+            photos.setVisibility(View.VISIBLE);
+
+            for(int i=0;i<photo_num;i++){
+                constraintLayouts[i].setVisibility(View.VISIBLE);
+                imageViewArray[i].setVisibility(View.VISIBLE);
+                int finalI = i;
+                imageViewArray[i].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Dialog dialog = new Dialog(InfoActivity.this, android.R.style.Theme_Material_Light_NoActionBar_Fullscreen);
+                        dialog.setContentView(R.layout.dialog_photo);
+
+                        // 创建动画对象
+                        Animation animation = new AlphaAnimation(0.0f, 1.0f);
+                        animation.setDuration(150); // 设置动画持续时间
+
+// 将动画应用到对话框的窗口
+                        Window window = dialog.getWindow();
+                        if (window != null) {
+                            window.setWindowAnimations(android.R.style.Animation_Dialog); // 设置窗口动画样式
+                            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                        }
+
+                        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialogInterface) {
+                                PhotoView photoView=dialog.findViewById(R.id.dialog_photo);
+                                Glide.with(getApplicationContext()).load(current_moment.getImages().get(finalI)).into(photoView);
+                                photoView.setVisibility(View.VISIBLE);
+
+                                Button button=dialog.findViewById(R.id.dialog_button);
+                                if (button != null) {
+                                    button.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            dialog.dismiss(); // 点击对话框根布局，关闭对话框
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+
+                        // 显示对话框
+                        dialog.show();
+                    }
+                });
+
+                Glide.with(getApplicationContext()).load(current_moment.getImages().get(i)).into(imageViewArray[i]);
+
+            }
+
+
+
+            if(photo_num<=3) {
+                for (int i = photo_num; i < 3; i++) {
+                    constraintLayouts[i].setVisibility(View.GONE);
+                }
+
+                for (int i = 3; i < 9; i++) {
+                    constraintLayouts[i].setVisibility(View.GONE);
+                }
+            }else if(photo_num<=6){
+                for (int i = photo_num; i < 6; i++) {
+                    constraintLayouts[i].setVisibility(View.INVISIBLE);
+                }
+
+                for (int i = 6; i < 9; i++) {
+                    constraintLayouts[i].setVisibility(View.GONE);
+                }
+            }else if(photo_num<=9){
+                for (int i = photo_num; i < 9; i++) {
+                    constraintLayouts[i].setVisibility(View.INVISIBLE);
+                }
+            }
+        }
+
+        if(current_moment.getVideos().size()==0){
+            video.setVisibility(View.GONE);
+        }else{
+            video.setVisibility(View.VISIBLE);
+
+            ExoPlayer player;
+            player = new ExoPlayer.Builder(getApplicationContext()).build();
+            video.setPlayer(player);
+            MediaItem mediaItem = MediaItem.fromUri(current_moment.getVideos().get(0));
+            player.setMediaItem(mediaItem);
+            player.prepare();
+        }
 
             /*
 

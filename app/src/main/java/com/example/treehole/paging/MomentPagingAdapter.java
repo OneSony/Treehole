@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.paging.LoadState;
 import androidx.paging.PagingDataAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,12 +35,20 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.treehole.R;
+import com.example.treehole.WebUtils;
 import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.room.Moment;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.PlayerView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
+
+
 
     Context context;
 
@@ -53,7 +62,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             @Override
             public boolean areContentsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
                 //Log.d("SAME?",String.valueOf(oldItem.getText().equals(newItem.getText())&&oldItem.topic.equals(newItem.topic)));
-                return oldItem.getText().equals(newItem.getText())&&oldItem.getTopic().equals(newItem.getTopic());
+                return oldItem.getText().equals(newItem.getText())&&oldItem.getTopic().equals(newItem.getTopic())&&oldItem.getLikes_num()==newItem.getLikes_num()&&oldItem.getFavourite_num()==newItem.getFavourite_num();
             }
         });
 
@@ -85,11 +94,115 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             holder.topic_box.setText(moment.getTopic());
             holder.main_box.setText(moment.getText());
 
+
+            holder.itemView.findViewById(R.id.like_icon).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
+
+                    //if(likeFlag==false) {
+                    if(true) {
+
+                        //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
+                        JSONObject json = new JSONObject();
+                        try {
+                            json.put("id", moment.getId());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        WebUtils.sendPost("/posts/like/", true, json, new WebUtils.WebCallback() {
+                            @Override
+                            public void onSuccess(JSONObject json) {
+                                try {
+                                    Log.d("SUCCESS", json.getString("message"));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                Log.e("ERROR", t.getMessage());
+                            }
+
+                            @Override
+                            public void onFailure(JSONObject json) {
+                                try {
+                                    Log.e("FAILURE", json.getString("message"));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }else{
+
+                        int like_num=Integer.parseInt(holder.like_box.getText().toString());
+                        like_num--;
+                        holder.like_box.setText(String.valueOf(like_num));
+
+
+                    }
+                }
+            });
+
+            holder.itemView.findViewById(R.id.collect_icon).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
+
+                    //if(likeFlag==false) {
+                    if(true) {
+
+                        //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
+                        JSONObject json = new JSONObject();
+                        try {
+                            json.put("id", moment.getId());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        WebUtils.sendPost("/posts/favourite/", true, json, new WebUtils.WebCallback() {
+                            @Override
+                            public void onSuccess(JSONObject json) {
+                                try {
+                                    Log.d("SUCCESS", json.getString("message"));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                Log.e("ERROR", t.getMessage());
+                            }
+
+                            @Override
+                            public void onFailure(JSONObject json) {
+                                try {
+                                    Log.e("FAILURE", json.getString("message"));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }else{
+
+                        int like_num=Integer.parseInt(holder.collect_box.getText().toString());
+                        like_num--;
+                        holder.collect_box.setText(String.valueOf(like_num));
+
+
+                    }
+                }
+            });
+
+
+
             Log.d("PHOTO_SIZE",String.valueOf(moment.getImages().size()));
 
             int photo_num=moment.getImages().size();
 
-            String invisible="null";
             if(photo_num==0){
                 holder.photos.setVisibility(View.GONE);
             }else{
@@ -143,37 +256,11 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
 
 
                     Log.d("PHOTO_URL",String.valueOf(i)+moment.getImages().get(i));
-                    Glide.with(holder.itemView.getContext()).load(moment.getImages().get(i)).listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            // 图片加载失败时的处理逻辑
-                            Log.d("Glide!!!!","WW");
-
-                            return false; // 返回false表示未处理，Glide会继续处理后续的回调
-                        }
-
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            // 图片加载成功时的处理逻辑
-                            return false; // 返回false表示未处理，Glide会继续处理后续的回调
-                        }
-                    }).into(holder.imageViewArray[i]);
+                    Glide.with(holder.itemView.getContext()).load(moment.getImages().get(i)).into(holder.imageViewArray[i]);
 
                 }
 
 
-                Log.d("PHOTO",moment.getTopic()+" "+moment.getText()+" "+String.valueOf(photo_num));
-/*
-                for(int i=photo_num;i<9;i++){
-                    holder.imageViewArray[i].setVisibility(View.GONE);
-                    Log.d("DISMISS",String.valueOf(i));
-                }
-
-*/
-                for(int i=photo_num;i<9;i++){
-                    invisible+=String.valueOf(i);
-                    holder.constraintLayouts[i].setVisibility(View.GONE);
-                }
 
                 if(photo_num<=3) {
                     for (int i = photo_num; i < 3; i++) {
@@ -200,6 +287,18 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
 
             if(moment.getVideos().size()==0){
                 holder.video.setVisibility(View.GONE);
+            }else{
+                holder.video.setVisibility(View.VISIBLE);
+
+                ExoPlayer player;
+                player = new ExoPlayer.Builder(context).build();
+                holder.video.setPlayer(player);
+                // Build the media item.
+                MediaItem mediaItem = MediaItem.fromUri(moment.getVideos().get(0));
+// Set the media item to be played.
+                player.setMediaItem(mediaItem);
+// Prepare the player.
+                player.prepare();
             }
 
             if(moment.getTags().size()==0){
@@ -226,6 +325,8 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                 }
             });
         }
+
+
     }
 
     /*

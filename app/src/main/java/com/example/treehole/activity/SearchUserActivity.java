@@ -141,14 +141,16 @@ public class SearchUserActivity extends AppCompatActivity {
             @Override
             public void onSuccess(JSONObject json) {
                 try {
-                    ProgressBar progressBar=findViewById(R.id.edit_location_progress);
-                    progressBar.setVisibility(View.GONE);
                     JSONArray users = json.getJSONArray("message");
                     if (users.length() == 0) {
                         Log.d("ADD","NODATA");
 
                         runOnUiThread(new Runnable() {
                             public void run() {
+
+                                ProgressBar progressBar=findViewById(R.id.search_progress);
+                                progressBar.setVisibility(View.GONE);
+
                                 noDataTextView.setVisibility(View.VISIBLE);
                             }
                         });
@@ -163,6 +165,9 @@ public class SearchUserActivity extends AppCompatActivity {
 
                         runOnUiThread(new Runnable() {
                             public void run() {
+
+                                ProgressBar progressBar=findViewById(R.id.search_progress);
+                                progressBar.setVisibility(View.GONE);
                                 adapter.setSearchUserResults(listContainer);
                                 adapter.notifyDataSetChanged();
                             }

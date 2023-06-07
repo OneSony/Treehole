@@ -232,7 +232,7 @@ public class EditActivity extends AppCompatActivity {
             if (uris.size() != 0) {
 
                 for (int i = 0; i < uris.size(); i++) {
-                    getContentResolver().takePersistableUriPermission(uris.get(i), Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    getContentResolver().takePersistableUriPermission(uris.get(i), Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     adapter.addUris(uris.get(i));
                 }
 
