@@ -1,7 +1,6 @@
 package com.example.treehole.paging;
 
 
-import android.icu.text.SimpleDateFormat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -22,10 +21,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -106,7 +103,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
                             // 处理列表中的数据
                             for (int ii = 0; ii < nestedArray.length(); ii++) {
-                                Object listItem = nestedArray.get(i);
+                                Object listItem = nestedArray.get(ii);
                                 // 将列表项转换为字符串并添加到 List<String> 中
                                 imagesList.add(String.valueOf(listItem));
                             }
