@@ -64,6 +64,7 @@ dependencies {
     implementation 'me.pushy:sdk:1.0.91'
 
     implementation 'com.google.android.exoplayer:exoplayer:2.18.7'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
 
 }
