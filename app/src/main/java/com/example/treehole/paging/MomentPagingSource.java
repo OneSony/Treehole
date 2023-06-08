@@ -136,7 +136,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
                             // 处理列表中的数据
                             for (int ii = 0; ii < nestedArray.length(); ii++) {
-                                Object listItem = nestedArray.get(i);
+                                Object listItem = nestedArray.get(ii);
                                 // 将列表项转换为字符串并添加到 List<String> 中
                                 videosList.add(String.valueOf(listItem));
                             }

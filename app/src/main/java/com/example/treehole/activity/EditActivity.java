@@ -62,6 +62,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
+
 public class EditActivity extends AppCompatActivity {
 
 
@@ -456,65 +457,69 @@ public class EditActivity extends AppCompatActivity {
         /*Toast toast=Toast.makeText(this,mPreferences.getString("TOPIC_STR","none"),Toast.LENGTH_SHORT);
         toast.show();*/
 
-        // Setup a multipart body
-        MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM);
-
-        // Add title and text to it
-        RequestBody titleBody = RequestBody.create(topicInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
-        RequestBody textBody = RequestBody.create(textInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
-        requestBodyBuilder.addFormDataPart("title", null, titleBody);
-        requestBodyBuilder.addFormDataPart("text_content", null, textBody);
-
-        List<String> paths = getPaths();
-        List<File> files = new ArrayList<>();
-        for (int i = 0; i < paths.size(); i++) {
-            files.add(new File(paths.get(i)));
-        }
-        // Add image or video to it
-        if (selectFlag == 1) {
-            for (int i = 0; i < files.size(); i++) {
-                RequestBody imageBody = RequestBody.create(files.get(i), MediaType.parse("image/jpeg"));
-                requestBodyBuilder.addFormDataPart("image-" + (i + 1), files.get(i).getName(), imageBody);
+        FileUtils.CompressionHandler.Builder compressionHandlerBuilder = new FileUtils.CompressionHandler.Builder(getApplicationContext());
+        for (String uriString: getUris()){
+            if (selectFlag == 1) {
+                compressionHandlerBuilder.add(Uri.parse(uriString), FileUtils.MEDIA_TYPE.IMAGE);
+            }
+            if (selectFlag == 2) {
+                compressionHandlerBuilder.add(Uri.parse(uriString), FileUtils.MEDIA_TYPE.VIDEO);
             }
         }
-        if (selectFlag == 2) {
-            for (int i = 0; i < files.size(); i++) {
-                RequestBody videoBody = RequestBody.create(files.get(i), MediaType.parse("video/mp4"));
-                requestBodyBuilder.addFormDataPart("video" + (i + 1), files.get(i).getName(), videoBody);
-            }
-        }
-
-        WebUtils.sendPost("/posts/post/", true, requestBodyBuilder, new WebUtils.WebCallback() {
+        compressionHandlerBuilder.addCallback(new FileUtils.CompressionThreadCallback() {
             @Override
-            public void onSuccess(JSONObject json) {
-                try {
-                    Log.d("SUCCESS", json.getString("message"));
-                    paths.clear();
-                    files.clear();
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+            public void onResult(List<File> imageFiles, List<File> videoFiles) {
+                Log.d("COMPRESSIONDONE", "RESULT: images:"+imageFiles.size()+"|videos:"+videoFiles.size());
+
+                // Setup a multipart body
+                MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM);
+
+                // Add title and text to it
+                RequestBody titleBody = RequestBody.create(topicInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
+                RequestBody textBody = RequestBody.create(textInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
+                requestBodyBuilder.addFormDataPart("title", null, titleBody);
+                requestBodyBuilder.addFormDataPart("text_content", null, textBody);
+
+                // Add image or video to it
+                for (int i = 0; i < imageFiles.size(); i++) {
+                    RequestBody imageBody = RequestBody.create(imageFiles.get(i), MediaType.parse("image/jpeg"));
+                    requestBodyBuilder.addFormDataPart("image-" + (i + 1), imageFiles.get(i).getName(), imageBody);
                 }
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Log.e("ERROR", t.getMessage());
-                paths.clear();
-                files.clear();
-            }
-
-            @Override
-            public void onFailure(JSONObject json) {
-                try {
-                    Log.e("FAILURE", json.getString("message"));
-                    paths.clear();
-                    files.clear();
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                for (int i = 0; i < videoFiles.size(); i++) {
+                    RequestBody imageBody = RequestBody.create(videoFiles.get(i), MediaType.parse("image/jpeg"));
+                    requestBodyBuilder.addFormDataPart("video-" + (i + 1), videoFiles.get(i).getName(), imageBody);
                 }
+
+                WebUtils.sendPost("/posts/post/", true, requestBodyBuilder, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+                        try {
+                            Log.d("SUCCESS", json.getString("message"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        Log.e("ERROR", t.getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        try {
+                            Log.e("FAILURE", json.getString("message"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
             }
         });
+
+        FileUtils.CompressionHandler compressionHandler = compressionHandlerBuilder.build();
+        compressionHandler.start();
 
         Log.d("SEND", "TEST");
 
