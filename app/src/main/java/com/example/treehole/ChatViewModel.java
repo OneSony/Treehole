@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageNode;
+import com.example.treehole.room.UserInfo;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -58,5 +59,13 @@ public class ChatViewModel extends AndroidViewModel {
 
     public void deleteAllMessage(){
         mRepository.deleteAllMessage();
+    }
+
+    public LiveData<List<UserInfo>> getAllUserInfo() throws ExecutionException, InterruptedException {
+        return mRepository.getAllUserInfo();
+    }
+
+    public void updateUserInfo(String user_id,String username){
+        mRepository.updateUserInfo(user_id,username);
     }
 }

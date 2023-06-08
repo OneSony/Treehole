@@ -9,6 +9,7 @@ import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageDao;
 import com.example.treehole.room.MessageDatabase;
 import com.example.treehole.room.MessageNode;
+import com.example.treehole.room.UserInfo;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -59,7 +60,16 @@ public class ChatRepository {
         new deleteAllAsyncTask(messageDao).execute();
     }
 
-    private static class insertAsyncTask extends AsyncTask<Message,Void,Void> {
+    public LiveData<List<UserInfo>> getAllUserInfo() throws ExecutionException, InterruptedException {
+        return new getAllUserInfoAsyncTask(messageDao).execute().get();
+    }
+
+    public void updateUserInfo(String user_id,String username){
+        new updateUserInfoAsyncTask(messageDao,user_id,username);
+    }
+
+
+        private static class insertAsyncTask extends AsyncTask<Message,Void,Void> {
         private MessageDao mAsyncTaskDao;
 
         insertAsyncTask(MessageDao dao){
@@ -188,6 +198,35 @@ public class ChatRepository {
         @Override
         protected Void doInBackground(Void... voids) {
             mAsyncTaskDao.cleanMessageUnread(index);
+            return null;
+        }
+    }
+
+    private static class getAllUserInfoAsyncTask extends AsyncTask<Integer, Void, LiveData<List<UserInfo>>> {
+        private MessageDao mAsyncTaskDao;
+        getAllUserInfoAsyncTask(MessageDao dao){
+            mAsyncTaskDao=dao;
+        }
+
+        @Override
+        protected LiveData<List<UserInfo>> doInBackground(Integer... integers) {
+            return mAsyncTaskDao.getAllUserInfos();
+        }
+    }
+
+    private static class updateUserInfoAsyncTask extends AsyncTask<Void,Void,Void> {
+        private MessageDao mAsyncTaskDao;
+        private String user_id;
+        private String username;
+        updateUserInfoAsyncTask(MessageDao dao,String user_id,String username){
+            this.mAsyncTaskDao=dao;
+            this.user_id=user_id;
+            this.username=username;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.updateUsernameByUserId(user_id,username);
             return null;
         }
     }

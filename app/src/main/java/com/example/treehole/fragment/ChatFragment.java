@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,14 +24,19 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.treehole.ChatListAdapter;
 import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
+import com.example.treehole.WebUtils;
 import com.example.treehole.activity.MsgActivity;
 import com.example.treehole.activity.SearchUserActivity;
 import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageNode;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +74,65 @@ public class ChatFragment extends Fragment {
         setHasOptionsMenu(true);
 
         ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.chatSwipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                LiveData<List<Message>> allMessage;
+                allMessage = viewModel.getAllMessage();
+
+                if(allMessage.getValue()==null){
+                    swipeRefreshLayout.setRefreshing(false);
+                    return;
+                }
+
+                for(Message message:allMessage.getValue()){
+
+                    JSONObject json = new JSONObject();
+                    try {
+                        json.put("id", message.getUser_id());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("URL","users/username?id="+message.getUser_id());
+                    WebUtils.sendGet("users/username?id="+message.getUser_id(), true, new WebUtils.WebCallback() {
+                        @Override
+                        public void onSuccess(JSONObject json) {
+
+                            String username;
+                            try {
+                                JSONObject msg=json.getJSONObject("message");
+                                username=msg.getString("username");
+                                Log.d("SUCCESS", json.getString("message"));
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                            if(username!=null&&!(username.equals(message.getUser_id()))){
+                                viewModel.updateUserInfo(message.getUser_id(), username);
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+                            Log.e("ERROR", t.getMessage());
+                        }
+
+                        @Override
+                        public void onFailure(JSONObject json) {
+                            try {
+                                Log.e("FAILURE", json.getString("message"));
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+
 
         Button button = view.findViewById(R.id.chat_temp_button);
         button.setOnClickListener(new View.OnClickListener() {
