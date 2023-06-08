@@ -12,13 +12,17 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -33,8 +37,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,6 +64,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import io.noties.markwon.Markwon;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -81,6 +88,8 @@ public class EditActivity extends AppCompatActivity {
     private int selectFlag = 0;//当前选择了照片还是视频，0无，1照片，2视频
     private boolean locationFlag = false;
 
+    private boolean markdownFlag = false;
+
     private String locationName = "";
 
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
@@ -96,10 +105,21 @@ public class EditActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
 
+    private boolean markdown_realtime_preview;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        markdown_realtime_preview = sharedPreferences.getBoolean("markdown_realtime_preview", true);
+
+        if(markdown_realtime_preview==false){
+            Button button = findViewById(R.id.markdown_refresh_button);
+            button.setVisibility(View.VISIBLE);
+        }
 
         progressBar=findViewById(R.id.edit_location_progress);
         progressBar.setVisibility(View.GONE);
@@ -342,9 +362,66 @@ public class EditActivity extends AppCompatActivity {
             setView(selectFlag);
         }
 
+
+        ImageButton markdown_button = findViewById(R.id.markdown_button);
+        markdown_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConstraintLayout markdownLayout=findViewById(R.id.markdown_layout);
+                TextView markdownTextView = findViewById(R.id.markdown_textview);
+
+                if(markdownFlag==false) {
+                    markdownFlag=true;
+                    Markwon markwon = Markwon.create(getApplicationContext());
+
+                    markdownTextView.setMovementMethod(new ScrollingMovementMethod()); // 启用滚动
+
+                    markwon.setMarkdown(markdownTextView, textInputLayout.getEditText().getText().toString());//先把已经有的放进去
+
+                    if(markdown_realtime_preview==true) {
+
+                        textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                                // 在文本改变之前执行的操作
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                                // 在文本改变时执行的操作
+                                String inputText = charSequence.toString();
+                                markwon.setMarkdown(markdownTextView, inputText);
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                // 在文本改变之后执行的操作
+                            }
+
+                        });
+                    }
+
+                    markdownLayout.setVisibility(View.VISIBLE);
+                }else{
+                    markdownFlag=false;
+
+                    markdownLayout.setVisibility(View.GONE);
+
+                    if(markdown_realtime_preview==true) {
+                        textInputLayout.getEditText().addTextChangedListener(null);
+                    }
+                }
+
+            }
+        });
+
+
+
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putBoolean("SEND_EXIT", false);//默认异常退出
         preferencesEditor.apply();
+
+
 
 
     }
@@ -752,6 +829,15 @@ public class EditActivity extends AppCompatActivity {
             return false;
         } else {
             return true;
+        }
+    }
+
+    public void markdown_refresh_click(View view) {
+        if(markdownFlag==true) {
+            TextView markdownTextView = findViewById(R.id.markdown_textview);
+            Markwon markwon = Markwon.create(getApplicationContext());
+            markdownTextView.setMovementMethod(new ScrollingMovementMethod()); // 启用滚动
+            markwon.setMarkdown(markdownTextView, textInputLayout.getEditText().getText().toString());//先把已经有的放进去
         }
     }
 }

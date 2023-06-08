@@ -70,6 +70,7 @@ dependencies {
 
 
     implementation 'com.linkedin.android.litr:litr:1.5.5'
+    implementation "io.noties.markwon:core:4.6.2"
 
 
 }

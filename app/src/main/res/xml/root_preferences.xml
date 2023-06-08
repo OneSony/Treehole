@@ -43,6 +43,11 @@
         android:title="本地信息"
         app:iconSpaceReserved="false">
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            app:iconSpaceReserved="false"
+            android:key="markdown_realtime_preview"
+            android:title="实时预览Markdown" />
         <ListPreference
             android:defaultValue="text"
             app:iconSpaceReserved="false"
