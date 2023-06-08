@@ -98,6 +98,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
         SearchView searchView = findViewById(R.id.search_user_searchview);
         searchView.setQuery(query, false);
+        searchView.setFocusable(false);
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

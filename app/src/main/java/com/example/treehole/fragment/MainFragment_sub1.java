@@ -1,6 +1,5 @@
 package com.example.treehole.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,21 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.fragment.NavHostFragment;
+import androidx.paging.LoadState;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.treehole.MainViewModel;
 import com.example.treehole.R;
-import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.application;
 import com.example.treehole.dot_list;
 import com.example.treehole.paging.MomentPagingAdapter;
-
-import java.util.List;
 
 
 public class MainFragment_sub1 extends Fragment {
@@ -52,7 +47,7 @@ public class MainFragment_sub1 extends Fragment {
             @Override
             public void onRefresh() {
                 update_data_live();
-                swipeRefreshLayout.setRefreshing(false);
+                //swipeRefreshLayout.setRefreshing(false);
                 Log.d("REFRESH","YEAH!");
             }
         });
@@ -82,6 +77,18 @@ public class MainFragment_sub1 extends Fragment {
 
         adapter=new MomentPagingAdapter(getActivity());
 
+        adapter.addLoadStateListener(loadStates -> {
+            if(loadStates.getRefresh() instanceof LoadState.Loading==false){
+                swipeRefreshLayout.setRefreshing(false);
+            }else{
+                swipeRefreshLayout.setRefreshing(true);
+            }
+
+            //swipeRefreshLayout.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
+            //        ? View.VISIBLE : View.GONE);
+            return null;
+        });
+
         recyclerView.setAdapter(adapter);
         MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);
 
@@ -93,7 +100,7 @@ public class MainFragment_sub1 extends Fragment {
 
         return view;
     }
-
+/*
     private void launch_info(int index) {
         Intent intent = new Intent(getActivity(), InfoActivity.class);
         Bundle bundle=new Bundle();
@@ -112,8 +119,8 @@ public class MainFragment_sub1 extends Fragment {
                 break;
             }
         }
-
-
+*/
+/*
         app=(application)getActivity().getApplication();
         if (currentFragment instanceof MainFragment) {
             //((MainFragment) currentFragment).update_data_live();
@@ -125,7 +132,7 @@ public class MainFragment_sub1 extends Fragment {
         }else if(currentFragment instanceof MineFragment){
             app.main_navigation_id=R.id.mineFragment;
         }
-
+*/
 
         //String topic_msg=data_list.get(index).getTopic().toString();
         //String main_msg=data_list.get(index).getText().toString();
@@ -146,10 +153,10 @@ public class MainFragment_sub1 extends Fragment {
             app.main_navigation_id=currentFragment.getId();
         }*/
 
-
+/*
         startActivity(intent);
     }
-
+*/
     public void update_data_live(){
         //app=(application)getActivity().getApplication();
         //data_list=app.data_list;

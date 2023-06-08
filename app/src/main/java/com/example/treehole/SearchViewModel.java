@@ -20,7 +20,7 @@ import kotlinx.coroutines.CoroutineScope;
 
 public class SearchViewModel extends AndroidViewModel {
 
-    PagingConfig pagingConfig=new PagingConfig(5,5,false,5);//初始化配置,可以定义最大加载的数据量
+    PagingConfig pagingConfig=new PagingConfig(10,5,false,10);//初始化配置,可以定义最大加载的数据量
 
     public SearchViewModel(@NonNull Application application) {
         super(application);

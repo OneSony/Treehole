@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.LoadState;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +36,8 @@ public class SearchMomentActivity extends AppCompatActivity {
 
     private String searchType="";
 
+    private ProgressBar progressBar;
+
 
 
     @Override
@@ -54,8 +57,8 @@ public class SearchMomentActivity extends AppCompatActivity {
         noDataTextView=findViewById(R.id.search_no_data_moment);
         noDataTextView.setVisibility(View.GONE);
 
-        ProgressBar progressBar=findViewById(R.id.search_progress_moment);
-        progressBar.setVisibility(View.GONE);
+        progressBar=findViewById(R.id.search_progress_moment);
+
 
         setSupportActionBar(findViewById(R.id.search_moment_toolbar));
         ActionBar bar=getSupportActionBar();
@@ -68,8 +71,6 @@ public class SearchMomentActivity extends AppCompatActivity {
         recyclerView=findViewById(R.id.search_moment_recyclerview);
 
 
-        noDataTextView.setVisibility(View.GONE);
-        //rogressBar.setVisibility(View.VISIBLE);
 
         final List<String>[] searchWords = new List[]{new ArrayList<>()};
 
@@ -84,6 +85,12 @@ public class SearchMomentActivity extends AppCompatActivity {
 
         adapter=new MomentPagingAdapter(SearchMomentActivity.this);
 
+        adapter.addLoadStateListener(loadStates -> {
+            progressBar.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
+                    ? View.VISIBLE : View.GONE);
+            return null;
+        });
+
         recyclerView.setAdapter(adapter);
 
         viewModel.getPaging(searchType, searchWords[0]).observe(this,
@@ -94,6 +101,7 @@ public class SearchMomentActivity extends AppCompatActivity {
 
         SearchView searchView = findViewById(R.id.search_moment_searchview);
         searchView.setQuery(query, false);
+        searchView.setFocusable(false);
 
 
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
@@ -109,6 +117,12 @@ public class SearchMomentActivity extends AppCompatActivity {
 
                 // 处理搜索提交事件
                 adapter=new MomentPagingAdapter(SearchMomentActivity.this);
+
+                adapter.addLoadStateListener(loadStates -> {
+                    progressBar.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
+                            ? View.VISIBLE : View.GONE);
+                    return null;
+                });
 
                 recyclerView.setAdapter(adapter);
 
@@ -176,6 +190,12 @@ public class SearchMomentActivity extends AppCompatActivity {
 
 
                 adapter=new MomentPagingAdapter(SearchMomentActivity.this);
+
+                adapter.addLoadStateListener(loadStates -> {
+                    progressBar.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
+                            ? View.VISIBLE : View.GONE);
+                    return null;
+                });
 
                 recyclerView.setAdapter(adapter);
 

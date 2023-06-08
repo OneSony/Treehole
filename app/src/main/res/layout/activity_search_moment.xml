@@ -50,7 +50,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_moment_searchview" />
+        app:layout_constraintTop_toTopOf="@+id/search_moment_recyclerview" />
 
     <ProgressBar
         android:id="@+id/search_progress_moment"
@@ -60,7 +60,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_moment_searchview" />
+        app:layout_constraintTop_toTopOf="@+id/search_moment_recyclerview" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/search_moment_tablayout"

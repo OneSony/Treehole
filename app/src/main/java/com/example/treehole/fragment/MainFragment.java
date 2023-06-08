@@ -96,7 +96,7 @@ public class MainFragment extends Fragment {
         // 先强制设置到指定页面
 
         // 通过数据修改
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        /*viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {//切换回来的时候更新一下
                 ((application) getActivity().getApplication()).main_frag_pager_id=position;
@@ -104,15 +104,15 @@ public class MainFragment extends Fragment {
                     //update_data_live();
                 }
             }
-        });
+        });*/
         pagerAdapter = new ScreenSlidePagerAdapter(this);
+
         viewPager.setAdapter(pagerAdapter);
-        pagerAdapter.notifyDataSetChanged();
+        //pagerAdapter.notifyDataSetChanged();
 
 
         // 切换到指定页面
-        viewPager.setCurrentItem(app.main_frag_pager_id);
-
+        //viewPager.setCurrentItem(app.main_frag_pager_id);
 
         new TabLayoutMediator(tabLayout, viewPager, true, (tab, position) -> tab.setText(titleList.get(position))).attach();
 
