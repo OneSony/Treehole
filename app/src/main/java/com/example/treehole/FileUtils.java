@@ -1,6 +1,7 @@
 package com.example.treehole;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -36,6 +37,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -54,17 +56,15 @@ public class FileUtils {
         void onResult(List<File> imageFiles, List<File> videoFiles);
     }
 
-
-    public class CompressionHandler extends Handler {
-        Integer supposedImageCount;
-        Integer supposedVideoCount;
-        private List<CompressionThread> threads;
+    public static class CompressionHandler extends Handler {
+        Integer supposedImageCount = 0;
+        Integer supposedVideoCount = 0;
+        private List<CompressionThread> threads = new ArrayList<>();
         private List<File> imageFiles = new ArrayList<>();
         private List<File> videoFiles = new ArrayList<>();
         private CompressionThreadCallback callback;
 
-
-        public class Builder {
+        public static class Builder {
             private Context context;
             private Integer imageCount;
             private Integer videoCount;
@@ -80,11 +80,11 @@ public class FileUtils {
                 try {
                     if (mediaType==MEDIA_TYPE.IMAGE){
                         imageCount+=1;
-                        compressionHandler.threads.add(new CompressionThread(context, compressionHandler, uri, File.createTempFile(String.valueOf(imageCount), ".jpg"), mediaType));
+                        compressionHandler.threads.add(new CompressionThread(context, compressionHandler, uri, File.createTempFile("image-"+String.valueOf(imageCount), ".jpg"), mediaType));
                     }
                     else if (mediaType==MEDIA_TYPE.VIDEO) {
                         videoCount+=1;
-                        compressionHandler.threads.add(new CompressionThread(context, compressionHandler, uri, File.createTempFile(String.valueOf(videoCount), ".mp4"), mediaType));
+                        compressionHandler.threads.add(new CompressionThread(context, compressionHandler, uri, File.createTempFile("video-"+String.valueOf(videoCount), ".mp4"), mediaType));
                     }
                     else{
                         throw new RuntimeException("invalid MEDIA_TYPE in Builder.add");
@@ -96,19 +96,17 @@ public class FileUtils {
                 return this;
             }
 
+            public Builder addCallback(CompressionThreadCallback callback) {
+                compressionHandler.callback = callback;
+                return this;
+            }
+
             public CompressionHandler build() {
                 // Set how many images and videos in handler
                 compressionHandler.setImageCount(imageCount);
                 compressionHandler.setVideoCount(videoCount);
                 return compressionHandler;
             }
-
-            public void clean() {
-                threads.clear();
-                compressionHandler = null;
-            }
-
-
         }
 
         @Override
@@ -129,7 +127,6 @@ public class FileUtils {
         }
 
         private boolean checkNumReached() {
-            //Log.d("HANDLER", "Submitted file progress: " + String.valueOf(imagePaths.size() + videoPaths.size()) + "/" + String.valueOf(numOfFiles));
             if ((imageFiles.size() + videoFiles.size()) >= supposedImageCount+supposedVideoCount) {
                 return true;
             }
@@ -140,17 +137,18 @@ public class FileUtils {
         }
 
         protected void setVideoCount(Integer count) {
-            supposedImageCount = count;
+            supposedVideoCount = count;
         }
 
         public void start() {
+            Log.d("HANDLER", "Compressing: " + "images:"+imageFiles.size()+"|videos:"+videoFiles.size() + "/" + (supposedImageCount+supposedVideoCount));
             for (CompressionThread thread: threads) {
                 thread.start();
             }
         }
     }
 
-    public class CompressionThread extends Thread {
+    public static class CompressionThread extends Thread {
         private Context context;
         private File outputFile;
         private Uri uri;
@@ -168,9 +166,9 @@ public class FileUtils {
         public void run() {
             // Long-running operation goes here
             if (mediaType==MEDIA_TYPE.IMAGE){
-                String compressFilePath = compressImage(getUriFilePath(context, uri), 60).getAbsolutePath();
+                compressImage(context, uri, outputFile, 60);
                 Bundle data = new Bundle();
-                data.putString("path", compressFilePath);
+                data.putString("path", getUriFilePath(context, uri));
 
                 // send a message to the handler with the bundle
                 Message msg = handler.obtainMessage();
@@ -188,7 +186,10 @@ public class FileUtils {
 
                     @Override
                     public void onProgress(@NonNull String id, float progress) {
-                        Log.d("COMPRESSVIDEO", "Progress: "+progress);
+                        Integer percentage = Math.round(progress*100);
+                        if (percentage%10==0){
+                            Log.d("COMPRESSVIDEO", "Progress: "+percentage+"%");
+                        }
                     }
 
                     @Override
@@ -198,7 +199,7 @@ public class FileUtils {
 
                         // send a message to the handler with the bundle
                         Message msg = handler.obtainMessage();
-                        msg.what = MEDIA_TYPE.IMAGE.ordinal();
+                        msg.what = MEDIA_TYPE.VIDEO.ordinal();
                         msg.setData(data);
 
                         handler.sendMessage(msg);
@@ -242,25 +243,34 @@ public class FileUtils {
         return compressedFile;
     }*/
 
-    public static File compressImage(String filePath, int quality) {
+    public static File compressImage(Context context, Uri uri, File outputFile, int quality) {
         try {
             // Load the image from the file path
-            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            //Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+
+            ContentResolver resolver = context.getContentResolver();
+
+            // open the input stream from the uri
+            InputStream inputStream = resolver.openInputStream(uri);
+
+            // decode the bitmap from the input stream
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
 
             // Compress the bitmap to a lower quality
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
 
             // Save the compressed bitmap to a new File object
-            File originalFile = new File(filePath);
-            String compressedFilePath = originalFile.getParent() + File.separator + "compressed_" + originalFile.getName();
-            File compressedFile = new File(compressedFilePath);
-            FileOutputStream fos = new FileOutputStream(compressedFile);
+            //File originalFile = new File(filePath);
+            //String compressedFilePath = originalFile.getParent() + File.separator + "compressed_" + originalFile.getName();
+            //File compressedFile = new File(compressedFilePath);
+            //FileOutputStream fos = new FileOutputStream(compressedFile);
+            FileOutputStream fos = new FileOutputStream(outputFile);
             fos.write(stream.toByteArray());
             fos.flush();
             fos.close();
 
-            return compressedFile;
+            return outputFile;
         } catch (FileNotFoundException e) {
             Log.e("compressImage", "File not found: " + e.getMessage());
         } catch (IOException e) {
