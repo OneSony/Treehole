@@ -196,6 +196,7 @@ public class ChatFragment extends Fragment {
                 // 处理搜索提交事件
                 Intent intent = new Intent(getActivity(), SearchUserActivity.class);
                 intent.putExtra("QUERY",query);
+                intent.putExtra("SEARCH_TYPE",0);//user search
                 startActivity(intent);
                 return true;
             }
@@ -238,13 +239,17 @@ public class ChatFragment extends Fragment {
         super.onResume();
 
         // 取消菜单项的选中状态
-        MenuItem menuItem = menu.findItem(R.id.action_add_chat);
-        menuItem.setChecked(false);
-        menuItem.collapseActionView();
 
-        // 关闭搜索框
-        SearchView searchView = (SearchView) menuItem.getActionView();
-        searchView.clearFocus();
+        if(menu!=null) {
+            MenuItem menuItem = menu.findItem(R.id.action_add_chat);
+            menuItem.setChecked(false);
+            menuItem.collapseActionView();
+
+
+            // 关闭搜索框
+            SearchView searchView = (SearchView) menuItem.getActionView();
+            searchView.clearFocus();
+        }
     }
 
 }
