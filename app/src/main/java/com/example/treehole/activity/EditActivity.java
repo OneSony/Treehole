@@ -234,7 +234,15 @@ public class EditActivity extends AppCompatActivity {
 
                 for (int i = 0; i < uris.size(); i++) {
                     getContentResolver().takePersistableUriPermission(uris.get(i), Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    adapter.addUris(uris.get(i));
+
+                    int flag=adapter.addUris(uris.get(i));
+
+                    if(flag==1){
+                        Toast.makeText(this, "最多只能选择9张图片", Toast.LENGTH_SHORT).show();
+                        break;
+                    }else if(flag==2){
+                        Toast.makeText(this, "已忽略重复照片", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 setView(1);

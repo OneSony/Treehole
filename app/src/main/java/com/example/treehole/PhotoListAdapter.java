@@ -49,9 +49,16 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoViewHolder>{
     }
 
 
-    public void addUris(Uri uri){
+    public int addUris(Uri uri){
+        if(uris.size()==9){
+            return 1;
+        }
+        if(uris.contains(uri)){
+            return 2;
+        }
         this.uris.add(uri);
         notifyDataSetChanged();
+        return 0;
     }
 
     public void onItemMove(int fromPosition, int toPosition) {
