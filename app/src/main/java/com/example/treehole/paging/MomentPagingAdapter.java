@@ -42,16 +42,6 @@ import org.json.JSONObject;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
 
-    public interface OnItemClickListener {
-        void onItemClick(Moment moment);
-    }
-
-    private OnItemClickListener onItemClickListener;
-
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.onItemClickListener = listener;
-    }
 
     private boolean photoClickable=true;
 
@@ -110,6 +100,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         View mItemView=inflater.inflate(R.layout.item,parent,false);
         return new MomentPagingViewHolder(mItemView);
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull MomentPagingViewHolder holder, int position) {
@@ -345,15 +336,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             }else{
                 holder.video.setVisibility(View.VISIBLE);
 
-                ExoPlayer player;
-                player = new ExoPlayer.Builder(context).build();
-                holder.video.setPlayer(player);
+                holder.player = new ExoPlayer.Builder(context).build();
+                holder.video.setPlayer(holder.player);
                 // Build the media item.
                 MediaItem mediaItem = MediaItem.fromUri(moment.getVideos().get(0));
-// Set the media item to be played.
-                player.setMediaItem(mediaItem);
-// Prepare the player.
-                player.prepare();
+                holder.player.setMediaItem(mediaItem);
+                holder.player.prepare();
             }
 
             if(moment.getTags().size()==0){
@@ -381,7 +369,20 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         }
 
 
+
     }
+
+
+    @Override
+    public void onViewRecycled(@NonNull MomentPagingViewHolder holder) {
+        if(holder.player!=null){
+            holder.player.release();
+        }
+        super.onViewRecycled(holder);
+    }
+
+
+
 
     /*
 
@@ -410,16 +411,6 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
     public final TextView comment_box;
     public final TextView collect_box;
 
-    /*
-    public final ImageView photo1;
-    public final ImageView photo2;
-    public final ImageView photo3;
-    public final ImageView photo4;
-    public final ImageView photo5;
-    public final ImageView photo6;
-    public final ImageView photo7;
-    public final ImageView photo8;
-    public final ImageView photo9;*/
 
     public final ImageView[] imageViewArray;
     public final ConstraintLayout[] constraintLayouts;
@@ -429,6 +420,8 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
     public final LinearLayout photos;
     public final PlayerView video;
     public final CardView tags_card;
+
+    ExoPlayer player;
 
     public MomentPagingViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -464,8 +457,6 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
         constraintLayouts[6]=itemView.findViewById(R.id.moment_photo_layout7);
         constraintLayouts[7]=itemView.findViewById(R.id.moment_photo_layout8);
         constraintLayouts[8]=itemView.findViewById(R.id.moment_photo_layout9);
-
-
 
 
 
