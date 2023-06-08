@@ -80,7 +80,7 @@ public class MainFragment_sub1 extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-        adapter=new MomentPagingAdapter(getContext());
+        adapter=new MomentPagingAdapter(getActivity());
 
         recyclerView.setAdapter(adapter);
         MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);

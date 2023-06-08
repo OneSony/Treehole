@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
 
 public class MomentPagingSource extends ListenableFuturePagingSource<String, Moment> {
 
+    private List<String> searchWords;
+
 
     //需要用到线程池
     private ListeningExecutorService executorService= MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
@@ -37,10 +39,13 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
         this.query=query;//查询内容所需参数
     }*/
 
-    /*public MomentPagingSource(MomentDao myDao) {
-        this.myDao = myDao;
+    public MomentPagingSource() {
+        searchWords = Collections.emptyList();
+    }
 
-    }*/
+    public MomentPagingSource(List<String> searchWords) {
+        this.searchWords = searchWords;
+    }
 
     @NotNull
     @Override
@@ -63,11 +68,20 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
         try {
             Log.d("NEXTPAGE","sending "+nextPageNumber);
             JsonArray keyWords = new JsonArray();
-            keyWords.add("");
+
+            if(searchWords.size() == 0) {
+                keyWords.add("");
+                queryData.put("filter_by", "");
+            }else{
+                Log.d("Search Size","search words "+searchWords.size());
+                queryData.put("filter_by", "username");
+                for(String word : searchWords) {
+                    keyWords.add(word);
+                }
+            }
 
             queryData.put("start", nextPageNumber);
             queryData.put("count", 5);
-            queryData.put("filter_by", "");
             queryData.put("key_words", keyWords);
             queryData.put("order_by", "date");
             queryData.put("order", "desc");
@@ -182,4 +196,5 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
     public String getRefreshKey(@NonNull PagingState<String, Moment> pagingState) {
         return null;
     }
+
 }

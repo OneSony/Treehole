@@ -25,7 +25,6 @@ import com.example.treehole.SearchUserResult;
 import com.example.treehole.SearchViewModel;
 import com.example.treehole.WebUtils;
 import com.example.treehole.paging.MomentPagingAdapter;
-import com.example.treehole.room.Moment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class SearchUserActivity extends AppCompatActivity {
+public class SearchMomentActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private SearchUserListAdapter adapterUser;
@@ -69,17 +68,15 @@ public class SearchUserActivity extends AppCompatActivity {
 
 
         recyclerView=findViewById(R.id.search_user_recyclerview);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),DividerItemDecoration.VERTICAL));
 
         SearchView searchView = findViewById(R.id.search_user_searchview);
         searchView.setQuery(query, false);
 
         noDataTextView.setVisibility(View.GONE);
-        //progressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         if(searchType==0) {
-            progressBar.setVisibility(View.VISIBLE);
-            recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),DividerItemDecoration.VERTICAL));
-
 
             ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
@@ -100,7 +97,7 @@ public class SearchUserActivity extends AppCompatActivity {
                 }
             });
 
-            searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     // 处理搜索提交事件
@@ -138,23 +135,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
             SearchViewModel viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
-            adapterMoment=new MomentPagingAdapter(SearchUserActivity.this);
-
-            adapterMoment.setOnItemClickListener(new MomentPagingAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(Moment moment) {
-                    // 在这里处理点击事件
-                    // 根据点击的位置进行相应的处理
-                    if (moment != null) {
-                        // 处理点击事件
-                        Intent intent = new Intent(getApplicationContext(), InfoActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("MOMENT", moment);
-                        intent.putExtra("BUNDLE_DATA", bundle);
-                        startActivity(intent);
-                    }
-                }
-            });
+            adapterMoment=new MomentPagingAdapter(getApplicationContext());
 
             recyclerView.setAdapter(adapterMoment);
 

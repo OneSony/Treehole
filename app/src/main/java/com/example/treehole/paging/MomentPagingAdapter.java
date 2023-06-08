@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,19 +20,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.paging.LoadState;
 import androidx.paging.PagingDataAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
 import com.example.treehole.activity.InfoActivity;
@@ -48,6 +41,18 @@ import org.json.JSONObject;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(Moment moment);
+    }
+
+    private OnItemClickListener onItemClickListener;
+
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClickListener = listener;
+    }
+
+
 
 
     Context context;
@@ -56,17 +61,21 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         super(new DiffUtil.ItemCallback<Moment>() {
             @Override
             public boolean areItemsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
-                return oldItem.getId().equals(newItem.getId());
+                //return oldItem.getId().equals(newItem.getId());
+                return false;
             }
 
             @Override
             public boolean areContentsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
                 //Log.d("SAME?",String.valueOf(oldItem.getText().equals(newItem.getText())&&oldItem.topic.equals(newItem.topic)));
-                return oldItem.getText().equals(newItem.getText())&&oldItem.getTopic().equals(newItem.getTopic())&&oldItem.getLikes_num()==newItem.getLikes_num()&&oldItem.getFavourite_num()==newItem.getFavourite_num();
+                //return oldItem.getText().equals(newItem.getText())&&oldItem.getTopic().equals(newItem.getTopic())&&oldItem.getLikes_num()==newItem.getLikes_num()&&oldItem.getFavourite_num()==newItem.getFavourite_num();
+                return false;
             }
         });
 
         this.context=context;
+
+
     }
 
 
@@ -215,7 +224,9 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                     holder.imageViewArray[i].setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Dialog dialog = new Dialog(context, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
+
+
+                            Dialog dialog = new Dialog(context, android.R.style.Theme_Material_Light_NoActionBar_Fullscreen);
                             dialog.setContentView(R.layout.dialog_photo);
 
                             // 创建动画对象
@@ -223,11 +234,14 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                             animation.setDuration(150); // 设置动画持续时间
 
 // 将动画应用到对话框的窗口
+
                             Window window = dialog.getWindow();
                             if (window != null) {
                                 window.setWindowAnimations(android.R.style.Animation_Dialog); // 设置窗口动画样式
                                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                             }
+
+
 
                             dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                                 @Override
@@ -308,6 +322,18 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             holder.like_box.setText(String.valueOf(moment.getLikes_num()));
             holder.collect_box.setText(String.valueOf(moment.getFavourite_num()));
 
+/*
+            if (onItemClickListener != null) {
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onItemClickListener.onItemClick(moment);
+                    }
+                });
+            } else {
+                holder.itemView.setOnClickListener(null);
+            }
+*/
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
