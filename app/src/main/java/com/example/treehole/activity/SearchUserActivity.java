@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -22,10 +21,7 @@ import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
 import com.example.treehole.SearchUserListAdapter;
 import com.example.treehole.SearchUserResult;
-import com.example.treehole.SearchViewModel;
 import com.example.treehole.WebUtils;
-import com.example.treehole.paging.MomentPagingAdapter;
-import com.example.treehole.room.Moment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,12 +34,9 @@ import java.util.concurrent.ExecutionException;
 public class SearchUserActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private SearchUserListAdapter adapterUser;
-    private MomentPagingAdapter adapterMoment;
+    private SearchUserListAdapter adapter;
 
     private TextView noDataTextView;
-
-    private int searchType;//0 user, 1 moment
 
 
     @Override
@@ -51,6 +44,7 @@ public class SearchUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_user);
 
+        ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
         noDataTextView=findViewById(R.id.search_no_data);
         noDataTextView.setVisibility(View.GONE);
@@ -63,108 +57,70 @@ public class SearchUserActivity extends AppCompatActivity {
         bar.setDisplayHomeAsUpEnabled(true);
 
         String query=getIntent().getStringExtra("QUERY");
-        searchType=getIntent().getIntExtra("SEARCH_TYPE",0);
-
-        Toast.makeText(getApplicationContext(),"searchType="+String.valueOf(searchType),Toast.LENGTH_SHORT).show();
 
 
         recyclerView=findViewById(R.id.search_user_recyclerview);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),DividerItemDecoration.VERTICAL));
+
+        adapter=new SearchUserListAdapter(getApplicationContext());
+        adapter.setOnItemClickListener(new SearchUserListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(String user_id,String username) throws ExecutionException, InterruptedException {
+                //Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+
+                Intent intent = new Intent(getApplicationContext(), MsgActivity.class);
+                Bundle bundle = new Bundle();
+
+
+                bundle.putSerializable("DATA",viewModel.searchMessage(user_id,username));
+                intent.putExtra("BUNDLE_DATA",bundle);
+
+                /*
+                bundle.putString("USERNAME", user_id);
+                intent.putExtra("BUNDLE_DATA", bundle);*/
+                startActivity(intent);
+            }
+        });
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+        //刚进来的时候就要提交搜索
+        noDataTextView.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+
+
+
+        List<SearchUserResult> searchUserResults=new ArrayList<>();
+        searchAndInsert(query, searchUserResults, adapter);
+
+
 
         SearchView searchView = findViewById(R.id.search_user_searchview);
         searchView.setQuery(query, false);
+        searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // 处理搜索提交事件
+                noDataTextView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
 
-        noDataTextView.setVisibility(View.GONE);
-        //progressBar.setVisibility(View.VISIBLE);
+                adapter.setSearchUserResults(new ArrayList<>());
+                adapter.notifyDataSetChanged();
 
-        if(searchType==0) {
-            progressBar.setVisibility(View.VISIBLE);
-            recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),DividerItemDecoration.VERTICAL));
-
-
-            ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
-
-            adapterUser = new SearchUserListAdapter(getApplicationContext());
-            adapterUser.setOnItemClickListener(new SearchUserListAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(String user_id, String username) throws ExecutionException, InterruptedException {
-                    //Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
-
-                    Intent intent = new Intent(getApplicationContext(), MsgActivity.class);
-                    Bundle bundle = new Bundle();
+                List<SearchUserResult> searchUserResults=new ArrayList<>();
+                searchAndInsert(query, searchUserResults, adapter);
 
 
-                    bundle.putSerializable("DATA", viewModel.searchMessage(user_id, username));
-                    intent.putExtra("BUNDLE_DATA", bundle);
+                return true;
+            }
 
-                    startActivity(intent);
-                }
-            });
-
-            searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    // 处理搜索提交事件
-                    noDataTextView.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
-
-                    adapterUser.setSearchUserResults(new ArrayList<>());
-                    adapterUser.notifyDataSetChanged();
-
-                    List<SearchUserResult> searchUserResults=new ArrayList<>();
-                    searchAndInsert(query, searchUserResults, adapterUser,searchType);
-
-
-                    return true;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    // 处理搜索框文本变化事件
-                    // 这里可以根据 newText 进行实时搜索或过滤操作
-                    return true;
-                }
-            });
-            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-
-            List<SearchUserResult> searchUserResults=new ArrayList<>();
-            searchAndInsert(query, searchUserResults, adapterUser,searchType);
-
-        }else if(searchType==1) {//moment search
-
-            List<String> searchWords=new ArrayList<>();
-            searchWords.add(query);
-
-            Toast.makeText(getApplicationContext(),"searchWords="+searchWords.get(0),Toast.LENGTH_SHORT).show();
-
-            SearchViewModel viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-
-            adapterMoment=new MomentPagingAdapter(SearchUserActivity.this);
-
-            adapterMoment.setOnItemClickListener(new MomentPagingAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(Moment moment) {
-                    // 在这里处理点击事件
-                    // 根据点击的位置进行相应的处理
-                    if (moment != null) {
-                        // 处理点击事件
-                        Intent intent = new Intent(getApplicationContext(), InfoActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("MOMENT", moment);
-                        intent.putExtra("BUNDLE_DATA", bundle);
-                        startActivity(intent);
-                    }
-                }
-            });
-
-            recyclerView.setAdapter(adapterMoment);
-
-            viewModel.getPaging(searchWords).observe(this,
-                    dataInfoPagingData -> adapterMoment.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
-
-            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-
-        }
-
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // 处理搜索框文本变化事件
+                // 这里可以根据 newText 进行实时搜索或过滤操作
+                return true;
+            }
+        });
     }
 
     @Override
@@ -178,87 +134,63 @@ public class SearchUserActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void searchAndInsert(String query, List<SearchUserResult> listContainer, SearchUserListAdapter adapter,int searchType) {
+    private void searchAndInsert(String query, List<SearchUserResult> listContainer, SearchUserListAdapter adapter) {
+        Log.d("GET", "HEERE");
+        WebUtils.sendGet("/users/find_users?username="+query, false, new WebUtils.WebCallback() {
 
+            @Override
+            public void onSuccess(JSONObject json) {
+                try {
+                    JSONArray users = json.getJSONArray("message");
+                    if (users.length() == 0) {
+                        Log.d("ADD","NODATA");
 
-        if (searchType == 0) {
-            WebUtils.sendGet("/users/find_users?username=" + query, false, new WebUtils.WebCallback() {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
 
-                @Override
-                public void onSuccess(JSONObject json) {
-                    try {
-                        JSONArray users = json.getJSONArray("message");
-                        if (users.length() == 0) {
-                            Log.d("ADD", "NODATA");
+                                ProgressBar progressBar=findViewById(R.id.search_progress);
+                                progressBar.setVisibility(View.GONE);
 
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-
-                                    ProgressBar progressBar = findViewById(R.id.search_progress);
-                                    progressBar.setVisibility(View.GONE);
-
-                                    noDataTextView.setVisibility(View.VISIBLE);
-                                }
-                            });
-
-                        } else {
-                            for (int i = 0; i < users.length(); i++) {
-                                JSONObject user = users.getJSONObject(i);
-                                String user_id = user.getString("user_id");
-                                String username = user.getString("username");
-                                listContainer.add(new SearchUserResult(user_id, username));
+                                noDataTextView.setVisibility(View.VISIBLE);
                             }
+                        });
 
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-
-                                    ProgressBar progressBar = findViewById(R.id.search_progress);
-                                    progressBar.setVisibility(View.GONE);
-                                    adapter.setSearchUserResults(listContainer);
-                                    adapter.notifyDataSetChanged();
-                                }
-                            });
+                    }else {
+                        for (int i = 0; i < users.length(); i++) {
+                            JSONObject user = users.getJSONObject(i);
+                            String user_id = user.getString("user_id");
+                            String username = user.getString("username");
+                            listContainer.add(new SearchUserResult(user_id, username));
                         }
 
-                    } catch (JSONException e) {
-                        Log.e("SEARCHUSERACTIVITY", "ERROR: " + e.getMessage());
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+
+                                ProgressBar progressBar=findViewById(R.id.search_progress);
+                                progressBar.setVisibility(View.GONE);
+                                adapter.setSearchUserResults(listContainer);
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
                     }
 
+                } catch (JSONException e) {
+                    Log.e("SEARCHUSERACTIVITY", "ERROR: "+e.getMessage());
                 }
 
-                @Override
-                public void onError(Throwable t) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),"搜索失败", Toast.LENGTH_SHORT).show();
-                            ProgressBar progressBar = findViewById(R.id.search_progress);
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    });
+            }
 
-                    Log.e("SEARCHUSERACTIVITY", "ERROR: " + t.getMessage());
-                }
+            @Override
+            public void onError(Throwable t) {
+                //progressBar.setVisibility(View.GONE);
+                Log.e("SEARCHUSERACTIVITY", "ERROR: "+t.getMessage());
+            }
 
-                @Override
-                public void onFailure(JSONObject json) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),"搜索失败", Toast.LENGTH_SHORT).show();
-                            ProgressBar progressBar = findViewById(R.id.search_progress);
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    });
-                    Log.e("SEARCHUSERACTIVITY", "FAILURE: " + json.optString("message", "onFailure"));
-                }
-            });
-
-
-        }else if(searchType==1){
-
-
-
-
-
-        }
+            @Override
+            public void onFailure(JSONObject json) {
+                //progressBar.setVisibility(View.GONE);
+                Log.e("SEARCHUSERACTIVITY", "FAILURE: "+json.optString("message", "onFailure"));
+            }
+        });
     }
 }

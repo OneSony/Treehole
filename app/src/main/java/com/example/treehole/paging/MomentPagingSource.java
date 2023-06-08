@@ -14,7 +14,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import com.google.gson.JsonArray;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -67,16 +66,17 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
         JSONObject queryData = new JSONObject();
         try {
             Log.d("NEXTPAGE","sending "+nextPageNumber);
-            JsonArray keyWords = new JsonArray();
+            JSONArray keyWords = new JSONArray();
+
 
             if(searchWords.size() == 0) {
-                keyWords.add("");
+                keyWords.put("");
                 queryData.put("filter_by", "");
             }else{
-                Log.d("Search Size","search words "+searchWords.size());
+                //Log.d("Search Size","search words "+searchWords.get(0));
                 queryData.put("filter_by", "username");
                 for(String word : searchWords) {
-                    keyWords.add(word);
+                    keyWords.put(word);
                 }
             }
 
@@ -85,6 +85,8 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
             queryData.put("key_words", keyWords);
             queryData.put("order_by", "date");
             queryData.put("order", "desc");
+
+            Log.d("Search Size",queryData.toString());
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
