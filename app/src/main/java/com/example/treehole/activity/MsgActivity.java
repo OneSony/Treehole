@@ -47,6 +47,7 @@ public class MsgActivity extends AppCompatActivity {
 
     boolean isFirstLoad = true;
 
+    private LiveData<Message> message= null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +72,6 @@ public class MsgActivity extends AppCompatActivity {
             viewModel.cleanMessageUnread(message_index);
         }
 
-        LiveData<Message> message= null;
         try {
             message = viewModel.getMessageByIndex(message_index);
         } catch (ExecutionException | InterruptedException e) {
@@ -231,10 +231,12 @@ public class MsgActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_person_page:
-                if(!username.equals("")) {
+
+                if(message!=null&&message.getValue()!=null) {
                     intent = new Intent(getApplicationContext(), PersonActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putString("USERNAME", username);
+                    bundle.putString("USERNAME", message.getValue().getUsername());
+                    bundle.putString("USER_ID", message.getValue().getUser_id());
                     intent.putExtra("BUNDLE_DATA", bundle);
                     startActivity(intent);
                 }

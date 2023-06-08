@@ -68,7 +68,8 @@ public class InfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("USERNAME", "UNKNOWN");
+                bundle.putString("USERNAME", current_moment.getUsername());
+                bundle.putString("USER_ID", current_moment.getUser_id());
                 intent.putExtra("BUNDLE_DATA", bundle);
                 startActivity(intent);
             }
