@@ -56,6 +56,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
+
 /*
     public int getMomentCount() throws ExecutionException, InterruptedException {
         return mMomentRepository.getMomentCount();

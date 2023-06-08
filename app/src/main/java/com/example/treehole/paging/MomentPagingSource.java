@@ -14,7 +14,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import com.google.gson.JsonArray;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -28,19 +27,26 @@ import java.util.concurrent.Executors;
 
 public class MomentPagingSource extends ListenableFuturePagingSource<String, Moment> {
 
+    private List<String> searchWords;
+
 
     //需要用到线程池
     private ListeningExecutorService executorService= MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     String query;
+    String searchType="";
     //MomentDao myDao;
     /*public MomentPagingSource(String query){
         this.query=query;//查询内容所需参数
     }*/
 
-    /*public MomentPagingSource(MomentDao myDao) {
-        this.myDao = myDao;
+    public MomentPagingSource() {
+        searchWords = Collections.emptyList();
+    }
 
-    }*/
+    public MomentPagingSource(String searchType,List<String> searchWords) {
+        this.searchType=searchType;
+        this.searchWords = searchWords;
+    }
 
     @NotNull
     @Override
@@ -62,15 +68,26 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
         JSONObject queryData = new JSONObject();
         try {
             Log.d("NEXTPAGE","sending "+nextPageNumber);
-            JsonArray keyWords = new JsonArray();
-            keyWords.add("");
+            JSONArray keyWords = new JSONArray();
 
+
+            if(searchWords.size() == 0) {
+                keyWords.put("");
+            }else{
+                //Log.d("Search Size","search words "+searchWords.get(0));
+                for(String word : searchWords) {
+                    keyWords.put(word);
+                }
+            }
+
+            queryData.put("filter_by", searchType);
             queryData.put("start", nextPageNumber);
             queryData.put("count", 5);
-            queryData.put("filter_by", "");
             queryData.put("key_words", keyWords);
             queryData.put("order_by", "date");
             queryData.put("order", "desc");
+
+            Log.d("Search Size",queryData.toString());
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -182,4 +199,5 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
     public String getRefreshKey(@NonNull PagingState<String, Moment> pagingState) {
         return null;
     }
+
 }

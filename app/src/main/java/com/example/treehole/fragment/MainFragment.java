@@ -15,8 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.treehole.activity.EditActivity;
 import com.example.treehole.R;
+import com.example.treehole.activity.EditActivity;
+import com.example.treehole.activity.SearchMomentActivity;
 import com.example.treehole.application;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -29,6 +30,7 @@ public class MainFragment extends Fragment {
 
     private TabLayout tabLayout;
 
+    private Menu menu;
 
     ArrayList<Fragment> fragmentContainer = new ArrayList<Fragment>();
     ArrayList<String> titleList = new ArrayList<String>();
@@ -55,7 +57,19 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //update_data_live();
+
+        // 取消菜单项的选中状态
+
+        if(menu!=null) {
+            MenuItem menuItem = menu.findItem(R.id.action_search);
+            menuItem.setChecked(false);
+            menuItem.collapseActionView();
+
+
+            // 关闭搜索框
+            SearchView searchView = (SearchView) menuItem.getActionView();
+            searchView.clearFocus();
+        }
     }
 
     /*
@@ -130,6 +144,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        this.menu=menu;
         inflater.inflate(R.menu.main_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -143,6 +158,10 @@ public class MainFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 // 处理搜索提交事件
                 Toast.makeText(getContext(), query, Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getActivity(), SearchMomentActivity.class);
+                intent.putExtra("QUERY",query);
+                startActivity(intent);
                 return true;
             }
 
