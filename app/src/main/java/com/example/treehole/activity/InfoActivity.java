@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -327,14 +328,25 @@ public class InfoActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            // android.R.id.home 这个是获取ids.xml页面的返回箭头，项目自带的，要加上android
-            case android.R.id.home:
-                // 返回
-                this.finish();
-                // 结束
-                return true;
+
+        if(item.getItemId()==android.R.id.home){
+            this.finish();
+            return true;
+        }else if(item.getItemId()==R.id.action_share){
+            Intent intent=new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_SUBJECT, current_moment.getTopic());
+            intent.putExtra(Intent.EXTRA_TEXT, current_moment.getText());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(Intent.createChooser(intent, getTitle()));
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.info_menu, menu);
+        return true;
     }
 }

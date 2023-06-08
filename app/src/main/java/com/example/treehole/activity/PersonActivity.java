@@ -53,7 +53,7 @@ public class PersonActivity extends AppCompatActivity {
 
 
         SearchViewModel viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-        MomentPagingAdapter adapter=new MomentPagingAdapter(PersonActivity.this);
+        MomentPagingAdapter adapter=new MomentPagingAdapter(PersonActivity.this,false);
 
         RecyclerView recyclerView=findViewById(R.id.person_recyclerview);
         recyclerView.setAdapter(adapter);

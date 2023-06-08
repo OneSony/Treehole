@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
 import com.example.treehole.activity.InfoActivity;
+import com.example.treehole.activity.PersonActivity;
 import com.example.treehole.room.Moment;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -52,7 +53,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         this.onItemClickListener = listener;
     }
 
-
+    private boolean photoClickable=true;
 
 
     Context context;
@@ -74,6 +75,29 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         });
 
         this.context=context;
+
+    }
+
+    public MomentPagingAdapter(Context context,boolean photoClickable) {
+        super(new DiffUtil.ItemCallback<Moment>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
+                //return oldItem.getId().equals(newItem.getId());
+                return false;
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Moment oldItem, @NonNull Moment newItem) {
+                //Log.d("SAME?",String.valueOf(oldItem.getText().equals(newItem.getText())&&oldItem.topic.equals(newItem.topic)));
+                //return oldItem.getText().equals(newItem.getText())&&oldItem.getTopic().equals(newItem.getTopic())&&oldItem.getLikes_num()==newItem.getLikes_num()&&oldItem.getFavourite_num()==newItem.getFavourite_num();
+                return false;
+            }
+        });
+
+        this.context=context;
+
+        this.photoClickable=photoClickable;
+
 
 
     }
@@ -103,6 +127,23 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             holder.topic_box.setText(moment.getTopic());
             holder.main_box.setText(moment.getText());
 
+
+            holder.profile_box.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if(photoClickable) {
+                        Intent intent = new Intent(context, PersonActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("USERNAME", moment.getUsername());
+                        bundle.putString("USER_ID", moment.getUser_id());
+                        intent.putExtra("BUNDLE_DATA", bundle);
+                        context.startActivity(intent);
+                    }else{
+                        Toast.makeText(context,"已进入该用户主页",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
             holder.itemView.findViewById(R.id.like_icon).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -321,19 +362,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
 
             holder.like_box.setText(String.valueOf(moment.getLikes_num()));
             holder.collect_box.setText(String.valueOf(moment.getFavourite_num()));
-
-/*
-            if (onItemClickListener != null) {
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        onItemClickListener.onItemClick(moment);
-                    }
-                });
-            } else {
-                holder.itemView.setOnClickListener(null);
-            }
-*/
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

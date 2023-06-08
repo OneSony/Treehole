@@ -52,7 +52,8 @@ public class MainFragment extends Fragment {
         fragmentContainer.add(new MainFragment_sub2());//热门
         fragmentContainer.add(new MainFragment_sub2());//关注
 
-    }
+
+}
 
     @Override
     public void onResume() {
@@ -116,6 +117,7 @@ public class MainFragment extends Fragment {
 
         new TabLayoutMediator(tabLayout, viewPager, true, (tab, position) -> tab.setText(titleList.get(position))).attach();
 
+
         return view;
     }
 
@@ -152,6 +154,8 @@ public class MainFragment extends Fragment {
 
         searchView.setQueryHint("输入关键词");
         searchView.setIconifiedByDefault(true);
+
+
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
