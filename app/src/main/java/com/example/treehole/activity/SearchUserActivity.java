@@ -55,6 +55,7 @@ public class SearchUserActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.search_user_toolbar));
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
+        bar.setTitle("搜索用户");
 
         String query=getIntent().getStringExtra("QUERY");
 
@@ -100,6 +101,8 @@ public class SearchUserActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+                searchView.clearFocus();
                 // 处理搜索提交事件
                 noDataTextView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);

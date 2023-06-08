@@ -33,6 +33,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
     //需要用到线程池
     private ListeningExecutorService executorService= MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     String query;
+    String searchType="";
     //MomentDao myDao;
     /*public MomentPagingSource(String query){
         this.query=query;//查询内容所需参数
@@ -42,7 +43,8 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
         searchWords = Collections.emptyList();
     }
 
-    public MomentPagingSource(List<String> searchWords) {
+    public MomentPagingSource(String searchType,List<String> searchWords) {
+        this.searchType=searchType;
         this.searchWords = searchWords;
     }
 
@@ -71,15 +73,14 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
             if(searchWords.size() == 0) {
                 keyWords.put("");
-                queryData.put("filter_by", "");
             }else{
                 //Log.d("Search Size","search words "+searchWords.get(0));
-                queryData.put("filter_by", "username");
                 for(String word : searchWords) {
                     keyWords.put(word);
                 }
             }
 
+            queryData.put("filter_by", searchType);
             queryData.put("start", nextPageNumber);
             queryData.put("count", 5);
             queryData.put("key_words", keyWords);

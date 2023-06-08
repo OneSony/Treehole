@@ -61,7 +61,7 @@ public class MainFragment extends Fragment {
         // 取消菜单项的选中状态
 
         if(menu!=null) {
-            MenuItem menuItem = menu.findItem(R.id.action_add_chat);
+            MenuItem menuItem = menu.findItem(R.id.action_search);
             menuItem.setChecked(false);
             menuItem.collapseActionView();
 
@@ -144,6 +144,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        this.menu=menu;
         inflater.inflate(R.menu.main_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -178,7 +179,6 @@ public class MainFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        this.menu=menu;
         int id = item.getItemId();
 
         // 处理菜单项的点击事件

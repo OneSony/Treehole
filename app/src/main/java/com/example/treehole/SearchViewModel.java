@@ -26,9 +26,9 @@ public class SearchViewModel extends AndroidViewModel {
         super(application);
     }
 
-    public LiveData<PagingData<Moment>> getPaging(List<String> searchWords){
+    public LiveData<PagingData<Moment>> getPaging(String searchType,List<String> searchWords){
         CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
-        Pager<String, Moment> pager = new Pager<String, Moment>(pagingConfig, ()->new MomentPagingSource(searchWords));//构造函数根据自己的需要来调整
+        Pager<String, Moment> pager = new Pager<String, Moment>(pagingConfig, ()->new MomentPagingSource(searchType,searchWords));//构造函数根据自己的需要来调整
 
         return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager),viewModelScope);
     }
