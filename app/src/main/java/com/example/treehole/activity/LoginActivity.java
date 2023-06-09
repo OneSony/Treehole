@@ -28,13 +28,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import me.pushy.sdk.Pushy;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
     //private String sharedPrefFile ="com.example.android.Treehole";
@@ -102,6 +95,7 @@ public class LoginActivity extends AppCompatActivity {
 
             switch (msg.what){
                 case 0:
+                    WebUtils.setLogIn(true);
                     Toast.makeText(getApplicationContext(),"登录成功",Toast.LENGTH_SHORT).show();
                     //new UserUtils.RegisterForPushNotificationsAsync(LoginActivity.this).execute();
                     intent_to_main();
@@ -153,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {   // 按下完成按钮，这里和上面imeOptions对应
-                    login();
+                    //login();
                 }
                 return true;
             }
@@ -263,7 +257,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login_click(View view) throws IOException {
 
-        login();
+        //login();
 
         username_box.setErrorEnabled(false);
         password_box.setErrorEnabled(false);
@@ -292,6 +286,8 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
+        /*
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), String.valueOf(json));
         Request request = new Request.Builder().url("https://rickyvu.pythonanywhere.com/users/login/").post(requestBody).build();
@@ -313,7 +309,8 @@ public class LoginActivity extends AppCompatActivity {
                     Message msg = new Message();
                     msg.obj = response.body().string();
                     msg.what=1;
-                    //Log.d("HTTP",response.body().toString());
+                    Log.d("HTTP",response.body().toString());
+
                     handler.sendMessage(msg);
                 }else{
                     Message msg = new Message();
@@ -321,6 +318,66 @@ public class LoginActivity extends AppCompatActivity {
                     handler.sendMessage(msg);
                 }
 
+            }
+        });*/
+
+
+        WebUtils.sendPost("/users/login/", false, json, new WebUtils.WebCallback() {
+
+            @Override
+            public void onSuccess(JSONObject json) {
+                JSONObject login_json = null;
+                try {
+                    login_json = json.getJSONObject("message");
+                    String user_id = login_json.getString("id");
+
+                    Log.d("Login get user_id", user_id);
+
+                    //run in UI thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            WebUtils.setLogIn(true);
+                            WebUtils.setUserid(user_id);
+                            WebUtils.setUsername(username);
+                            Toast.makeText(getApplicationContext(),"登录成功"+username,Toast.LENGTH_SHORT).show();
+                            //new UserUtils.RegisterForPushNotificationsAsync(LoginActivity.this).execute();
+                            intent_to_main();
+                        }
+                    });
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.d("POSTRETRIEVE", t.getMessage());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"登录失败",Toast.LENGTH_SHORT).show();
+                        login_button.setEnabled(true);
+                        to_register_button.setEnabled(true);
+                        username_box.setEnabled(true);
+                        password_box.setEnabled(true);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                Log.d("POSTRETRIEVE", json.optString("message", "onFailure"));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),"登录失败",Toast.LENGTH_SHORT).show();
+                        login_button.setEnabled(true);
+                        to_register_button.setEnabled(true);
+                        username_box.setEnabled(true);
+                        password_box.setEnabled(true);
+                    }
+                });
             }
         });
     }

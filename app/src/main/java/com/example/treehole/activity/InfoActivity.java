@@ -23,6 +23,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
+import com.example.treehole.UserUtils;
 import com.example.treehole.room.Moment;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -40,12 +41,14 @@ public class InfoActivity extends AppCompatActivity {
     private Moment current_moment;
 
 
-    public ImageView[] imageViewArray;
-    public ConstraintLayout[] constraintLayouts;
+    private ImageView[] imageViewArray;
+    private ConstraintLayout[] constraintLayouts;
 
-    public LinearLayout photos;
+    private LinearLayout photos;
 
-    public PlayerView video;
+    private PlayerView video;
+
+    private String user_id;
 
 
     @Override
@@ -79,6 +82,11 @@ public class InfoActivity extends AppCompatActivity {
         String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+current_moment.getUser_id();
         Glide.with(getApplicationContext()).load(profile_photo_url).into(profile_photo);
 
+        ImageView my_profile_photo= findViewById(R.id.info_my_profile);
+        user_id= UserUtils.getUserid();
+        if(user_id!=""){
+            Glide.with(getApplicationContext()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+user_id).into(my_profile_photo);
+        }
 
         topic_box = findViewById(R.id.topic_box);
         main_box = findViewById(R.id.main_box);

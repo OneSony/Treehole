@@ -2,6 +2,7 @@ package com.example.treehole.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,25 +10,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.treehole.R;
+import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
 import com.example.treehole.activity.FollowerActivity;
 import com.example.treehole.activity.LoginActivity;
 import com.example.treehole.activity.SettingsActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class MineFragment extends Fragment {
 
-
-    public MineFragment() {
-        // Required empty public constructor
-    }
-
+    String user_id;
+    String username;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,62 @@ public class MineFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_mine, container, false);
+
+        user_id= UserUtils.getUserid();
+        username=UserUtils.getUsername();
+
+        TextView user_id_text = view.findViewById(R.id.mine_my_username);
+        user_id_text.setText(username);
+
+        user_id= UserUtils.getUserid();
+        if (user_id != "") {
+            ImageView user_image = view.findViewById(R.id.mine_my_photo);
+            String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+user_id;
+            Glide.with(getContext()).load(profile_photo_url).into(user_image);
+        }
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("id", user_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("URL","/users/username?id="+user_id);
+        WebUtils.sendGet("/users/username?id="+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+                try {
+                    JSONObject msg=json.getJSONObject("message");
+                    username=msg.getString("username");
+                    Log.d("SUCCESS", username);
+
+                    //run in UI
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            user_id_text.setText(username);
+                        }
+                    });
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
 
         Button exit_button = view.findViewById(R.id.exit_button);

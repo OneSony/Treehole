@@ -7,42 +7,27 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.example.treehole.SharedPreferencesCookieJar;
-import com.example.treehole.UserUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.CookieJar;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class WebUtils {
     private static OkHttpClient client = null;
@@ -249,6 +234,14 @@ public class WebUtils {
 
     public static void setLogIn(Boolean val){
         userUtils.setLogIn(val);
+    }
+
+    public static void setUserid(String user_id){
+        userUtils.setUserid(user_id);
+    }
+
+    public static void setUsername(String username){
+        userUtils.setUsername(username);
     }
 
     public static void clearSession(){

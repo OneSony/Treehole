@@ -16,6 +16,8 @@ public class UserUtils {
     public static SharedPreferences userDetails;
     private static final String USER_PREF = "user_details";
     private static final String USERNAME = "USERNAME";
+
+    private static final String USERID = "USERID";
     private static UserUtils instance;
 
     private Boolean loginStatus = false;
@@ -160,7 +162,17 @@ public class UserUtils {
         editor.apply();
     }
 
+    public void setUserid(String userid){
+        SharedPreferences.Editor editor = userDetails.edit();
+        editor.putString(USERID, userid);
+        editor.apply();
+    }
+
     public static String getUsername(){
         return userDetails.getString(USERNAME, "");
+    }
+
+    public static String getUserid(){
+        return userDetails.getString(USERID, "");
     }
 }

@@ -384,6 +384,8 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
 
 
 
+
+
     /*
 
     private static final DiffUtil.ItemCallback<Moment> DIFF_CALLBACK = new DiffUtil.ItemCallback<Moment>() {

@@ -95,8 +95,8 @@ public class ChatFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Log.d("URL","users/username?id="+message.getUser_id());
-                    WebUtils.sendGet("users/username?id="+message.getUser_id(), true, new WebUtils.WebCallback() {
+                    Log.d("URL","/users/username?id="+message.getUser_id());
+                    WebUtils.sendGet("/users/username?id="+message.getUser_id(), false, new WebUtils.WebCallback() {
                         @Override
                         public void onSuccess(JSONObject json) {
 
