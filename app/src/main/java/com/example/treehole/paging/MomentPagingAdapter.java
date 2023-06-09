@@ -36,9 +36,13 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.flexbox.FlexboxLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
 
@@ -348,6 +352,15 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                 holder.tags_card.setVisibility(View.GONE);
             }
 
+
+            for (String tag : moment.getTags()) {
+                View tagView = LayoutInflater.from(context).inflate(R.layout.tag_item, holder.tag_layout, false);
+                TextView textView = tagView.findViewById(R.id.tag_item_text);
+                textView.setText(tag);
+                holder.tag_layout.addView(tagView);
+            }
+
+
             holder.like_box.setText(String.valueOf(moment.getLikes_num()));
             holder.collect_box.setText(String.valueOf(moment.getFavourite_num()));
 
@@ -367,6 +380,9 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                 }
             });
         }
+
+        FlexboxLayout flexboxLayout = holder.itemView.findViewById(R.id.tag_layout);
+        List<String> tags = new ArrayList<>();
 
 
 
@@ -423,6 +439,8 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
     public final PlayerView video;
     public final CardView tags_card;
 
+    public final FlexboxLayout tag_layout;
+
     ExoPlayer player;
 
     public MomentPagingViewHolder(@NonNull View itemView) {
@@ -465,6 +483,8 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
         photos=itemView.findViewById(R.id.moment_photos);
         video=itemView.findViewById(R.id.moment_video);
         tags_card=itemView.findViewById(R.id.moment_tag_card);
+
+        tag_layout=itemView.findViewById(R.id.tag_layout);
     }
 
 }
