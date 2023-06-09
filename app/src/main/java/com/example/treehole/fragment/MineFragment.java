@@ -2,6 +2,9 @@ package com.example.treehole.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +36,33 @@ public class MineFragment extends Fragment {
     String user_id;
     String username;
 
+    TextView username_text;
+
+    private Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            if (!isAdded()) {
+                return; // 页面已经不存在，不执行更新UI的操作
+            }
+
+            // 处理消息并更新UI
+            switch (msg.what) {
+                case 10:
+                    if(username_text!=null&&msg.obj!=null){
+                        username_text.setText((String)msg.obj);
+                    }
+                    break;
+            }
+        }
+    };
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        handler.removeCallbacksAndMessages(null); // 移除未处理的消息和处理程序
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
@@ -48,8 +78,8 @@ public class MineFragment extends Fragment {
         user_id= UserUtils.getUserid();
         username=UserUtils.getUsername();
 
-        TextView user_id_text = view.findViewById(R.id.mine_my_username);
-        user_id_text.setText(username);
+        username_text = view.findViewById(R.id.mine_my_username);
+        username_text.setText(username);
 
         user_id= UserUtils.getUserid();
         if (user_id != "") {
@@ -65,22 +95,24 @@ public class MineFragment extends Fragment {
             e.printStackTrace();
         }
         Log.d("URL","/users/username?id="+user_id);
+
+
         WebUtils.sendGet("/users/username?id="+user_id, false, new WebUtils.WebCallback() {
             @Override
             public void onSuccess(JSONObject json) {
 
                 try {
-                    JSONObject msg=json.getJSONObject("message");
-                    username=msg.getString("username");
+                    JSONObject username_msg=json.getJSONObject("message");
+                    username=username_msg.getString("username");
                     Log.d("SUCCESS", username);
 
-                    //run in UI
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            user_id_text.setText(username);
-                        }
-                    });
+                    WebUtils.setUsername(username);
+
+                    Message msg=new Message();
+                    msg.what=10;
+                    msg.obj=username;
+                    handler.sendMessage(msg);
+
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
