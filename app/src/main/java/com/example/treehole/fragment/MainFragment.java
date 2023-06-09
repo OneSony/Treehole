@@ -30,8 +30,6 @@ import com.example.treehole.activity.EditActivity;
 import com.example.treehole.activity.SearchMomentActivity;
 import com.example.treehole.paging.MomentPagingAdapter;
 
-import java.util.ArrayList;
-
 public class MainFragment extends Fragment {
 
     private Menu menu;
@@ -42,9 +40,6 @@ public class MainFragment extends Fragment {
     private MainViewModel viewModel;
 
     private String sortType;
-
-    ArrayList<Fragment> fragmentContainer = new ArrayList<Fragment>();
-    ArrayList<String> titleList = new ArrayList<String>();
 
 
     @Override

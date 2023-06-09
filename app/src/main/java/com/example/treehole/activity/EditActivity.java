@@ -2,6 +2,7 @@ package com.example.treehole.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -35,6 +37,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -103,7 +106,9 @@ public class EditActivity extends AppCompatActivity {
 
     private ExoPlayer player;
 
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
+
+    private List<String> tags=new ArrayList<>();
 
     private boolean markdown_realtime_preview;
 
@@ -840,6 +845,36 @@ public class EditActivity extends AppCompatActivity {
             markdownTextView.setMovementMethod(new ScrollingMovementMethod()); // 启用滚动
             markwon.setMarkdown(markdownTextView, textInputLayout.getEditText().getText().toString());//先把已经有的放进去
         }
+    }
+
+    public void tag_click(View view) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("添加标签");  // 设置对话框标题
+
+// 创建文本输入框
+        final EditText editText = new EditText(this);
+        builder.setView(editText);  // 将文本输入框设置为对话框的内容
+
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String inputText = editText.getText().toString();
+                tags.add(inputText);
+            }
+        });
+
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // 在这里处理取消按钮的点击事件
+            }
+        });
+
+// 创建并显示对话框
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 }
 

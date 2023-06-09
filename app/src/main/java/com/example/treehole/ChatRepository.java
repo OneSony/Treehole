@@ -2,6 +2,7 @@ package com.example.treehole;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -65,7 +66,7 @@ public class ChatRepository {
     }
 
     public void updateUserInfo(String user_id,String username){
-        new updateUserInfoAsyncTask(messageDao,user_id,username);
+        new updateUserInfoAsyncTask(messageDao,user_id,username).execute();
     }
 
 
@@ -227,6 +228,7 @@ public class ChatRepository {
         @Override
         protected Void doInBackground(Void... voids) {
             mAsyncTaskDao.updateUsernameByUserId(user_id,username);
+            Log.d("update","update in repository");
             return null;
         }
     }

@@ -104,13 +104,23 @@ public class ChatFragment extends Fragment {
                             try {
                                 JSONObject msg=json.getJSONObject("message");
                                 username=msg.getString("username");
-                                Log.d("SUCCESS", json.getString("message"));
+                                Log.d("SUCCESS", username);
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
                             }
                             if(username!=null&&!(username.equals(message.getUser_id()))){
                                 viewModel.updateUserInfo(message.getUser_id(), username);
+                                Log.d("VIEWMODEL", "update user info");
+
+                                //run in UI thread
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
                             }
+
                         }
 
                         @Override
@@ -138,7 +148,7 @@ public class ChatFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.receiveMessageNode("test_user", "test_user", new MessageNode(0, "test"));
+                viewModel.receiveMessageNode("2", "", new MessageNode(0, "hi"));
             }
         });
 

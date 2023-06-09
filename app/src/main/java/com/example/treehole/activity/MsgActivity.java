@@ -118,19 +118,19 @@ public class MsgActivity extends AppCompatActivity {
                     if(messageText.equals("")){//不发送空消息
                         return false;
                     }
-                    String receiverUsername = "";
 
                     viewModel.addMessageNode(message_index, new MessageNode(1, messageText));
-                    editText.setText("");//清空内容
 
                     JSONObject json = new JSONObject();
                     try{
-                        json.put("receiver", receiverUsername);
+                        json.put("receiver", message.getValue().getUsername());
                         json.put("type", "string");
                         json.put("message", messageText);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
+                    Log.d("Message", "Message send: "+json.toString());
                     WebUtils.sendPost("/messaging/send/", true, json, new WebUtils.WebCallback() {
                         @Override
                         public void onSuccess(JSONObject json) {
@@ -153,6 +153,8 @@ public class MsgActivity extends AppCompatActivity {
 
                         }
                     });
+
+                    editText.setText("");//清空内容
                 }
                 return false;//返回true，保留软键盘。false，隐藏软键盘
             }
