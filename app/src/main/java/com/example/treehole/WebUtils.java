@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.example.treehole.room.MessageDatabase;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -249,6 +251,7 @@ public class WebUtils {
         editor.clear();
         editor.apply();
         userUtils.setLogIn(false);
+        MessageDatabase.closeDatabase();
     }
 
     public static void clearUser(){

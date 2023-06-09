@@ -9,6 +9,8 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.treehole.UserUtils;
+
 @Database(entities = {Message.class},version = 1,exportSchema = false)
 @TypeConverters(MessageNodeConverter.class)
 public abstract class MessageDatabase extends RoomDatabase {
@@ -19,7 +21,7 @@ public abstract class MessageDatabase extends RoomDatabase {
         if(INSTANCE==null){
             synchronized (MessageDatabase.class){
                 if(INSTANCE==null){
-                    INSTANCE= Room.databaseBuilder(context.getApplicationContext(),MessageDatabase.class,"message_database").addCallback(sOnOpenCallback).fallbackToDestructiveMigration().build();
+                    INSTANCE= Room.databaseBuilder(context.getApplicationContext(),MessageDatabase.class,"message_database_"+ UserUtils.getUserid()).addCallback(sOnOpenCallback).fallbackToDestructiveMigration().build();
                 }
             }
         }
@@ -36,5 +38,12 @@ public abstract class MessageDatabase extends RoomDatabase {
 
     private static void initializeData() {
 
+    }
+
+    public static void closeDatabase() {
+        if (INSTANCE != null && INSTANCE.isOpen()) {
+            INSTANCE.close();
+            INSTANCE = null;
+        }
     }
 }
