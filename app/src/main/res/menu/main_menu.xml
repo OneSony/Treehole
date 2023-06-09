@@ -12,16 +12,17 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
     <item
+        android:id="@+id/action_sort"
+        android:icon="@drawable/sort"
+        android:title="sort"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_add"
         android:icon="@drawable/add"
         android:title="add"
         app:showAsAction="always"/>
 
-    <item
-        android:id="@+id/action_sort"
-        android:icon="@drawable/like"
-        android:title="sort"
-        app:showAsAction="always"/>
 
 
 
