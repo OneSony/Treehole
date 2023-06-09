@@ -122,34 +122,61 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                         int favourites_num = moment.getInt("favourites");
                         tempMoment.setNum(likes_num,favourites_num);
 
+                        {
+                            Object imagesObject = moment.get("images");
+                            List<String> imagesList = new ArrayList<>();
+                            if (imagesObject instanceof JSONArray) {
+                                JSONArray nestedArray = (JSONArray) imagesObject;
 
-                        Object imagesObject = moment.get("images");
-                        List<String> imagesList = new ArrayList<>();
-                        if (imagesObject instanceof JSONArray) {
-                            JSONArray nestedArray = (JSONArray) imagesObject;
-
-                            // 处理列表中的数据
-                            for (int ii = 0; ii < nestedArray.length(); ii++) {
-                                Object listItem = nestedArray.get(ii);
-                                // 将列表项转换为字符串并添加到 List<String> 中
-                                imagesList.add(String.valueOf(listItem));
+                                // 处理列表中的数据
+                                for (int ii = 0; ii < nestedArray.length(); ii++) {
+                                    Object listItem = nestedArray.get(ii);
+                                    // 将列表项转换为字符串并添加到 List<String> 中
+                                    imagesList.add(String.valueOf(listItem));
+                                }
                             }
+
+
+                            Object videoObject = moment.get("videos");
+                            List<String> videosList = new ArrayList<>();
+                            if (videoObject instanceof JSONArray) {
+                                JSONArray nestedArray = (JSONArray) videoObject;
+
+                                // 处理列表中的数据
+                                for (int ii = 0; ii < nestedArray.length(); ii++) {
+                                    Object listItem = nestedArray.get(ii);
+                                    // 将列表项转换为字符串并添加到 List<String> 中
+                                    videosList.add(String.valueOf(listItem));
+                                }
+                            }
+
+                            tempMoment.setMedias(imagesList,videosList);
                         }
 
-                        Object videoObject = moment.get("videos");
-                        List<String> videosList = new ArrayList<>();
-                        if (imagesObject instanceof JSONArray) {
-                            JSONArray nestedArray = (JSONArray) videoObject;
 
-                            // 处理列表中的数据
-                            for (int ii = 0; ii < nestedArray.length(); ii++) {
-                                Object listItem = nestedArray.get(ii);
-                                // 将列表项转换为字符串并添加到 List<String> 中
-                                videosList.add(String.valueOf(listItem));
+                        {
+
+                            Object tagsObject = moment.get("tags");
+                            List<String> tagsList = new ArrayList<>();
+                            if (tagsObject instanceof JSONArray) {
+                                JSONArray nestedArray = (JSONArray) tagsObject;
+
+                                // 处理列表中的数据
+                                for (int ii = 0; ii < nestedArray.length(); ii++) {
+                                    Object listItem = nestedArray.get(ii);
+                                    // 将列表项转换为字符串并添加到 List<String> 中
+                                    tagsList.add(String.valueOf(listItem));
+                                }
                             }
+
+                            tempMoment.setTags(tagsList);
                         }
 
-                        tempMoment.setMedias(imagesList,videosList);
+
+                        String location = moment.getString("pub_location");
+                        tempMoment.setLocation(location);
+
+
 
 
                         moments.add(tempMoment);

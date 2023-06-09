@@ -353,12 +353,22 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             }
 
 
+
+
+            if(!moment.getLocation().equals("null")){
+                View tagView = LayoutInflater.from(context).inflate(R.layout.location_item, holder.tag_layout, false);
+                TextView textView = tagView.findViewById(R.id.location_item_text);
+                textView.setText(moment.getLocation());
+                holder.tag_layout.addView(tagView);
+            }
+
             for (String tag : moment.getTags()) {
                 View tagView = LayoutInflater.from(context).inflate(R.layout.tag_item, holder.tag_layout, false);
                 TextView textView = tagView.findViewById(R.id.tag_item_text);
                 textView.setText(tag);
                 holder.tag_layout.addView(tagView);
             }
+
 
 
             holder.like_box.setText(String.valueOf(moment.getLikes_num()));
