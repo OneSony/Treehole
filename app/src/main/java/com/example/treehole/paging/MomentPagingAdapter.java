@@ -390,8 +390,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             });
         }
 
-        FlexboxLayout flexboxLayout = holder.itemView.findViewById(R.id.tag_layout);
-        List<String> tags = new ArrayList<>();
 
 
 
@@ -402,6 +400,10 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
     public void onViewRecycled(@NonNull MomentPagingViewHolder holder) {
         if(holder.player!=null){
             holder.player.release();
+        }
+
+        if(holder.tag_layout!=null) {
+            holder.tag_layout.removeAllViews();
         }
         super.onViewRecycled(holder);
     }

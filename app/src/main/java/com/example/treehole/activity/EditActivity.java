@@ -579,6 +579,24 @@ public class EditActivity extends AppCompatActivity {
                 requestBodyBuilder.addFormDataPart("title", null, titleBody);
                 requestBodyBuilder.addFormDataPart("text_content", null, textBody);
 
+
+
+
+                List<String> tagsList= getTags();
+                if(tagsList.size()!=0) {
+                    String[] tags = tagsList.toArray(new String[0]);
+                    // Encode the data as JSON
+                    RequestBody tagsBody = RequestBody.create(Arrays.toString(tags), MediaType.parse("application/json"));
+                    requestBodyBuilder.addFormDataPart("tags", null, tagsBody);
+                }
+
+                if(locationFlag==true) {
+                    RequestBody locationBody = RequestBody.create(locationName, MediaType.parse("text/plain"));
+                    requestBodyBuilder.addFormDataPart("location", null, locationBody);
+                }
+
+
+
                 // Add image or video to it
                 for (int i = 0; i < imageFiles.size(); i++) {
                     RequestBody imageBody = RequestBody.create(imageFiles.get(i), MediaType.parse("image/jpeg"));
@@ -928,6 +946,7 @@ public class EditActivity extends AppCompatActivity {
         if(tag.equals("")||tag.matches("\\s*")==true){
             return;
         }
+
         List<String> exitsTags = getTags();
         if(exitsTags.contains(tag)) {
             Toast.makeText(EditActivity.this, "标签已存在", Toast.LENGTH_SHORT).show();
