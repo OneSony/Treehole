@@ -347,11 +347,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                 holder.player.prepare();
             }
 
-            if(moment.getTags().size()==0){
-                holder.tags_card.setVisibility(View.GONE);
-            }
-
-
 
 
             if(!moment.getLocation().equals("null")){
@@ -448,7 +443,6 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
 
     public final LinearLayout photos;
     public final PlayerView video;
-    public final CardView tags_card;
 
     public final FlexboxLayout tag_layout;
 
@@ -493,7 +487,6 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
 
         photos=itemView.findViewById(R.id.moment_photos);
         video=itemView.findViewById(R.id.moment_video);
-        tags_card=itemView.findViewById(R.id.moment_tag_card);
 
         tag_layout=itemView.findViewById(R.id.tag_layout);
     }

@@ -63,6 +63,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -584,9 +585,10 @@ public class EditActivity extends AppCompatActivity {
 
                 List<String> tagsList= getTags();
                 if(tagsList.size()!=0) {
-                    String[] tags = tagsList.toArray(new String[0]);
+                    JSONArray tags=new JSONArray(tagsList);
+                    //String[] tags = tagsList.toArray(new String[0]);
                     // Encode the data as JSON
-                    RequestBody tagsBody = RequestBody.create(Arrays.toString(tags), MediaType.parse("application/json"));
+                    RequestBody tagsBody = RequestBody.create(tags.toString(), MediaType.parse("application/json"));
                     requestBodyBuilder.addFormDataPart("tags", null, tagsBody);
                 }
 
