@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -41,16 +42,21 @@ public class MainFragment_sub1 extends Fragment {
         View view=inflater.inflate(R.layout.fragment_main_sub1, container, false);
 
 
+        TextView no_data=view.findViewById(R.id.main_no_data);
+        no_data.setVisibility(View.GONE);
+
 
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                no_data.setVisibility(View.GONE);
                 update_data_live();
                 //swipeRefreshLayout.setRefreshing(false);
                 Log.d("REFRESH","YEAH!");
             }
         });
+
 
 
         MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
@@ -77,17 +83,24 @@ public class MainFragment_sub1 extends Fragment {
 
         adapter=new MomentPagingAdapter(getActivity());
 
-        adapter.addLoadStateListener(loadStates -> {
-            if(loadStates.getRefresh() instanceof LoadState.Loading==false){
-                swipeRefreshLayout.setRefreshing(false);
-            }else{
-                swipeRefreshLayout.setRefreshing(true);
-            }
+        adapter.addLoadStateListener(loadStates-> {
+                if (loadStates.getRefresh() instanceof LoadState.Loading) {
+                    swipeRefreshLayout.setRefreshing(true);
+                    // 数据源正在加载中
+                    // 可以显示加载中的动画或提示信息
+                } else if (loadStates.getRefresh() instanceof LoadState.Error) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    // 数据源加载时遇到错误
+                    // 可以显示错误提示信息
+                } else if (loadStates.getRefresh() instanceof LoadState.NotLoading) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    if(adapter.getItemCount()==0){
+                        no_data.setVisibility(View.VISIBLE);
+                    }
+                }
+                return null;
+            });
 
-            //swipeRefreshLayout.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
-            //        ? View.VISIBLE : View.GONE);
-            return null;
-        });
 
         recyclerView.setAdapter(adapter);
         MainViewModel loadMoreViewModel=new ViewModelProvider(this).get(MainViewModel.class);

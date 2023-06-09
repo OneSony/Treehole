@@ -85,9 +85,30 @@ public class SearchMomentActivity extends AppCompatActivity {
 
         adapter=new MomentPagingAdapter(SearchMomentActivity.this);
 
-        adapter.addLoadStateListener(loadStates -> {
+        /*adapter.addLoadStateListener(loadStates -> {
             progressBar.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
                     ? View.VISIBLE : View.GONE);
+            return null;
+        });*/
+
+        adapter.addLoadStateListener(loadStates-> {
+            if (loadStates.getRefresh() instanceof LoadState.Loading) {
+                progressBar.setVisibility(View.VISIBLE);
+                // 数据源正在加载中
+                // 可以显示加载中的动画或提示信息
+            } else if (loadStates.getRefresh() instanceof LoadState.Error) {
+                progressBar.setVisibility(View.GONE);
+                // 数据源加载时遇到错误
+                // 可以显示错误提示信息
+            } else if (loadStates.getRefresh() instanceof LoadState.NotLoading) {
+                progressBar.setVisibility(View.GONE);
+
+                Log.d("PAGING","count"+adapter.getItemCount()+loadStates.getRefresh().getEndOfPaginationReached());
+                if(adapter.getItemCount()==0) {
+                    noDataTextView.setVisibility(View.VISIBLE);
+                }
+
+            }
             return null;
         });
 
@@ -107,7 +128,7 @@ public class SearchMomentActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new android.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
+                noDataTextView.setVisibility(View.GONE);
 
                 searchWords[0] =new ArrayList<>();
                 String[] words=query.split(" ");
@@ -118,9 +139,40 @@ public class SearchMomentActivity extends AppCompatActivity {
                 // 处理搜索提交事件
                 adapter=new MomentPagingAdapter(SearchMomentActivity.this);
 
-                adapter.addLoadStateListener(loadStates -> {
-                    progressBar.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
-                            ? View.VISIBLE : View.GONE);
+                adapter.addLoadStateListener(loadStates-> {
+                    if (loadStates.getRefresh() instanceof LoadState.Loading) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        // 数据源正在加载中
+                        // 可以显示加载中的动画或提示信息
+                    } else if (loadStates.getRefresh() instanceof LoadState.Error) {
+                        progressBar.setVisibility(View.GONE);
+                        // 数据源加载时遇到错误
+                        // 可以显示错误提示信息
+                    } else if (loadStates.getRefresh() instanceof LoadState.NotLoading) {
+                        progressBar.setVisibility(View.GONE);
+
+                        Log.d("PAGING","count"+adapter.getItemCount()+loadStates.getRefresh().getEndOfPaginationReached());
+                        if(adapter.getItemCount()==0) {
+                            noDataTextView.setVisibility(View.VISIBLE);
+                        }
+                /*
+                if (!loadStates.getRefresh().getEndOfPaginationReached()) {
+                    // 加载完成且有更多数据可加载
+                    // 可以根据数据列表是否为空来判断是否获得了数据
+                    if (adapter.getItemCount() == 0) {
+                        // 没有获得任何数据
+                        // 可以显示空数据提示信息
+                    }
+                } else {
+                    // 加载完成且没有更多数据可加载
+                    // 可以根据数据列表是否为空来判断是否获得了数据
+                    if (adapter.getItemCount() == 0) {
+                        // 没有获得任何数据
+                        // 可以显示空数据提示信息
+                        Log.d("PAGING","Nothing!");
+                    }
+                }*/
+                    }
                     return null;
                 });
 
@@ -167,6 +219,7 @@ public class SearchMomentActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                noDataTextView.setVisibility(View.GONE);
                 // 当选项卡被选中时调用此方法
                 // 获取选中标签的文本
                 int tabPosition = tab.getPosition();
@@ -191,9 +244,24 @@ public class SearchMomentActivity extends AppCompatActivity {
 
                 adapter=new MomentPagingAdapter(SearchMomentActivity.this);
 
-                adapter.addLoadStateListener(loadStates -> {
-                    progressBar.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
-                            ? View.VISIBLE : View.GONE);
+                adapter.addLoadStateListener(loadStates-> {
+                    if (loadStates.getRefresh() instanceof LoadState.Loading) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        // 数据源正在加载中
+                        // 可以显示加载中的动画或提示信息
+                    } else if (loadStates.getRefresh() instanceof LoadState.Error) {
+                        progressBar.setVisibility(View.GONE);
+                        // 数据源加载时遇到错误
+                        // 可以显示错误提示信息
+                    } else if (loadStates.getRefresh() instanceof LoadState.NotLoading) {
+                        progressBar.setVisibility(View.GONE);
+
+                        Log.d("PAGING","count"+adapter.getItemCount()+loadStates.getRefresh().getEndOfPaginationReached());
+                        if(adapter.getItemCount()==0) {
+                            noDataTextView.setVisibility(View.VISIBLE);
+                        }
+
+                    }
                     return null;
                 });
 
@@ -230,5 +298,6 @@ public class SearchMomentActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 }
