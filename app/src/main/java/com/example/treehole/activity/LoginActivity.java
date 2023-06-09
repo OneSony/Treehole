@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,27 +36,52 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
-        WebUtils.init(getApplicationContext(),"https://rickyvu.pythonanywhere.com");
+        WebUtils.init(getApplicationContext());
+        UserUtils.init(this);
         Pushy.listen(this);
         new UserUtils.RegisterForPushNotificationsAsync(this).execute();
-        setContentView(R.layout.activity_login);
 
-        setSupportActionBar(findViewById(R.id.login_toolbar));
-        ActionBar bar=getSupportActionBar();
-        bar.setTitle("Login");
+        setContentView(R.layout.loading_page);
+        ProgressBar progressBar = findViewById(R.id.progress_bar);
 
-        if(WebUtils.isLoggedIn()){
-            intent_to_main();
-        }
+
+        UserUtils.isLoggedIn(new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                runOnUiThread(() -> {
+                    progressBar.setProgress(100);
+                    intent_to_main();
+                });
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                runOnUiThread(() -> {
+                    displayLogin();
+                });
+            }
+        });
 
         //mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
         //if(mPreferences.getBoolean("LOGIN_SIT", false)){
         //    intent_to_main();
         //}
 
+
+
+    }
+
+    public void displayLogin() {
+        setContentView(R.layout.activity_login);
+        setSupportActionBar(findViewById(R.id.login_toolbar));
+        ActionBar bar=getSupportActionBar();
+        bar.setTitle("Login");
         username_box = findViewById(R.id.username_box);
         password_box = findViewById(R.id.password_box);
 
@@ -72,7 +98,6 @@ public class LoginActivity extends AppCompatActivity {
                 return true;
             }
         });
-
     }
 
     public void login(){
@@ -95,17 +120,7 @@ public class LoginActivity extends AppCompatActivity {
         username_box.setEnabled(false);
         password_box.setEnabled(false);
 
-        JSONObject json = new JSONObject();
-        try {
-            json.put("username", username);
-            json.put("password", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-
-        WebUtils.sendPost("/users/login/", false, json, new WebUtils.WebCallback() {
+        WebUtils.WebCallback loginCallback = new WebUtils.WebCallback() {
 
             @Override
             public void onSuccess(JSONObject json) {
@@ -120,9 +135,6 @@ public class LoginActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            WebUtils.setLogIn(true);
-                            WebUtils.setUserid(user_id);
-                            WebUtils.setUsername(username);
                             Toast.makeText(getApplicationContext(),"登录成功"+username,Toast.LENGTH_SHORT).show();
                             //new UserUtils.RegisterForPushNotificationsAsync(LoginActivity.this).execute();
                             intent_to_main();
@@ -162,7 +174,9 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
             }
-        });
+        };
+
+        UserUtils.login(username, password, loginCallback);
     }
 
     public void login_click(View view) throws IOException {
