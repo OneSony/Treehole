@@ -16,4 +16,9 @@
         <item>location</item>
         <item>username</item>
     </string-array>
+
+    <string-array name="main_sort_type">
+        <item>date</item>
+        <item>likes</item>
+    </string-array>
 </resources>

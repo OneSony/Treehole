@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RadioGroup
+        android:id="@+id/sort_radio_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/time_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="时间排序" />
+
+        <RadioButton
+            android:id="@+id/hot_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="热度排序" />
+
+    </RadioGroup>
+</FrameLayout>

@@ -18,6 +18,8 @@ import kotlinx.coroutines.CoroutineScope;
 
 public class MainViewModel extends AndroidViewModel {
 
+    private String default_sortType="date";
+
 
     //private MomentRepository mMomentRepository;
 
@@ -26,13 +28,15 @@ public class MainViewModel extends AndroidViewModel {
     //MutableLiveData<PagingData<Moment>> momentMutableLiveData=new MutableLiveData<>();
     PagingConfig pagingConfig=new PagingConfig(10,5,false,10);//初始化配置,可以定义最大加载的数据量
 
-
     private LiveData<PagingData<Moment>> paging;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
+    }
 
-        paging=_getPaging();
+
+    public void setDefault_sortType(String default_sortType) {
+        this.default_sortType = default_sortType;
     }
 
     /*
@@ -48,6 +52,7 @@ public class MainViewModel extends AndroidViewModel {
 
     private LiveData<PagingData<Moment>> _getPaging(){
         CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
+
         //Pager<Integer, Moment> pager = new Pager<Integer, Moment>(pagingConfig, ()->new MomentPagingSource(MomentDatabase.getDatabase(getApplication().getApplicationContext()).momentDao()));//构造函数根据自己的需要来调整
         Pager<String, Moment> pager = new Pager<String, Moment>(pagingConfig, ()->new MomentPagingSource());//构造函数根据自己的需要来调整
 
@@ -56,8 +61,23 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public LiveData<PagingData<Moment>> getPaging(){
+        if(paging==null){
+            return getNewPaging(default_sortType);
+        }else {
+            return paging;
+        }
+    }
+
+    public LiveData<PagingData<Moment>> getNewPaging(String sortType){
+        CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
+
+        //MomentPagingSource pagingSource = new MomentPagingSource(sortType);
+        Pager<String, Moment> pager = new Pager<String, Moment>(pagingConfig, ()->new MomentPagingSource(sortType));//构造函数根据自己的需要来调整
+
+        paging=PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager),viewModelScope);
         return paging;
     }
+
 
 
 
