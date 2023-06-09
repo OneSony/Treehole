@@ -388,7 +388,6 @@ public class SettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Toast.makeText(getContext(),"退出成功",Toast.LENGTH_SHORT).show();
-                                    WebUtils.clearSession();
 
                                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                                     startActivity(intent);

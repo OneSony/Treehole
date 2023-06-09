@@ -106,7 +106,7 @@ public class MineFragment extends Fragment {
                     username=username_msg.getString("username");
                     Log.d("SUCCESS", username);
 
-                    WebUtils.setUsername(username);
+                    UserUtils.setUsername(username);
 
                     Message msg=new Message();
                     msg.what=10;
@@ -147,7 +147,6 @@ public class MineFragment extends Fragment {
                 preferencesEditor.putBoolean("LOGIN_SIT", false);
                 preferencesEditor.apply();*/
 
-                WebUtils.setLogIn(false);
 
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);

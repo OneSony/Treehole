@@ -16,6 +16,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.treehole.R;
+import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -142,7 +143,6 @@ public class RegisterActivity extends AppCompatActivity {
                 try{
                     Boolean success = json.getBoolean("success");
                     String message = json.getString("message");
-                    WebUtils.setLogIn(true);
                     Log.d("JSON-PARSED", "success: " + String.valueOf(success) + ", message: " + message);
 
                     Message msg = new Message();
