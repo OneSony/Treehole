@@ -17,5 +17,12 @@
         android:title="add"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@drawable/like"
+        android:title="sort"
+        app:showAsAction="always"/>
+
+
 
 </menu>

@@ -140,7 +140,9 @@ public class PersonActivity extends AppCompatActivity {
         });
 
         recyclerView=findViewById(R.id.person_recyclerview);
+
         recyclerView.setAdapter(adapter);
+        //recyclerView.setItemAnimator(null);
 
         List<String> searchWords = new ArrayList<>();
         searchWords.add(username);
@@ -149,7 +151,6 @@ public class PersonActivity extends AppCompatActivity {
                 dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-
 
         updateUsername();
     }

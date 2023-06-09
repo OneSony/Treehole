@@ -27,25 +27,32 @@ import java.util.concurrent.Executors;
 
 public class MomentPagingSource extends ListenableFuturePagingSource<String, Moment> {
 
-    private List<String> searchWords;
+    private List<String> searchWords=Collections.emptyList();
+    ;
 
 
     //需要用到线程池
     private ListeningExecutorService executorService= MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     String query;
     String searchType="";
+
+    String sortType="date";
     //MomentDao myDao;
     /*public MomentPagingSource(String query){
         this.query=query;//查询内容所需参数
     }*/
 
     public MomentPagingSource() {
-        searchWords = Collections.emptyList();
+
     }
 
     public MomentPagingSource(String searchType,List<String> searchWords) {
         this.searchType=searchType;
         this.searchWords = searchWords;
+    }
+
+    public MomentPagingSource(String sortType) {
+        this.sortType=sortType;
     }
 
     @NotNull
@@ -84,7 +91,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
             queryData.put("start", nextPageNumber);
             queryData.put("count", 10);
             queryData.put("key_words", keyWords);
-            queryData.put("order_by", "date");
+            queryData.put("order_by", sortType);
             queryData.put("order", "desc");
 
             Log.d("Search Size",queryData.toString());
@@ -172,12 +179,19 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
             @Override
             public void onError(Throwable t) {
+                Log.d("NEXTPAGE","error");
                 Log.d("POSTRETRIEVE", t.getMessage());
+
+                LoadResult<String, Moment> result=new LoadResult.Page<>(Collections.emptyList(), null, null);;
+                future.set(result);
             }
 
             @Override
             public void onFailure(JSONObject json) {
                 Log.d("POSTRETRIEVE", json.optString("message", "onFailure"));
+
+                LoadResult<String, Moment> result=new LoadResult.Page<>(Collections.emptyList(), null, null);;
+                future.set(result);
             }
         });
 

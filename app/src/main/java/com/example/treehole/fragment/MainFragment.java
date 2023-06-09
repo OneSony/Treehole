@@ -1,36 +1,47 @@
 package com.example.treehole.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.paging.LoadState;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.treehole.MainViewModel;
 import com.example.treehole.R;
 import com.example.treehole.activity.EditActivity;
 import com.example.treehole.activity.SearchMomentActivity;
-import com.example.treehole.application;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
+import com.example.treehole.paging.MomentPagingAdapter;
 
 import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
-    private ViewPager2 viewPager;
-    private FragmentStateAdapter pagerAdapter;
-
-    private TabLayout tabLayout;
 
     private Menu menu;
+    private RecyclerView recyclerView;
+    //private dot_list_adapter adapter;
+    private MomentPagingAdapter adapter;
+
+    private MainViewModel viewModel;
+
+    private String sortType;
 
     ArrayList<Fragment> fragmentContainer = new ArrayList<Fragment>();
     ArrayList<String> titleList = new ArrayList<String>();
@@ -42,16 +53,13 @@ public class MainFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        //添加子页面
-        titleList.add("新发表");
-        titleList.add("新回复");
-        titleList.add("热门");
-        titleList.add("关注");
-        fragmentContainer.add(new MainFragment_sub1());//新发表
-        fragmentContainer.add(new MainFragment_sub2());//新回复
-        fragmentContainer.add(new MainFragment_sub2());//热门
-        fragmentContainer.add(new MainFragment_sub2());//关注
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sortType = sharedPreferences.getString("main_sort_type", "date");
+        Log.d("sort Type", sortType);
 
+
+        viewModel=new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel.setDefault_sortType(sortType);
 
 }
 
@@ -73,54 +81,66 @@ public class MainFragment extends Fragment {
         }
     }
 
-    /*
-    public void update_data_live(){//可以换成LiveData？
-
-        Fragment activeFragment = getChildFragmentManager().findFragmentByTag("f" + viewPager.getCurrentItem());
-
-        if (activeFragment != null && activeFragment instanceof MainFragment_sub1) {
-            //((MainFragment_sub1) activeFragment).refreshPage();
-        }
-
-    }
-    */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        application app=(application)getActivity().getApplication();
+
+        //application app=(application)getActivity().getApplication();
         View view=inflater.inflate(R.layout.fragment_main, container, false);
 
-        tabLayout = view.findViewById(R.id.main_tab);
-        viewPager = view.findViewById(R.id.main_paper);
+        TextView no_data=view.findViewById(R.id.main_no_data);
+        no_data.setVisibility(View.GONE);
 
-        // 先强制设置到指定页面
 
-        // 通过数据修改
-        /*viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onPageSelected(int position) {//切换回来的时候更新一下
-                ((application) getActivity().getApplication()).main_frag_pager_id=position;
-                if(position==0){
-                    //update_data_live();
+            public void onRefresh() {
+                no_data.setVisibility(View.GONE);
+                update_data_live();
+                //swipeRefreshLayout.setRefreshing(false);
+                Log.d("REFRESH","YEAH!");
+            }
+        });
+
+
+        recyclerView=view.findViewById(R.id.recycle_box);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
+        adapter=new MomentPagingAdapter(getActivity());
+
+        adapter.addLoadStateListener(loadStates-> {
+            if (loadStates.getRefresh() instanceof LoadState.Loading) {
+                swipeRefreshLayout.setRefreshing(true);
+                no_data.setVisibility(View.GONE);
+                // 数据源正在加载中
+                // 可以显示加载中的动画或提示信息
+            } else if (loadStates.getRefresh() instanceof LoadState.Error) {
+                swipeRefreshLayout.setRefreshing(false);
+                // 数据源加载时遇到错误
+                // 可以显示错误提示信息
+            } else if (loadStates.getRefresh() instanceof LoadState.NotLoading) {
+                swipeRefreshLayout.setRefreshing(false);
+                if(adapter.getItemCount()==0){
+                    no_data.setVisibility(View.VISIBLE);
                 }
             }
-        });*/
-        pagerAdapter = new ScreenSlidePagerAdapter(this);
-
-        viewPager.setAdapter(pagerAdapter);
-        //pagerAdapter.notifyDataSetChanged();
+            return null;
+        });
 
 
-        // 切换到指定页面
-        //viewPager.setCurrentItem(app.main_frag_pager_id);
+        recyclerView.setAdapter(adapter);
 
-        new TabLayoutMediator(tabLayout, viewPager, true, (tab, position) -> tab.setText(titleList.get(position))).attach();
+        viewModel.getPaging().observe(getViewLifecycleOwner(),
+                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+
 
 
         return view;
     }
-
+/*
     private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
         public ScreenSlidePagerAdapter(MainFragment fa) {
             super(fa);
@@ -135,7 +155,7 @@ public class MainFragment extends Fragment {
         public int getItemCount() {
             return fragmentContainer.size();
         }
-    }
+    }*/
 
     @Override
     public void onDestroy() {
@@ -197,12 +217,138 @@ public class MainFragment extends Fragment {
             return true;
         }
 
-        /*if(item.getItemId() == R.id.action_refresh){
-            update_data_live();
+
+        if(item.getItemId() == R.id.action_sort){
+            showSortDialog();
             return true;
-        }*/
+        }
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void update_data_live(){
+        adapter.refresh();
+        recyclerView.scrollToPosition(0);
+        Log.d("UPDATE","UPDATA!");
+    }
+
+    /*
+    private void showSortDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Select an option");
+
+        // Inflate the dialog layout
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_main_sort, null);
+        builder.setView(dialogView);
+
+        // Set up the radio button group
+        RadioGroup radioGroup = dialogView.findViewById(R.id.sort_radio_group);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // Handle radio button selection
+                switch (checkedId) {
+                    case R.id.time_sort:
+                        // Option 1 selected
+                        //modifyData("Option 1");
+                        viewModel.getNewPaging("date").observe(getViewLifecycleOwner(),
+                                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+                        //update_data_live();
+                        break;
+                    case R.id.hot_sort:
+                        // Option 2 selected
+                        //modifyData("Option 2");
+                        viewModel.getNewPaging("likes").observe(getViewLifecycleOwner(),
+                                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+                        //update_data_live();
+                        break;
+                    // Handle other radio button selections as needed
+                }
+            }
+        });
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle OK button click
+                Toast.makeText(getContext(), "OK clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle Cancel button click
+                Toast.makeText(getContext(), "Cancel clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    */
+
+
+    // 在你的 Activity 或 Fragment 中创建对话框
+    private void showSortDialog() {
+
+        // 默认选中的排序方式
+        int defaultSortOption = 0;
+
+        if (sortType.equals("date")) {
+            defaultSortOption = 0;
+        } else if (sortType.equals("likes")) {
+            defaultSortOption = 1;
+        }
+
+        // 选项列表
+        final String[] sortOptions = {"时间排序", "热度排序"};
+
+        // 构建对话框
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("选择排序方式")
+                .setSingleChoiceItems(sortOptions, defaultSortOption, null)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 获取选中的选项
+                        int selectedOption = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+
+                        // 提交选中的选项
+                        submitSortOption(selectedOption);
+                    }
+                })
+                .setNegativeButton("取消", null);
+
+        // 显示对话框
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    // 提交选中的选项
+    private void submitSortOption(int selectedOption) {
+        // 根据选项执行相应的操作
+        switch (selectedOption) {
+            case 0:
+                viewModel.getNewPaging("date").observe(getViewLifecycleOwner(),
+                        dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+                //update_data_live();
+                sortType="date";
+                break;
+            case 1:
+                viewModel.getNewPaging("likes").observe(getViewLifecycleOwner(),
+                        dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+                //update_data_live();
+                sortType="likes";
+                break;
+            case 2:
+                // 执行 Option 3 的操作
+                break;
+            default:
+                break;
+        }
+    }
+
 
 }
