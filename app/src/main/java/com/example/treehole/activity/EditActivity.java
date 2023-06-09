@@ -668,7 +668,10 @@ public class EditActivity extends AppCompatActivity {
 
     public void location_click(View view) {
 
+
+
         if (locationFlag == false) {//没有添加定位信息
+
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -677,6 +680,8 @@ public class EditActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
 
             } else {
+
+                view.setClickable(false);
 
                 TextView locationTextView = findViewById(R.id.edit_location);
                 locationTextView.setText("定位中");
@@ -723,6 +728,9 @@ public class EditActivity extends AppCompatActivity {
                                                 progressBar.setVisibility(View.GONE);
                                                 Log.d("LOCATION", "City Name: " + cityName);
 
+                                                CardView locationCardView=findViewById(R.id.cardView7);
+                                                locationCardView.setClickable(true);
+
                                                 // 在这里进行UI更新或其他操作
                                             }
                                         });
@@ -738,6 +746,9 @@ public class EditActivity extends AppCompatActivity {
                                             locationTextView.setVisibility(View.VISIBLE);
                                             progressBar.setVisibility(View.GONE);
                                             locationFlag = false;
+
+                                            CardView locationCardView=findViewById(R.id.cardView7);
+                                            locationCardView.setClickable(true);
 
                                             // 在这里进行UI更新或其他操作
                                         }
