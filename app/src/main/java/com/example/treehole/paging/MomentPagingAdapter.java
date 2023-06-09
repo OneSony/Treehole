@@ -93,7 +93,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         this.photoClickable=photoClickable;
 
 
-
     }
 
 

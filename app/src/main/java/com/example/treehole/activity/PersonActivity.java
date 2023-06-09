@@ -43,7 +43,7 @@ public class PersonActivity extends AppCompatActivity {
                     List<String> searchWords = new ArrayList<>();
                     searchWords.add(username);
 
-                    adapter=new MomentPagingAdapter(getApplication());
+                    adapter=new MomentPagingAdapter(PersonActivity.this,false);
 
                     adapter.addLoadStateListener(loadStates-> {
                         if (loadStates.getRefresh() instanceof LoadState.Loading) {
@@ -116,7 +116,9 @@ public class PersonActivity extends AppCompatActivity {
 
 
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-        adapter=new MomentPagingAdapter(PersonActivity.this,false);
+
+
+        adapter=new MomentPagingAdapter(this,false);
 
         adapter.addLoadStateListener(loadStates-> {
             if (loadStates.getRefresh() instanceof LoadState.Loading) {

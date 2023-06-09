@@ -14,17 +14,22 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -55,6 +60,7 @@ import com.example.treehole.WebUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
@@ -108,9 +114,9 @@ public class EditActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
 
-    private List<String> tags=new ArrayList<>();
-
     private boolean markdown_realtime_preview;
+
+    public FlexboxLayout edit_tag_layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -420,6 +426,8 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
+
+        edit_tag_layout=findViewById(R.id.edit_tag_layout);
 
 
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
@@ -848,19 +856,29 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void tag_click(View view) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("添加标签");  // 设置对话框标题
 
-// 创建文本输入框
+        // 创建文本输入框
         final EditText editText = new EditText(this);
+        editText.setInputType(InputType.TYPE_CLASS_TEXT);
+        editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                addTags(editText.getText().toString());
+                v.setText("");
+                return true;
+            }
+        });
         builder.setView(editText);  // 将文本输入框设置为对话框的内容
 
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String inputText = editText.getText().toString();
-                tags.add(inputText);
+
+                addTags(inputText);
             }
         });
 
@@ -871,10 +889,64 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-// 创建并显示对话框
+        // 创建并显示对话框
         AlertDialog dialog = builder.create();
         dialog.show();
-
     }
+
+    List<String> getTags() {
+        List<String> textList = new ArrayList<>();
+
+        for (int i = 0; i < edit_tag_layout.getChildCount(); i++) {
+            View childView = edit_tag_layout.getChildAt(i);
+            if (childView instanceof FrameLayout) {
+                FrameLayout frameLayout = (FrameLayout) childView;
+                TextView textView = frameLayout.findViewById(R.id.tag_item_text);
+                if (textView != null) {
+                    String text = textView.getText().toString();
+                    textList.add(text);
+                }
+            }
+        }
+
+        return textList;
+    }
+
+    private void addTags(String tag){
+
+        if(tag.equals("")||tag.matches("\\s*")==true){
+            return;
+        }
+        List<String> exitsTags = getTags();
+        if(exitsTags.contains(tag)) {
+            Toast.makeText(EditActivity.this, "标签已存在", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 使用正确的上下文获取布局视图
+        View tagView = LayoutInflater.from(EditActivity.this).inflate(R.layout.tag_item, edit_tag_layout, false);
+        TextView textView = tagView.findViewById(R.id.tag_item_text);
+        textView.setText(tag);
+        tagView.setOnTouchListener(new View.OnTouchListener() {
+            private long lastClickTime = 0;
+            private static final long DOUBLE_CLICK_TIME_DELTA = 300; // 双击间隔时间阈值
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    long clickTime = System.currentTimeMillis();
+                    if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                        // 双击事件
+                        edit_tag_layout.removeView(tagView); // 移除被双击的标签视图
+                    }
+                    lastClickTime = clickTime;
+                }
+                return true;
+            }
+        });
+        edit_tag_layout.addView(tagView);
+    }
+
+
 }
 
