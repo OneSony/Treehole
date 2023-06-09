@@ -4,13 +4,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.example.treehole.activity.LoginActivity;
-import com.example.treehole.activity.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +21,6 @@ public class UserUtils {
     private static final String USERNAME = "USERNAME";
 
     private static final String USERID = "USERID";
-    private static UserUtils instance;
 
     private Context context;
 
@@ -117,6 +112,10 @@ public class UserUtils {
             e.printStackTrace();
         }
         WebUtils.sendPost("/users/login/", false, json, callback);
+    }
+
+    public static void logout(WebUtils.WebCallback callback) {
+        WebUtils.sendGet("/users/logout/", false, callback);
     }
 
     public static void setUsername(String username){

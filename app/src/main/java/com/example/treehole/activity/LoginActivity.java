@@ -131,6 +131,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     Log.d("Login get user_id", user_id);
 
+                    UserUtils.setUserid(user_id);
+                    UserUtils.setUsername(username);
+
+
                     //run in UI thread
                     runOnUiThread(new Runnable() {
                         @Override

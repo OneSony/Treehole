@@ -33,7 +33,9 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.example.treehole.ChatViewModel;
 import com.example.treehole.FileUtils;
 import com.example.treehole.R;
+import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
+import com.example.treehole.room.MessageDatabase;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
@@ -387,10 +389,36 @@ public class SettingsActivity extends AppCompatActivity {
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(getContext(),"退出成功",Toast.LENGTH_SHORT).show();
+                                    // 禁用对话框
 
-                                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                                    startActivity(intent);
+
+                                    // 发起网络请求
+                                    WebUtils.WebCallback loginCallback = new WebUtils.WebCallback() {
+                                        @Override
+                                        public void onSuccess(JSONObject json) {
+                                            MessageDatabase.closeDatabase();
+                                            // 处理成功回调的逻辑
+                                            // 关闭对话框
+                                            dialog.dismiss();
+
+                                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                                            startActivity(intent);
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable t) {
+                                            // 处理错误回调的逻辑
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(JSONObject json) {
+                                            // 处理失败回调的逻辑
+
+                                        }
+                                    };
+
+                                    UserUtils.logout(loginCallback);
                                 }
                             })
                             .setNegativeButton("取消", new DialogInterface.OnClickListener() {
