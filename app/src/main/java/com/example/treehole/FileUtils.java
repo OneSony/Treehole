@@ -142,9 +142,14 @@ public class FileUtils {
 
         public void start() {
             Log.d("HANDLER", "Compressing: " + "images:"+imageFiles.size()+"|videos:"+videoFiles.size() + "/" + (supposedImageCount+supposedVideoCount));
+
+            if (checkNumReached()){
+                callback.onResult(imageFiles, videoFiles);
+            }
             for (CompressionThread thread: threads) {
                 thread.start();
             }
+
         }
     }
 
