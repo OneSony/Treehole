@@ -93,7 +93,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         this.photoClickable=photoClickable;
 
 
-
     }
 
 
@@ -348,11 +347,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                 holder.player.prepare();
             }
 
-            if(moment.getTags().size()==0){
-                holder.tags_card.setVisibility(View.GONE);
-            }
-
-
 
 
             if(!moment.getLocation().equals("null")){
@@ -391,8 +385,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             });
         }
 
-        FlexboxLayout flexboxLayout = holder.itemView.findViewById(R.id.tag_layout);
-        List<String> tags = new ArrayList<>();
 
 
 
@@ -403,6 +395,10 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
     public void onViewRecycled(@NonNull MomentPagingViewHolder holder) {
         if(holder.player!=null){
             holder.player.release();
+        }
+
+        if(holder.tag_layout!=null) {
+            holder.tag_layout.removeAllViews();
         }
         super.onViewRecycled(holder);
     }
@@ -447,7 +443,6 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
 
     public final LinearLayout photos;
     public final PlayerView video;
-    public final CardView tags_card;
 
     public final FlexboxLayout tag_layout;
 
@@ -492,7 +487,6 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
 
         photos=itemView.findViewById(R.id.moment_photos);
         video=itemView.findViewById(R.id.moment_video);
-        tags_card=itemView.findViewById(R.id.moment_tag_card);
 
         tag_layout=itemView.findViewById(R.id.tag_layout);
     }
