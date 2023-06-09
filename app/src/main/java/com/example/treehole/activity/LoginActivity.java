@@ -2,13 +2,13 @@ package com.example.treehole.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,13 +24,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import me.pushy.sdk.Pushy;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
     //private String sharedPrefFile ="com.example.android.Treehole";
@@ -110,53 +103,8 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), String.valueOf(json));
-        Request request = new Request.Builder().url("https://rickyvu.pythonanywhere.com/users/login/").post(requestBody).build();
 
 
-        Call call = client.newCall(request);
-
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message msg = new Message();
-                msg.what=-1;
-                //handler.sendMessage(msg);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if(response.isSuccessful()) {
-                    Message msg = new Message();
-                    msg.obj = response.body().string();
-                    msg.what=1;
-
-                    Log.d("LOGIN",msg.obj.toString());
-                    //Log.d("HTTP",response.body().toString());
-                    /*runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            WebUtils.setLogIn(true);
-                            WebUtils.setUserid(user_id);
-                            WebUtils.setUsername(username);
-                            Toast.makeText(getApplicationContext(),"登录成功"+username,Toast.LENGTH_SHORT).show();
-                            //new UserUtils.RegisterForPushNotificationsAsync(LoginActivity.this).execute();
-                            intent_to_main();
-                        }
-                    });*/
-                }else{
-                    Message msg = new Message();
-                    msg.what=2;
-                    //handler.sendMessage(msg);
-                }
-
-            }
-
-
-        });
-
-/*
         WebUtils.sendPost("/users/login/", false, json, new WebUtils.WebCallback() {
 
             @Override
@@ -214,7 +162,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
             }
-        });*/
+        });
     }
 
     public void login_click(View view) throws IOException {

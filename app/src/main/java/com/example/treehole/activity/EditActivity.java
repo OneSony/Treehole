@@ -576,6 +576,7 @@ public class EditActivity extends AppCompatActivity {
                     requestBodyBuilder.addFormDataPart("video-" + (i + 1), videoFiles.get(i).getName(), imageBody);
                 }
 
+
                 WebUtils.sendPost("/posts/post/", true, requestBodyBuilder, new WebUtils.WebCallback() {
                     @Override
                     public void onSuccess(JSONObject json) {
