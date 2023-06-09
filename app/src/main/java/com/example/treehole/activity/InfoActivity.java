@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.flexbox.FlexboxLayout;
 
 public class InfoActivity extends AppCompatActivity {
     private TextView topic_box;
@@ -47,6 +49,8 @@ public class InfoActivity extends AppCompatActivity {
     private LinearLayout photos;
 
     private PlayerView video;
+
+    ExoPlayer player;
 
     private String user_id;
 
@@ -213,8 +217,6 @@ public class InfoActivity extends AppCompatActivity {
             video.setVisibility(View.GONE);
         }else{
             video.setVisibility(View.VISIBLE);
-
-            ExoPlayer player;
             player = new ExoPlayer.Builder(getApplicationContext()).build();
             video.setPlayer(player);
             MediaItem mediaItem = MediaItem.fromUri(current_moment.getVideos().get(0));
@@ -222,85 +224,23 @@ public class InfoActivity extends AppCompatActivity {
             player.prepare();
         }
 
-            /*
+        FlexboxLayout tag_layout=findViewById(R.id.info_tag);
 
-            curr_data = (dot) bundle.getSerializable("DATA");
+        if(!current_moment.getLocation().equals("null")){
+            View tagView = LayoutInflater.from(InfoActivity.this).inflate(R.layout.location_item, tag_layout, false);
+            TextView textView = tagView.findViewById(R.id.location_item_text);
+            textView.setText(current_moment.getLocation());
+            tag_layout.addView(tagView);
+        }
 
-            topic_box = findViewById(R.id.topic_box);
-            main_box = findViewById(R.id.main_box);
-            auth_box = findViewById(R.id.auth_box);
-            date_box = findViewById(R.id.date_box);
+        for (String tag : current_moment.getTags()) {
+            View tagView = LayoutInflater.from(InfoActivity.this).inflate(R.layout.tag_item, tag_layout, false);
+            TextView textView = tagView.findViewById(R.id.tag_item_text);
+            textView.setText(tag);
+            tag_layout.addView(tagView);
+        }
+    }
 
-            photo1 = findViewById(R.id.photo1);
-            photo2 = findViewById(R.id.photo2);
-            photo3 = findViewById(R.id.photo3);
-
-
-
-            topic_box.setText(curr_data.getTopic());
-            main_box.setText(curr_data.getText());
-            auth_box.setText(curr_data.getAuth());
-            date_box.setText(curr_data.getDate());
-
-            profile_photo.setImageResource(curr_data.getProfile_index());
-
-
-            photo1.setVisibility(View.GONE);
-            photo2.setVisibility(View.GONE);
-            photo3.setVisibility(View.GONE);
-
-            int photo_num = curr_data.getPhoto_num();
-            if (photo_num == 1) {
-                photo1.setVisibility(View.VISIBLE);
-                photo1.setImageResource(curr_data.getPhoto_index(0));
-            } else if (photo_num == 2) {
-                photo1.setVisibility(View.VISIBLE);
-                photo1.setImageResource(curr_data.getPhoto_index(0));
-
-                photo2.setVisibility(View.VISIBLE);
-                photo2.setImageResource(curr_data.getPhoto_index(1));
-            } else if (photo_num == 3) {
-                photo1.setVisibility(View.VISIBLE);
-                photo1.setImageResource(curr_data.getPhoto_index(0));
-
-                photo2.setVisibility(View.VISIBLE);
-                photo2.setImageResource(curr_data.getPhoto_index(1));
-
-                photo3.setVisibility(View.VISIBLE);
-                photo3.setImageResource(curr_data.getPhoto_index(2));
-            }
-
-
-             */
-
-            /*
-
-            if(curr_data.isPath_flag()==true){
-                photo1.setVisibility(View.VISIBLE);
-                Log.d("PATH","in!!");
-
-                Glide.with(this).load("https://rickyvu.pythonanywhere.com/static/images/test1.png").into(photo1);
-
-                Log.d("PATH","out!!");*/
-
-
-                /*File imgFile = new File(curr_data.getPhoto_path());
-                if(imgFile.exists()){
-                    Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    photo1.setImageBitmap(bitmap);
-                }*/
-                //holder.photo1.setImageResource(R.drawable.photo1);
-            }
-
-        /*photo1.setImageResource(R.drawable.photo);
-        photo2.setImageResource(R.drawable.photo);
-        photo3.setImageResource(R.drawable.photo);*/
-    //}
-
-    /*public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        //savedInstanceState.putSerializable("SAVED_DATA",);
-    }*/
 
     @Override
     protected void onPause() {
@@ -330,6 +270,9 @@ public class InfoActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        if(player!=null){
+            player.release();
+        }
         //photo1.setImageBitmap(null);
         //Log.d(LOG_TAG, "onDestroy");
     }
