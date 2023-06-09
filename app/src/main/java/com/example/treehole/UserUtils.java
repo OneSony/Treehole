@@ -122,6 +122,7 @@ public class UserUtils {
                 JSONObject registerData = new JSONObject();
                 try {
                     registerData.put("token", deviceDetails.getString(DEVICETOKEN, ""));
+                    Log.d("TOKEN", deviceDetails.getString(DEVICETOKEN, ""));
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
