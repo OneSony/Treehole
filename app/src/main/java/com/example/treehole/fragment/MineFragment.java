@@ -14,15 +14,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
 import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
+import com.example.treehole.activity.FavouriteActivity;
 import com.example.treehole.activity.FollowerActivity;
 import com.example.treehole.activity.LoginActivity;
 import com.example.treehole.activity.SettingsActivity;
@@ -163,7 +166,67 @@ public class MineFragment extends Fragment {
             }
         });
 
-        TextView my_username = view.findViewById(R.id.mine_my_username);
+
+        {
+            LinearLayout follow_layout = view.findViewById(R.id.follow_layout);
+            follow_layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), FollowerActivity.class);
+                    intent.putExtra("SEARCH_TYPE", 0);
+                    getActivity().startActivity(intent);
+                }
+            });
+        }
+        {
+            LinearLayout fans_layout = view.findViewById(R.id.fans_layout);
+            fans_layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), FollowerActivity.class);
+                    intent.putExtra("SEARCH_TYPE", 1);
+                    getActivity().startActivity(intent);
+                }
+            });
+        }
+
+        {
+            ConstraintLayout blacklist_layout = view.findViewById(R.id.blacklist_layout);
+            blacklist_layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), FollowerActivity.class);
+                    intent.putExtra("SEARCH_TYPE", 2);
+                    getActivity().startActivity(intent);
+                }
+            });
+        }
+
+        {
+            ConstraintLayout favourite_layout = view.findViewById(R.id.favourite_layout);
+            favourite_layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), FavouriteActivity.class);
+                    intent.putExtra("SEARCH_TYPE", 1);
+                    getActivity().startActivity(intent);
+                }
+            });
+        }
+
+        {
+            ConstraintLayout published_layout = view.findViewById(R.id.published_layout);
+            published_layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), FavouriteActivity.class);
+                    intent.putExtra("SEARCH_TYPE", 0);
+                    getActivity().startActivity(intent);
+                }
+            });
+        }
+
+
 
 
         return view;
@@ -198,4 +261,5 @@ public class MineFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
