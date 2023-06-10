@@ -78,6 +78,17 @@ public class PersonActivity extends AppCompatActivity {
                             dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
 
                     recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                    break;
+                case 70:
+                    if(follower_count !=null&&msg.obj!=null){
+                        follower_count.setText(String.valueOf(msg.obj));
+                    }
+                    break;
+                case 80:
+                    if(follow_count !=null&&msg.obj!=null){
+                        follow_count.setText(String.valueOf(msg.obj));
+                    }
+                    break;
 
             }
         }
@@ -97,6 +108,10 @@ public class PersonActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
 
     private SearchViewModel viewModel;
+
+    private TextView follow_count;
+    private TextView follower_count;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +127,14 @@ public class PersonActivity extends AppCompatActivity {
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setTitle(username);
+
+
+        follow_count = findViewById(R.id.person_follow_count);
+        follow_count.setText("-");
+
+        follower_count = findViewById(R.id.person_follower_count);
+        follower_count.setText("-");
+
 
         ImageView profile_photo=findViewById(R.id.person_profile_photo);
         String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+user_id;
@@ -161,6 +184,78 @@ public class PersonActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
         updateUsername();
+
+
+
+        WebUtils.sendGet("/users/follow_count?id="+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    Integer follow_count = responseJson.optInt("count", 0);
+                    Log.d("SUCCESS", String.valueOf(follow_count));
+
+
+                    Message msg=new Message();
+                    msg.what=80;
+                    msg.obj=follow_count;
+                    handler.sendMessage(msg);
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        WebUtils.sendGet("/users/follower_count?id="+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    Integer follower_count = responseJson.optInt("count", 0);
+                    Log.d("SUCCESS", String.valueOf(follower_count));
+
+
+                    Message msg=new Message();
+                    msg.what=70;
+                    msg.obj=follower_count;
+                    handler.sendMessage(msg);
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
 
         if(user_id.equals(UserUtils.getUserid())){//我自己
@@ -248,6 +343,61 @@ public class PersonActivity extends AppCompatActivity {
                 bundle.putString("USERNAME", user_id);
                 intent.putExtra("BUNDLE_DATA", bundle);*/
         startActivity(intent);
+
+    }
+
+    public void person_blacklist_click(View view) {
+        sendPost(0);
+    }
+
+    public void person_follow_click(View view) {
+        sendPost(1);
+    }
+
+    private void sendPost(int flag){
+
+        String api="";
+
+        if(flag==0){
+            api="/users/blacklist/";
+        }else if(flag==1) {
+            api = "/users/follow/";
+        }else{
+            return;
+        }
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("id", user_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("BLACKLIST","json"+json.toString());
+        WebUtils.sendPost(api, true, json, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                try {
+                    Log.d("SUCCESS", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
     }
 }
