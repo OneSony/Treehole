@@ -27,33 +27,6 @@ public class ChatViewModel extends AndroidViewModel {
         super(application);
         mRepository=new ChatRepository(application);
         mAllMessage=mRepository.getAllMessage();
-/*
-        application myApplication = (application) getApplication();
-
-
-        Observer<ArrayList<MessageQueueNode>> unreadMessagesObserver = messageQueue -> {
-            // 更新未读消息列表
-
-            ArrayList<MessageQueueNode> unreadMessages = new ArrayList<>();
-            unreadMessages.addAll(messageQueue);
-            //unreadMessages.clear();
-
-            Log.d("GOT IN chat viewmodel",String.valueOf(messageQueue.size()));
-
-            // 处理未读消息
-            for (MessageQueueNode messageQueueNode : unreadMessages) {
-                receiveMessageNode(messageQueueNode.getSenderId(), messageQueueNode.getSenderUsername(), messageQueueNode.getMessageNode());
-            }
-
-            messageQueue.clear();
-        };
-
-        messageNodeQueueLiveData=myApplication.getUnreadMessagesLiveData();
-
-        messageNodeQueueLiveData.observe(this.getApplication(), unreadMessagesObserver);
-
-
- */
     }
 
     public LiveData<List<Message>> getAllMessage(){

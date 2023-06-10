@@ -20,16 +20,23 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.example.treehole.CommentListAdapter;
 import com.example.treehole.R;
 import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
+import com.example.treehole.room.Comment;
 import com.example.treehole.room.Moment;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -38,8 +45,13 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class InfoActivity extends AppCompatActivity {
     private TextView topic_box;
@@ -64,6 +76,7 @@ public class InfoActivity extends AppCompatActivity {
 
     private String user_id;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,13 +263,194 @@ public class InfoActivity extends AppCompatActivity {
             tag_layout.addView(tagView);
         }
 
+
+
+
+
+
+
+
+
+
+        RecyclerView recyclerView=findViewById(R.id.comment_recyclerview);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),DividerItemDecoration.VERTICAL));
+
+        CommentListAdapter adapter=new CommentListAdapter(getApplicationContext());
+        adapter.setOnItemClickListener(new CommentListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(String user_id,String username) throws ExecutionException, InterruptedException {
+                //Intent intent = new Intent(getApplicationContext(), PersonActivity.class);
+
+
+                Intent intent = new Intent(InfoActivity.this, PersonActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("USERNAME", username);
+                bundle.putString("USER_ID", user_id);
+                intent.putExtra("BUNDLE_DATA", bundle);
+                InfoActivity.this.startActivity(intent);
+
+            }
+        });
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+
+
+
+        Log.d("COMMENT SUCC","/posts/comment?id="+current_moment.getId());
+        WebUtils.sendGet("/posts/comment?id="+current_moment.getId(), false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+
+                List<Comment> newComments=new ArrayList<>();
+
+                Log.d("COMMENT SUCC",json.toString());
+
+                try {
+
+                    Object msg=json.get("message");
+
+                    if (msg instanceof JSONArray) {
+                        JSONArray nestedArray = (JSONArray) msg;
+
+                        // 处理列表中的数据
+                        for (int ii = 0; ii < nestedArray.length(); ii++) {
+                            Object listItem = nestedArray.get(ii);
+                            if(listItem instanceof JSONObject){
+                                JSONObject comment=(JSONObject)listItem;
+                                String user_id=comment.getString("id");
+                                String username=comment.getString("username");
+                                String content=comment.getString("text");
+                                String time=comment.getString("time");
+                                newComments.add(new Comment(user_id,username,content,time));
+
+                                Log.d("COMMENT GET",user_id+" "+content+" "+time);
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.setSearchUserResults(newComments);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        swipeRefreshLayout = findViewById(R.id.infoSwipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                Log.d("FRESH","in");
+
+                WebUtils.sendGet("/posts/comment?id="+current_moment.getId(), false, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+
+
+                        List<Comment> newComments=new ArrayList<>();
+
+                        Log.d("COMMENT SUCC",json.toString());
+
+                        try {
+
+                            Object msg=json.get("message");
+
+                            if (msg instanceof JSONArray) {
+                                JSONArray nestedArray = (JSONArray) msg;
+
+                                // 处理列表中的数据
+                                for (int ii = 0; ii < nestedArray.length(); ii++) {
+                                    Object listItem = nestedArray.get(ii);
+                                    if(listItem instanceof JSONObject){
+                                        JSONObject comment=(JSONObject)listItem;
+                                        String user_id=comment.getString("id");
+                                        String username=comment.getString("username");
+                                        String content=comment.getString("text");
+                                        String time=comment.getString("time");
+                                        newComments.add(new Comment(user_id,username,content,time));
+
+                                        Log.d("COMMENT GET",user_id+" "+content+" "+time);
+                                    }
+                                }
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeRefreshLayout.setRefreshing(false);
+                                adapter.setSearchUserResults(newComments);
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        Log.e("ERROR", t.getMessage());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        try {
+                            Log.e("FAILURE", json.getString("message"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+
+
+
+
+
         commentInput = findViewById(R.id.infoTextInputLayout);
         EditText editText = commentInput.getEditText();
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+
                     JSONObject json = new JSONObject();
                     try {
                         String comment = editText.getText().toString();
@@ -265,9 +459,20 @@ public class InfoActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
-                    WebUtils.sendPost("/post/comment/", true, json, new WebUtils.WebCallback() {
+                    WebUtils.sendPost("/posts/comment/", true, json, new WebUtils.WebCallback() {
                         @Override
                         public void onSuccess(JSONObject json) {
+
+                            //run in UI
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    //swipeRefreshLayout.setRefreshing(true);
+
+                                    Toast.makeText(getApplicationContext(), "评论成功", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
 
                         }
 
@@ -281,7 +486,8 @@ public class InfoActivity extends AppCompatActivity {
 
                         }
                     });
-                    return true;
+
+                    editText.setText("");//清空内容
                 }
                 return false;
             }
