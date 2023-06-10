@@ -43,6 +43,8 @@ public class MineFragment extends Fragment {
     TextView follow_count;
     TextView follower_count;
 
+    TextView description_text;
+
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -67,6 +69,11 @@ public class MineFragment extends Fragment {
                         follow_count.setText(String.valueOf(msg.obj));
                     }
                     break;
+
+                case 200:
+                    if(description_text!=null&&msg.obj!=null){
+                        description_text.setText((String)msg.obj);
+                    }
             }
         }
     };
@@ -90,7 +97,7 @@ public class MineFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_mine, container, false);
 
-        user_id= UserUtils.getUserid();
+        user_id=UserUtils.getUserid();
         username=UserUtils.getUsername();
 
         username_text = view.findViewById(R.id.mine_my_username);
@@ -101,6 +108,45 @@ public class MineFragment extends Fragment {
 
         follower_count = view.findViewById(R.id.textView4);
         follower_count.setText("-");
+
+        description_text=view.findViewById(R.id.mine_my_about);
+
+        WebUtils.sendGet("/users/description?id="+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                Log.d("description",json.toString());
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    String description = responseJson.optString("description", "");
+
+
+                    Message msg=new Message();
+                    msg.what=200;
+                    msg.obj=description;
+                    handler.sendMessage(msg);
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+
+
 
         user_id= UserUtils.getUserid();
         if (user_id != "") {

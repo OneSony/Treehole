@@ -338,83 +338,8 @@ public class PersonActivity extends AppCompatActivity {
             blacklistButton.setEnabled(false);
         }else{
             msgButton.setEnabled(true);
-
             isFollowed();
             isBlacklisted();
-
-
-            /*
-            WebUtils.sendGet("/users/is_following?id="+user_id, false, new WebUtils.WebCallback() {
-                @Override
-                public void onSuccess(JSONObject json) {
-
-                    try {
-                        JSONObject responseJson=json.getJSONObject("message");
-                        boolean following = responseJson.optBoolean("yes", false);
-                        Log.d("SUCCESS", String.valueOf(following));
-
-                        Message msg=new Message();
-                        msg.what=90;
-                        msg.obj=following;
-                        handler.sendMessage(msg);
-
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                @Override
-                public void onError(Throwable t) {
-                    Log.e("ERROR", t.getMessage());
-                }
-
-                @Override
-                public void onFailure(JSONObject json) {
-                    try {
-                        Log.e("FAILURE", json.getString("message"));
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });*/
-
-            WebUtils.sendGet("/users/is_blacklisted?id="+user_id, false, new WebUtils.WebCallback() {
-                @Override
-                public void onSuccess(JSONObject json) {
-
-                    try {
-                        JSONObject responseJson=json.getJSONObject("message");
-                        boolean blacklisted = responseJson.optBoolean("yes", false);
-                        Log.d("SUCCESS", String.valueOf(blacklisted));
-
-                        Message msg=new Message();
-                        msg.what=100;
-                        msg.obj=blacklisted;
-                        handler.sendMessage(msg);
-
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                @Override
-                public void onError(Throwable t) {
-                    Log.e("ERROR", t.getMessage());
-                }
-
-                @Override
-                public void onFailure(JSONObject json) {
-                    try {
-                        Log.e("FAILURE", json.getString("message"));
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-
-
-
-
 
         }
     }
@@ -493,7 +418,7 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     public void person_blacklist_click(View view) {
-        blacklistButton.setEnabled(false);
+        //blacklistButton.setEnabled(false);
         if(isBlacklisted==false) {
             sendPost(0);
         }else{
@@ -502,7 +427,7 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     public void person_follow_click(View view) {
-        followButton.setEnabled(false);
+        //followButton.setEnabled(false);
         if(isFollowed==false) {
             sendPost(1);
         }else{
@@ -542,12 +467,10 @@ public class PersonActivity extends AppCompatActivity {
                             if(flag==0){
                                 isBlacklisted=true;
                                 blacklistButton.setText("已拉黑");
-                                blacklistButton.setPressed(true);
                                 blacklistButton.setEnabled(true);
                             }else if(flag==1) {
                                 isFollowed=true;
                                 followButton.setText("已关注");
-                                followButton.setPressed(true);
                                 followButton.setEnabled(true);
                             }else{
                                 return;
@@ -609,12 +532,10 @@ public class PersonActivity extends AppCompatActivity {
                             if(flag==0){
                                 isBlacklisted=false;
                                 blacklistButton.setText("拉黑");
-                                blacklistButton.setPressed(false);
                                 blacklistButton.setEnabled(true);
                             }else if(flag==1) {
                                 isFollowed=false;
                                 followButton.setText("关注");
-                                followButton.setPressed(false);
                                 followButton.setEnabled(true);
                             }else{
                                 return;
@@ -662,7 +583,6 @@ public class PersonActivity extends AppCompatActivity {
                             if(followButton!=null) {
                                 if (following) {
                                     followButton.setText("已关注");
-                                    followButton.setPressed(true);
                                     followButton.setEnabled(true);
                                 } else {
                                     followButton.setEnabled(true);
@@ -711,7 +631,6 @@ public class PersonActivity extends AppCompatActivity {
                             if(blacklistButton!=null) {
                                 if (blacklisting) {
                                     blacklistButton.setText("已拉黑");
-                                    blacklistButton.setPressed(true);
                                     blacklistButton.setEnabled(true);
                                 } else {
                                     blacklistButton.setEnabled(true);
