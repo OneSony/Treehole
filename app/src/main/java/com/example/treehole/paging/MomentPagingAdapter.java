@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -137,66 +138,86 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                 }
             });
 
-            holder.itemView.findViewById(R.id.like_icon).setOnClickListener(new View.OnClickListener() {
+            if(moment.isLiked()){
+                holder.like_icon.setImageResource(R.drawable.like_true);
+            }else{
+                holder.like_icon.setImageResource(R.drawable.like_false);
+            }
+
+            if(moment.isFavourite()){
+                holder.collect_icon.setImageResource(R.drawable.collect_true);
+            }else{
+                holder.collect_icon.setImageResource(R.drawable.collect_false);
+            }
+
+
+
+            holder.itemView.findViewById(R.id.like_layout).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
+                    int like_num=Integer.parseInt(holder.like_box.getText().toString());
+                    if(moment.isLiked()){
+                        like_num--;
+                        moment.setLiked(false);
+                        holder.like_icon.setImageResource(R.drawable.like_false);
+                    }else{
+                        like_num++;
+                        moment.setLiked(true);
+                        holder.like_icon.setImageResource(R.drawable.like_true);
+                    }
+                    holder.like_box.setText(String.valueOf(like_num));
 
-                    //if(likeFlag==false) {
-                    if(true) {
 
-                        //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
-                        JSONObject json = new JSONObject();
-                        try {
-                            json.put("id", moment.getId());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                    JSONObject json = new JSONObject();
+                    try {
+                        json.put("id", moment.getId());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    WebUtils.sendPost("/posts/like/", true, json, new WebUtils.WebCallback() {
+                        @Override
+                        public void onSuccess(JSONObject json) {
+                            try {
+                                Log.d("SUCCESS", json.getString("message"));
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
 
-                        WebUtils.sendPost("/posts/like/", true, json, new WebUtils.WebCallback() {
-                            @Override
-                            public void onSuccess(JSONObject json) {
-                                try {
-                                    Log.d("SUCCESS", json.getString("message"));
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
+                        @Override
+                        public void onError(Throwable t) {
+                            Log.e("ERROR", t.getMessage());
+                        }
+
+                        @Override
+                        public void onFailure(JSONObject json) {
+                            try {
+                                Log.e("FAILURE", json.getString("message"));
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
                             }
-
-                            @Override
-                            public void onError(Throwable t) {
-                                Log.e("ERROR", t.getMessage());
-                            }
-
-                            @Override
-                            public void onFailure(JSONObject json) {
-                                try {
-                                    Log.e("FAILURE", json.getString("message"));
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                        });
-                    }else{
-
-                        int like_num=Integer.parseInt(holder.like_box.getText().toString());
-                        like_num--;
-                        holder.like_box.setText(String.valueOf(like_num));
-
-
-                    }
+                        }
+                    });
                 }
             });
 
-            holder.itemView.findViewById(R.id.collect_icon).setOnClickListener(new View.OnClickListener() {
+            holder.itemView.findViewById(R.id.collect_layout).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
+                    int favourite_num=Integer.parseInt(holder.collect_box.getText().toString());
+                    if(moment.isFavourite()){
+                        favourite_num--;
+                        moment.setFavourite(false);
+                        holder.collect_icon.setImageResource(R.drawable.collect_false);
+                    }else{
+                        favourite_num++;
+                        moment.setFavourite(true);
+                        holder.collect_icon.setImageResource(R.drawable.collect_true);
+                    }
+                    holder.collect_box.setText(String.valueOf(favourite_num));
 
-                    //if(likeFlag==false) {
-                    if(true) {
 
-                        //Toast.makeText(context,"Like",Toast.LENGTH_SHORT).show();
                         JSONObject json = new JSONObject();
                         try {
                             json.put("id", moment.getId());
@@ -228,14 +249,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                                 }
                             }
                         });
-                    }else{
 
-                        int like_num=Integer.parseInt(holder.collect_box.getText().toString());
-                        like_num--;
-                        holder.collect_box.setText(String.valueOf(like_num));
-
-
-                    }
                 }
             });
 
@@ -435,7 +449,15 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
 
 
     public final ImageView[] imageViewArray;
+
+    public final ImageView like_icon;
+    public final ImageView comment_icon;
+    public final ImageView collect_icon;
     public final ConstraintLayout[] constraintLayouts;
+
+    public final ConstraintLayout like_layout;
+    public final ConstraintLayout comment_layout;
+    public final ConstraintLayout collect_layout;
 
 
 
@@ -480,6 +502,15 @@ class MomentPagingViewHolder extends RecyclerView.ViewHolder{
         constraintLayouts[6]=itemView.findViewById(R.id.moment_photo_layout7);
         constraintLayouts[7]=itemView.findViewById(R.id.moment_photo_layout8);
         constraintLayouts[8]=itemView.findViewById(R.id.moment_photo_layout9);
+
+        like_icon=itemView.findViewById(R.id.like_icon);
+        comment_icon=itemView.findViewById(R.id.comment_icon);
+        collect_icon=itemView.findViewById(R.id.collect_icon);
+
+        like_layout=itemView.findViewById(R.id.like_layout);
+        comment_layout=itemView.findViewById(R.id.comment_layout);
+        collect_layout=itemView.findViewById(R.id.collect_layout);
+
 
 
 

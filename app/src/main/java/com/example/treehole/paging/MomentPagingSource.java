@@ -105,6 +105,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
             @Override
             public void onSuccess(JSONObject json) {
+                Log.d("PAGING",json.toString());
                 try {
                     JSONArray moments_json = null;
                     //String size_json=json.getString("size");
@@ -122,6 +123,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                         String date = moment.getString("pub_date");
                         Boolean is_liked = moment.getBoolean("is_liked");
                         Boolean is_favourited = moment.getBoolean("is_favourited");
+
 
 
                         Log.d("NEXTPAGE","id "+id);
@@ -186,6 +188,9 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                         String location = moment.getString("pub_location");
                         tempMoment.setLocation(location);
 
+                        tempMoment.setLiked(is_liked,is_favourited);
+                        tempMoment.setText_type(text_type);
+                        Log.d("TYPE","type is "+text_type);
 
 
 

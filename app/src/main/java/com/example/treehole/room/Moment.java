@@ -31,6 +31,12 @@ public class Moment implements Serializable {
     private int likes_num;
     private int favourite_num;
 
+    private boolean isLiked=false;
+
+    private boolean isFavourite=false;
+
+    private String text_type;
+
     public Moment(String topic, String text){
         this.topic=topic;
         this.text=text;
@@ -94,6 +100,15 @@ public class Moment implements Serializable {
             }else{//都没有
             }
         }
+    }
+
+    public void setLiked(Boolean isLiked,Boolean isFavourite){
+        this.isLiked=isLiked;
+        this.isFavourite=isFavourite;
+    }
+
+    public void setText_type(String text_type){
+        this.text_type=text_type;
     }
 
 
@@ -200,6 +215,22 @@ public class Moment implements Serializable {
 
     public int getFavourite_num() {
         return favourite_num;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public void setFavourite(boolean favourite) {
+        isFavourite = favourite;
+    }
+
+    public Boolean isLiked(){
+        return isLiked;
+    }
+
+    public Boolean isFavourite(){
+        return isFavourite;
     }
 
 
