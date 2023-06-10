@@ -90,6 +90,26 @@ public class PersonActivity extends AppCompatActivity {
                     }
                     break;
 
+                case 90:
+                    if(followButton !=null&&msg.obj!=null){
+                        if((boolean)msg.obj==true){
+                            followButton.setText("已关注");
+                        }else{
+                            followButton.setEnabled(true);
+                        }
+                    }
+                    break;
+
+                case 100:
+                    if(blacklistButton !=null&&msg.obj!=null){
+                        if((boolean)msg.obj==true){
+                            blacklistButton.setText("已拉黑");;
+                        }else{
+                            blacklistButton.setEnabled(true);
+                        }
+                    }
+                    break;
+
             }
         }
     };
@@ -112,6 +132,8 @@ public class PersonActivity extends AppCompatActivity {
     private TextView follow_count;
     private TextView follower_count;
 
+    Button msgButton,followButton,blacklistButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +149,16 @@ public class PersonActivity extends AppCompatActivity {
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setTitle(username);
+
+
+        msgButton=findViewById(R.id.person_msg_button);
+        msgButton.setEnabled(false);
+
+        followButton=findViewById(R.id.person_follow_button);
+        followButton.setEnabled(false);
+
+        blacklistButton=findViewById(R.id.person_blacklist_button);
+        blacklistButton.setEnabled(false);
 
 
         follow_count = findViewById(R.id.person_follow_count);
@@ -258,18 +290,88 @@ public class PersonActivity extends AppCompatActivity {
         });
 
 
+
+
+
         if(user_id.equals(UserUtils.getUserid())){//我自己
-            Button msgButton=findViewById(R.id.person_msg_button);
-            //msgButton.setClickable(false);
             msgButton.setEnabled(false);
-
-            Button followButton=findViewById(R.id.person_follow_button);
-            //followButton.setClickable(false);
             followButton.setEnabled(false);
-
-            Button blacklistButton=findViewById(R.id.person_blacklist_button);
-            //blacklistButton.setClickable(false);
             blacklistButton.setEnabled(false);
+        }else{
+            msgButton.setEnabled(true);
+
+            WebUtils.sendGet("/users/is_following?id="+user_id, false, new WebUtils.WebCallback() {
+                @Override
+                public void onSuccess(JSONObject json) {
+
+                    try {
+                        JSONObject responseJson=json.getJSONObject("message");
+                        boolean following = responseJson.optBoolean("yes", false);
+                        Log.d("SUCCESS", String.valueOf(following));
+
+                        Message msg=new Message();
+                        msg.what=90;
+                        msg.obj=following;
+                        handler.sendMessage(msg);
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    Log.e("ERROR", t.getMessage());
+                }
+
+                @Override
+                public void onFailure(JSONObject json) {
+                    try {
+                        Log.e("FAILURE", json.getString("message"));
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
+            WebUtils.sendGet("/users/is_blacklisted?id="+user_id, false, new WebUtils.WebCallback() {
+                @Override
+                public void onSuccess(JSONObject json) {
+
+                    try {
+                        JSONObject responseJson=json.getJSONObject("message");
+                        boolean blacklisted = responseJson.optBoolean("yes", false);
+                        Log.d("SUCCESS", String.valueOf(blacklisted));
+
+                        Message msg=new Message();
+                        msg.what=100;
+                        msg.obj=blacklisted;
+                        handler.sendMessage(msg);
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    Log.e("ERROR", t.getMessage());
+                }
+
+                @Override
+                public void onFailure(JSONObject json) {
+                    try {
+                        Log.e("FAILURE", json.getString("message"));
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
+
+
+
+
         }
     }
 

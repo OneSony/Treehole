@@ -33,4 +33,11 @@ public class SearchViewModel extends AndroidViewModel {
         return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager),viewModelScope);
     }
 
+    public LiveData<PagingData<Moment>> getPaging(String searchType){
+        CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
+        Pager<String, Moment> pager = new Pager<String, Moment>(pagingConfig, ()->new MomentPagingSource(searchType,""));//构造函数根据自己的需要来调整
+
+        return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager),viewModelScope);
+    }
+
 }

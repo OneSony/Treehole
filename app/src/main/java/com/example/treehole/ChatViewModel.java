@@ -53,6 +53,10 @@ public class ChatViewModel extends AndroidViewModel {
         mRepository.receiveMessageNode(user_id,username, messageNode);
     }
 
+    public void receiveMessageNode(String user_id, String username, MessageNode messageNode,int index) {//收到消息的接口
+        mRepository.receiveMessageNode(user_id,username, messageNode,index);
+    }
+
     public void cleanMessageUnread(int index){
         mRepository.cleanMessageUnread(index);
     }

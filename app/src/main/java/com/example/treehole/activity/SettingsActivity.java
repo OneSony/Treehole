@@ -30,6 +30,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.treehole.ChatViewModel;
 import com.example.treehole.FileUtils;
 import com.example.treehole.R;
@@ -112,7 +114,10 @@ public class SettingsActivity extends AppCompatActivity {
                     // Inflate the custom dialog layout
                     View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_change_profile_photo, null);
                     Button button = dialogView.findViewById(R.id.dialog_profile_button);
+
                     changeProfilePictureImageView = dialogView.findViewById(R.id.change_profile_photo);
+                    Glide.with(getActivity()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+UserUtils.getUserid()).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(changeProfilePictureImageView);
+
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

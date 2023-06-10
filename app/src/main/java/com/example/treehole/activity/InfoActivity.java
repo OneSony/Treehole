@@ -78,6 +78,8 @@ public class InfoActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    TextView no_data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -295,6 +297,9 @@ public class InfoActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
 
+        no_data=findViewById(R.id.info_no_data);
+        no_data.setVisibility(View.GONE);
+
 
 
         Log.d("COMMENT SUCC","/posts/comment?id="+current_moment.getId());
@@ -332,13 +337,25 @@ public class InfoActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.setSearchUserResults(newComments);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+
+                if(newComments.size()!=0) {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.setSearchUserResults(newComments);
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+
+                }else{
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            no_data.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
 
             }
 
@@ -361,6 +378,7 @@ public class InfoActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                no_data.setVisibility(View.GONE);
 
                 Log.d("FRESH","in");
 
@@ -398,14 +416,27 @@ public class InfoActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                swipeRefreshLayout.setRefreshing(false);
-                                adapter.setSearchUserResults(newComments);
-                                adapter.notifyDataSetChanged();
-                            }
-                        });
+                        if(newComments.size()!=0) {
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.setSearchUserResults(newComments);
+                                    adapter.notifyDataSetChanged();
+                                    swipeRefreshLayout.setRefreshing(false);
+                                }
+                            });
+
+                        }else{
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    no_data.setVisibility(View.VISIBLE);
+                                    swipeRefreshLayout.setRefreshing(false);
+                                }
+                            });
+                        }
 
                     }
 

@@ -20,13 +20,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.paging.PagingDataAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
 import com.example.treehole.activity.InfoActivity;
@@ -40,9 +40,6 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
 
@@ -115,7 +112,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         }else{
             String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+moment.getUser_id();
             Log.d("PROFILE URL",profile_photo_url);
-            Glide.with(holder.itemView.getContext()).load(profile_photo_url).into(holder.profile_box);
+            Glide.with(holder.itemView.getContext()).load(profile_photo_url).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(holder.profile_box);
             holder.auth_box.setText(moment.getUsername());
             holder.date_box.setText(moment.getDate());
             holder.topic_box.setText(moment.getTopic());

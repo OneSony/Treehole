@@ -28,7 +28,6 @@ import java.util.concurrent.Executors;
 public class MomentPagingSource extends ListenableFuturePagingSource<String, Moment> {
 
     private List<String> searchWords=Collections.emptyList();
-    ;
 
 
     //需要用到线程池
@@ -53,6 +52,10 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
     public MomentPagingSource(String sortType) {
         this.sortType=sortType;
+    }
+
+    public MomentPagingSource(String searchType,String justForOverload) {
+        this.searchType=searchType;
     }
 
     @NotNull
@@ -102,8 +105,12 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
 
             @Override
             public void onSuccess(JSONObject json) {
-                JSONArray moments_json = null;
                 try {
+                    JSONArray moments_json = null;
+                    //String size_json=json.getString("size");
+
+                    //Log.d("MOMENT SIZE",size_json);
+
                     moments_json = json.getJSONArray("message");
                     for (int i = 0; i < moments_json.length(); i++) {
                         JSONObject moment = (JSONObject) moments_json.get(i);

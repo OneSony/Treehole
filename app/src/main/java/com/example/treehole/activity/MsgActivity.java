@@ -74,7 +74,11 @@ public class MsgActivity extends AppCompatActivity {
 
             // 处理未读消息
             for (MessageQueueNode messageQueueNode : unreadMessages) {
-                viewModel.receiveMessageNode(messageQueueNode.getSenderId(), messageQueueNode.getSenderUsername(), messageQueueNode.getMessageNode());
+                if(message!=null) {
+                    viewModel.receiveMessageNode(messageQueueNode.getSenderId(), messageQueueNode.getSenderUsername(), messageQueueNode.getMessageNode(), message.getValue().getIndex());
+                }else{
+                    viewModel.receiveMessageNode(messageQueueNode.getSenderId(), messageQueueNode.getSenderUsername(), messageQueueNode.getMessageNode());
+                }
             }
 
             unreadMessages.clear();

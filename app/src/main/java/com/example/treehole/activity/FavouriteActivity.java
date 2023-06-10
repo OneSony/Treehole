@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.R;
 import com.example.treehole.SearchViewModel;
+import com.example.treehole.UserUtils;
 import com.example.treehole.paging.MomentPagingAdapter;
 import com.google.android.material.tabs.TabLayout;
 
@@ -60,28 +61,8 @@ public class FavouriteActivity extends AppCompatActivity {
 
 
         recyclerView=findViewById(R.id.favourite_recyclerview);
-
-
-
-        final List<String>[] searchWords = new List[]{new ArrayList<>()};
-
-        String query="test";
-        String[] words= query.split(" ");
-        for(String word:words){
-            searchWords[0].add(word);
-        }
-
-        Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
-
-        SearchViewModel viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
-
         adapter=new MomentPagingAdapter(FavouriteActivity.this);
 
-        /*adapter.addLoadStateListener(loadStates -> {
-            progressBar.setVisibility(loadStates.getRefresh() instanceof LoadState.Loading
-                    ? View.VISIBLE : View.GONE);
-            return null;
-        });*/
 
         adapter.addLoadStateListener(loadStates-> {
             if (loadStates.getRefresh() instanceof LoadState.Loading) {
@@ -106,8 +87,26 @@ public class FavouriteActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(adapter);
 
-        viewModel.getPaging("username", searchWords[0]).observe(this,
-                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+
+        SearchViewModel viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+
+        if(searchType==0) {
+            //noDataTextView.setText("你还没有发表过树洞哦");
+            final List<String>[] searchWords = new List[]{new ArrayList<>()};
+            searchWords[0].add(UserUtils.getUserid());
+
+            Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
+            viewModel.getPaging("username", searchWords[0]).observe(this,
+                    dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+
+
+
+        }else if(searchType==1){
+            viewModel.getPaging("favourite").observe(this,
+                    dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+
+        }
+
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
@@ -160,9 +159,21 @@ public class FavouriteActivity extends AppCompatActivity {
 
                 recyclerView.setAdapter(adapter);
 
-                viewModel.getPaging("username", searchWords[0]).observe(FavouriteActivity.this,
-                        dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+                if(searchType==0) {
+                    final List<String>[] searchWords = new List[]{new ArrayList<>()};
+                    searchWords[0].add(UserUtils.getUserid());
 
+                    Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
+                    viewModel.getPaging("username", searchWords[0]).observe(FavouriteActivity.this,
+                            dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+
+
+
+                }else if(searchType==1){
+                    viewModel.getPaging("favourite").observe(FavouriteActivity.this,
+                            dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+
+                }
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             }
 

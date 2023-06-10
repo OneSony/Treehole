@@ -49,6 +49,10 @@ public class ChatRepository {
         new newMessageNodeAsyncTask(messageDao, user_id,username, messageNode).execute();
     }
 
+    public void receiveMessageNode(String user_id, String username, MessageNode messageNode,int index) {//收到消息的接口
+        new newMessageNodeAsyncTaskFilter(messageDao, user_id,username, messageNode,index).execute();
+    }
+
     public void cleanMessageUnread(int index){
         new cleanMessageUnreadAsyncTask(messageDao,index).execute();
     }
@@ -184,6 +188,30 @@ public class ChatRepository {
         protected Void doInBackground(Void... voids) {
             int message_index=mAsyncTaskDao.searchAndCreateMessage(user_id,username);
             mAsyncTaskDao.addMessageNode(message_index,messageNode);
+            return null;
+        }
+    }
+
+    private static class newMessageNodeAsyncTaskFilter extends AsyncTask<Void,Void,Void> {
+        private MessageDao mAsyncTaskDao;
+        private MessageNode messageNode;
+        private String user_id;
+        private String username;
+
+        private int filter_index;
+
+        newMessageNodeAsyncTaskFilter(MessageDao dao,String user_id,String username,MessageNode messageNode,int filter_index){
+            this.mAsyncTaskDao=dao;
+            this.messageNode=messageNode;
+            this.user_id=user_id;
+            this.username=username;
+            this.filter_index=filter_index;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            int message_index=mAsyncTaskDao.searchAndCreateMessage(user_id,username);
+            mAsyncTaskDao.addMessageNode(message_index,messageNode,filter_index);
             return null;
         }
     }

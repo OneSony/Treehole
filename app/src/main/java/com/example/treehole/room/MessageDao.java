@@ -30,6 +30,21 @@ public interface MessageDao {
     void updateMessage(Message message);
 
     @Transaction
+    default void addMessageNode(int index, MessageNode messageNode,int filter_index) {//吧message的index传进来
+        Message message = _getMessageByIndex(index);
+        if (message != null) {
+            if(message.getIndex()==filter_index) {
+                message.getNodes().add(messageNode);
+                updateMessage(message);
+            }else {
+                message.getNodes().add(messageNode);
+                message.plusUnread();
+                updateMessage(message);
+            }
+        }
+    }
+
+    @Transaction
     default void addMessageNode(int index, MessageNode messageNode) {//吧message的index传进来
         Message message = _getMessageByIndex(index);
         if (message != null) {
@@ -47,6 +62,7 @@ public interface MessageDao {
             updateMessage(message);
         }
     }
+
 
     @Query("SELECT * FROM message_table WHERE user_id = :userId")
     Message getMessageByUserId(String userId);
