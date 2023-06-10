@@ -11,8 +11,11 @@ import android.content.BroadcastReceiver;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.treehole.activity.LoginActivity;
+import com.example.treehole.activity.MsgActivity;
+import com.example.treehole.room.MessageNode;
 //import android.support.v4.app.NotificationCompat;
 
 public class PushReceiver extends BroadcastReceiver {
@@ -22,6 +25,7 @@ public class PushReceiver extends BroadcastReceiver {
         // Parse values from Pushy
         String id = intent.getStringExtra("id");
         String sender_username = intent.getStringExtra("sender");
+        String sender_id = String.valueOf(intent.getIntExtra("sender_id", 1));
         String type = intent.getStringExtra("type"); // string|image|video
         String message = intent.getStringExtra("message"); // String, or image/video url
 
@@ -78,6 +82,10 @@ public class PushReceiver extends BroadcastReceiver {
         // Use a random notification ID so multiple
         // notifications don't overwrite each other
         notificationManager.notify((int)(Math.random() * 100000), builder.build());
+
+        MsgActivity activity = (MsgActivity) context;
+        ChatViewModel viewModel = new ViewModelProvider(activity).get(ChatViewModel.class);
+        viewModel.receiveMessageNode(sender_id , sender_username, new MessageNode(0, message));
 
 
 

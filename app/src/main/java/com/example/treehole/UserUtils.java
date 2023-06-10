@@ -157,7 +157,30 @@ public class UserUtils {
     }
 
     public static void logout(WebUtils.WebCallback callback) {
-        WebUtils.sendGet("/users/logout/", false, callback);
+        JSONObject deleteData = new JSONObject();
+        try {
+            deleteData.put("token", deviceDetails.getString(DEVICETOKEN, ""));
+            Log.d("TOKEN", deviceDetails.getString(DEVICETOKEN, ""));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        WebUtils.sendDelete("/messaging/device/", true, deleteData, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                WebUtils.sendGet("/users/logout/", false, callback);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+
+            }
+        });
+
     }
 
     public static void setUsername(String username){
