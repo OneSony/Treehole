@@ -110,7 +110,6 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                     //String size_json=json.getString("size");
 
                     //Log.d("MOMENT SIZE",size_json);
-
                     moments_json = json.getJSONArray("message");
                     for (int i = 0; i < moments_json.length(); i++) {
                         JSONObject moment = (JSONObject) moments_json.get(i);
@@ -119,7 +118,11 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                         String username = moment.getString("user");
                         String topic = moment.optString("title");
                         String text = moment.getString("text");
+                        String text_type = moment.getString("text_type");
                         String date = moment.getString("pub_date");
+                        Boolean is_liked = moment.getBoolean("is_liked");
+                        Boolean is_favourited = moment.getBoolean("is_favourited");
+
 
                         Log.d("NEXTPAGE","id "+id);
 

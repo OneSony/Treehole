@@ -313,7 +313,7 @@ public class InfoActivity extends AppCompatActivity {
                 Log.d("COMMENT SUCC",json.toString());
 
                 try {
-
+                    Integer comment_count = json.getInt("size");
                     Object msg=json.get("message");
 
                     if (msg instanceof JSONArray) {
@@ -392,7 +392,7 @@ public class InfoActivity extends AppCompatActivity {
                         Log.d("COMMENT SUCC",json.toString());
 
                         try {
-
+                            Integer comment_count = json.getInt("size");
                             Object msg=json.get("message");
 
                             if (msg instanceof JSONArray) {
