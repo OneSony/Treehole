@@ -37,6 +37,9 @@ import java.util.concurrent.ExecutionException;
 
 public class PersonActivity extends AppCompatActivity {
 
+    private boolean isFollowed=false;
+    private boolean isBlacklisted=false;
+
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -217,6 +220,42 @@ public class PersonActivity extends AppCompatActivity {
 
         updateUsername();
 
+        WebUtils.sendGet("/users/description?id="+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                Log.d("description",json.toString());
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    String description = responseJson.optString("description", "");
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TextView descriptionTextView=findViewById(R.id.person_about);
+                            descriptionTextView.setText(description);
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
 
 
         WebUtils.sendGet("/users/follow_count?id="+user_id, false, new WebUtils.WebCallback() {
@@ -300,6 +339,11 @@ public class PersonActivity extends AppCompatActivity {
         }else{
             msgButton.setEnabled(true);
 
+            isFollowed();
+            isBlacklisted();
+
+
+            /*
             WebUtils.sendGet("/users/is_following?id="+user_id, false, new WebUtils.WebCallback() {
                 @Override
                 public void onSuccess(JSONObject json) {
@@ -332,7 +376,7 @@ public class PersonActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 }
-            });
+            });*/
 
             WebUtils.sendGet("/users/is_blacklisted?id="+user_id, false, new WebUtils.WebCallback() {
                 @Override
@@ -449,16 +493,27 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     public void person_blacklist_click(View view) {
-        sendPost(0);
+        blacklistButton.setEnabled(false);
+        if(isBlacklisted==false) {
+            sendPost(0);
+        }else{
+            sendDelete(0);
+        }
     }
 
     public void person_follow_click(View view) {
-        sendPost(1);
+        followButton.setEnabled(false);
+        if(isFollowed==false) {
+            sendPost(1);
+        }else{
+            sendDelete(1);
+        }
     }
 
     private void sendPost(int flag){
 
         String api="";
+
 
         if(flag==0){
             api="/users/blacklist/";
@@ -480,6 +535,25 @@ public class PersonActivity extends AppCompatActivity {
             @Override
             public void onSuccess(JSONObject json) {
                 try {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(flag==0){
+                                isBlacklisted=true;
+                                blacklistButton.setText("已拉黑");
+                                blacklistButton.setPressed(true);
+                                blacklistButton.setEnabled(true);
+                            }else if(flag==1) {
+                                isFollowed=true;
+                                followButton.setText("已关注");
+                                followButton.setPressed(true);
+                                followButton.setEnabled(true);
+                            }else{
+                                return;
+                            }
+                        }
+                    });
                     Log.d("SUCCESS", json.getString("message"));
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -500,6 +574,170 @@ public class PersonActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    private void sendDelete(int flag){
+
+        String api="";
+
+        if(flag==0){
+            api="/users/blacklist/";
+        }else if(flag==1) {
+            api = "/users/follow/";
+        }else{
+            return;
+        }
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("id", user_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("BLACKLIST","json"+json.toString());
+        WebUtils.sendDelete(api, true, json, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                try {
+
+                    Log.d("SUCCESS", json.getString("message"));
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(flag==0){
+                                isBlacklisted=false;
+                                blacklistButton.setText("拉黑");
+                                blacklistButton.setPressed(false);
+                                blacklistButton.setEnabled(true);
+                            }else if(flag==1) {
+                                isFollowed=false;
+                                followButton.setText("关注");
+                                followButton.setPressed(false);
+                                followButton.setEnabled(true);
+                            }else{
+                                return;
+                            }
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    private void isFollowed(){
+        WebUtils.sendGet("/users/is_following?id="+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    boolean following = responseJson.optBoolean("yes", false);
+                    Log.d("SUCCESS", String.valueOf(following));
+
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            isFollowed=following;
+
+                            if(followButton!=null) {
+                                if (following) {
+                                    followButton.setText("已关注");
+                                    followButton.setPressed(true);
+                                    followButton.setEnabled(true);
+                                } else {
+                                    followButton.setEnabled(true);
+                                }
+                            }
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    private void isBlacklisted(){
+        WebUtils.sendGet("/users/is_blacklisted?id="+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    boolean blacklisting = responseJson.optBoolean("yes", false);
+                    Log.d("SUCCESS", String.valueOf(blacklisting));
+
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            isBlacklisted=blacklisting;
+
+                            if(blacklistButton!=null) {
+                                if (blacklisting) {
+                                    blacklistButton.setText("已拉黑");
+                                    blacklistButton.setPressed(true);
+                                    blacklistButton.setEnabled(true);
+                                } else {
+                                    blacklistButton.setEnabled(true);
+                                }
+                            }
+                        }
+                    });
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 }
