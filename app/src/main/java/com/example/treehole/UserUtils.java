@@ -17,16 +17,20 @@ import me.pushy.sdk.Pushy;
 
 public class UserUtils {
     public static SharedPreferences userDetails;
+    public static SharedPreferences deviceDetails;
     private static final String USER_PREF = "USER_DETAILS";
     private static final String USERNAME = "USERNAME";
 
     private static final String USERID = "USERID";
+    private static final String DEVICE_PREF = "DEVICE_DETAILS";
+    private static final String DEVICETOKEN = "DEVICETOKEN";
 
     private Context context;
 
     public static void init(Context context) {
         context = context;
         userDetails = context.getSharedPreferences(USER_PREF, MODE_PRIVATE);
+        deviceDetails = context.getSharedPreferences(DEVICE_PREF, MODE_PRIVATE);
     }
 
     public static class RegisterForPushNotificationsAsync extends AsyncTask<Void, Void, Object> {
@@ -43,6 +47,9 @@ public class UserUtils {
                 if (!Pushy.isRegistered(mActivity)) {
                 // Register the device for notifications (replace MainActivity with your Activity class name)
                     deviceToken = Pushy.register(mActivity);
+                    SharedPreferences.Editor editor = deviceDetails.edit();
+                    editor.putString(DEVICETOKEN, deviceToken);
+                    editor.apply();
                 } else{
                     return ALREADY_REGISTERED;
                 }
@@ -50,8 +57,6 @@ public class UserUtils {
                 // Registration succeeded, log token to logcat
                 Log.d("Pushy", "Pushy device token: " + deviceToken);
 
-                // Send the token to your backend server via an HTTP GET request
-                new URL("https://rickyvu.pythonanywhere.com/messaging/device?token=" + deviceToken).openConnection();
 
                 // Provide token to onPostExecute()
                 return deviceToken;
@@ -111,11 +116,71 @@ public class UserUtils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        WebUtils.sendPost("/users/login/", false, json, callback);
+        WebUtils.sendPost("/users/login/", false, json, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                JSONObject registerData = new JSONObject();
+                try {
+                    registerData.put("token", deviceDetails.getString(DEVICETOKEN, ""));
+                    Log.d("TOKEN", deviceDetails.getString(DEVICETOKEN, ""));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                WebUtils.sendPost("/messaging/device/", true, registerData, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject deviceResponseJson) {
+                        callback.onSuccess(json);
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        callback.onError(t);
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject deviceResponseJson) {
+                        callback.onFailure(deviceResponseJson);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                callback.onError(t);
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                callback.onFailure(json);
+            }
+        });
     }
 
     public static void logout(WebUtils.WebCallback callback) {
-        WebUtils.sendGet("/users/logout/", false, callback);
+        JSONObject deleteData = new JSONObject();
+        try {
+            deleteData.put("token", deviceDetails.getString(DEVICETOKEN, ""));
+            Log.d("TOKEN", deviceDetails.getString(DEVICETOKEN, ""));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        WebUtils.sendDelete("/messaging/device/", true, deleteData, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                WebUtils.sendGet("/users/logout/", false, callback);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+
+            }
+        });
+
     }
 
     public static void setUsername(String username){

@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,7 +14,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,12 +29,17 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
 import com.example.treehole.UserUtils;
+import com.example.treehole.WebUtils;
 import com.example.treehole.room.Moment;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.textfield.TextInputLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class InfoActivity extends AppCompatActivity {
     private TextView topic_box;
@@ -45,6 +54,7 @@ public class InfoActivity extends AppCompatActivity {
 
     private ImageView[] imageViewArray;
     private ConstraintLayout[] constraintLayouts;
+    private TextInputLayout commentInput;
 
     private LinearLayout photos;
 
@@ -239,6 +249,43 @@ public class InfoActivity extends AppCompatActivity {
             textView.setText(tag);
             tag_layout.addView(tagView);
         }
+
+        commentInput = findViewById(R.id.infoTextInputLayout);
+        EditText editText = commentInput.getEditText();
+
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    JSONObject json = new JSONObject();
+                    try {
+                        String comment = editText.getText().toString();
+                        json.put("text", comment);
+                        json.put("id", current_moment.getId());
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    WebUtils.sendPost("/post/comment/", true, json, new WebUtils.WebCallback() {
+                        @Override
+                        public void onSuccess(JSONObject json) {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+
+                        }
+
+                        @Override
+                        public void onFailure(JSONObject json) {
+
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
 

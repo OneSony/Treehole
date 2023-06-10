@@ -123,7 +123,8 @@ public class MsgActivity extends AppCompatActivity {
 
                     JSONObject json = new JSONObject();
                     try{
-                        json.put("receiver", message.getValue().getUsername());
+                        json.put("receiver", message.getValue().getUser_id());//message.getValue().getUsername());
+
                         json.put("type", "string");
                         json.put("message", messageText);
                     } catch (JSONException e) {
