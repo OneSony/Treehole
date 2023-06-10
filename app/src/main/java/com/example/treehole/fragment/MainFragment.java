@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
 import com.example.treehole.MainViewModel;
 import com.example.treehole.R;
 import com.example.treehole.activity.EditActivity;
@@ -55,7 +56,6 @@ public class MainFragment extends Fragment {
 
         viewModel=new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.setDefault_sortType(sortType);
-
 }
 
     @Override

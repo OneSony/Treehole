@@ -44,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -143,6 +144,63 @@ public class SettingsActivity extends AppCompatActivity {
 
                             // Do something with the entered text
                             // ...
+                            FileUtils.CompressionHandler.Builder compressionHandlerBuilder = new FileUtils.CompressionHandler.Builder(getContext());
+                            compressionHandlerBuilder.add(newProfilePictureUri, FileUtils.MEDIA_TYPE.IMAGE).addCallback(new FileUtils.CompressionThreadCallback() {
+                                @Override
+                                public void onResult(List<File> imageFiles, List<File> videoFiles) {
+
+                                    MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
+                                            .setType(MultipartBody.FORM);
+
+
+                                    RequestBody imageBody = RequestBody.create(imageFiles.get(0), MediaType.parse("image/jpeg"));
+                                    requestBodyBuilder.addFormDataPart("image", imageFiles.get(0).getName(), imageBody);
+
+                                    WebUtils.sendPost("/users/change_profile_picture/", true, requestBodyBuilder, new WebUtils.WebCallback() {
+                                        @Override
+                                        public void onSuccess(JSONObject json) {
+                                            Log.d("CHANGEPROFILE", "successfully changed profile picture");
+                                            Thread thread = new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Glide.get(getContext()).clearDiskCache();
+
+                                                }
+                                            });
+                                            thread.start();
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable t) {
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                            Log.d("CHANGEPROFILE", t.getMessage());
+                                        }
+
+                                        @Override
+                                        public void onFailure(JSONObject json) {
+
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                            Log.d("CHANGEPROFILE", json.optString("message", "onFailure"));
+                                        }
+                                    });
+
+                                }
+                            });
+
+                            FileUtils.CompressionHandler compressionHandler = compressionHandlerBuilder.build();
+                            compressionHandler.start();
+
+                            /*
                             RequestBody imageBody = RequestBody.create(new File(getPathFromUri(getContext(),newProfilePictureUri)), MediaType.parse("image/jpeg"));
                             MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
                                     .setType(MultipartBody.FORM)
@@ -153,14 +211,14 @@ public class SettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(JSONObject json) {
                                     Log.d("CHANGEPROFILE", "successfully changed profile picture");
-
-                                    getActivity().runOnUiThread(new Runnable() {
+                                    Thread thread = new Thread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
+                                            Glide.get(getContext()).clearDiskCache();
+
                                         }
                                     });
-
+                                    thread.start();
                                 }
 
                                 @Override
@@ -185,7 +243,7 @@ public class SettingsActivity extends AppCompatActivity {
                                     });
                                     Log.d("CHANGEPROFILE", json.optString("message", "onFailure"));
                                 }
-                            });
+                            });*/
                         }
                     });
 
