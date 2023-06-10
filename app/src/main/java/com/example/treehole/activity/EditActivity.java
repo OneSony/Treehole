@@ -13,6 +13,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -81,6 +84,19 @@ import okhttp3.RequestBody;
 
 
 public class EditActivity extends AppCompatActivity {
+
+    private Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            // 处理消息并更新UI
+            switch (msg.what) {
+                case 100:
+                    finish();
+                    break;
+
+            }
+        }
+    };
 
 
     private TextInputLayout topicInputLayout;
@@ -478,20 +494,17 @@ public class EditActivity extends AppCompatActivity {
                 // 结束
                 return true;
             case R.id.action_send:
-                if (send() == true) {
+
+                send();
+                /*if (send() == true) {
                     this.finish();
-                }
+                }*/
                 return true;
 
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void send_click(View view) {
-        if (send() == true) {
-            this.finish();
-        }
-    }
 
     public void photo_click(View view) {
 
@@ -555,6 +568,10 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private boolean send() {
+        ProgressBar edit_progress=findViewById(R.id.edit_progress);
+        edit_progress.setVisibility(View.VISIBLE);
+
+
         String topic = topicInputLayout.getEditText().getText().toString();
         String text = textInputLayout.getEditText().getText().toString();
 
@@ -576,9 +593,6 @@ public class EditActivity extends AppCompatActivity {
             return false;
         }
 
-
-        Toast toast = Toast.makeText(this, "已发布", Toast.LENGTH_SHORT);
-        toast.show();
         /*Toast toast=Toast.makeText(this,mPreferences.getString("TOPIC_STR","none"),Toast.LENGTH_SHORT);
         toast.show();*/
 
@@ -639,7 +653,22 @@ public class EditActivity extends AppCompatActivity {
                 WebUtils.sendPost("/posts/post/", true, requestBodyBuilder, new WebUtils.WebCallback() {
                     @Override
                     public void onSuccess(JSONObject json) {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast toast = Toast.makeText(getApplicationContext(), "已发送", Toast.LENGTH_SHORT);
+                                toast.show();
+                                finish();
+                            }
+                        });
+
                         try {
+                            /*
+                            Message msg=new Message();
+                            msg.what=100;
+                            handler.sendMessage(msg);*/
+
                             Log.d("SUCCESS", json.getString("message"));
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -648,11 +677,33 @@ public class EditActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable t) {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ProgressBar edit_progress=findViewById(R.id.edit_progress);
+                                edit_progress.setVisibility(View.GONE);
+                                Toast toast = Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        });
+
                         Log.e("ERROR", t.getMessage());
                     }
 
                     @Override
                     public void onFailure(JSONObject json) {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ProgressBar edit_progress=findViewById(R.id.edit_progress);
+                                edit_progress.setVisibility(View.GONE);
+                                Toast toast = Toast.makeText(getApplicationContext(), "发送失败", Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        });
+
                         try {
                             Log.e("FAILURE", json.getString("message"));
                         } catch (JSONException e) {
@@ -672,12 +723,6 @@ public class EditActivity extends AppCompatActivity {
         preferencesEditor.putBoolean("SEND_EXIT", true);//正常发送
         preferencesEditor.apply();
         return true;
-    }
-
-    public void delete_click(View view) {
-        cardView.setVisibility(View.GONE);
-        //photo_path="";
-        //photoView.setImageBitmap(null);
     }
 
     public void setView(int flag) {

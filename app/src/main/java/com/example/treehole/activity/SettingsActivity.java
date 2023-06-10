@@ -125,21 +125,7 @@ public class SettingsActivity extends AppCompatActivity {
                             if(checkFilePermission()==false){
                                 Toast.makeText(getContext(), "请授予文件读写权限", Toast.LENGTH_SHORT).show();
                             }else {
-                            /*ActivityResultLauncher<Intent> pickImage = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                                // Callback is invoked after the user selects a media item or closes the
-                                // photo picker.
-                                if (result.getResultCode() == Activity.RESULT_OK) {
-                                    Uri uri = result.getData().getData();
-                                    //getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-                                    imageView.setImageURI(uri);
-                                    //Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
-                                    Log.d("PhotoPicker", "Selected URI: " + uri);
-                                } else {
-                                    Log.d("PhotoPicker", "No media selected");
-                                }
-                            });*/
-                                //Toast.makeText(getContext(), "打开相册", Toast.LENGTH_SHORT).show();
                                 pickImage.launch(new PickVisualMediaRequest.Builder()
                                         .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                                         .build());
@@ -167,15 +153,36 @@ public class SettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(JSONObject json) {
                                     Log.d("CHANGEPROFILE", "successfully changed profile picture");
+
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
                                 }
 
                                 @Override
                                 public void onError(Throwable t) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEPROFILE", t.getMessage());
                                 }
 
                                 @Override
                                 public void onFailure(JSONObject json) {
+
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEPROFILE", json.optString("message", "onFailure"));
                                 }
                             });
@@ -224,16 +231,36 @@ public class SettingsActivity extends AppCompatActivity {
                             WebUtils.sendPost("/users/change_username/", true, jsonObject, new WebUtils.WebCallback() {
                                 @Override
                                 public void onSuccess(JSONObject json) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            UserUtils.setUsername(enteredText);
+                                            Log.d("CHANGEUSERNAME", enteredText);
+                                            Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEUSERNAME", "successful");
                                 }
 
                                 @Override
                                 public void onError(Throwable t) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEUSERNAME", t.getMessage());
                                 }
 
                                 @Override
                                 public void onFailure(JSONObject json) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEUSERNAME", json.optString("message", "onFailure"));
                                 }
                             });
@@ -281,16 +308,34 @@ public class SettingsActivity extends AppCompatActivity {
                             WebUtils.sendPost("/users/change_description/", true, jsonObject, new WebUtils.WebCallback() {
                                 @Override
                                 public void onSuccess(JSONObject json) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEDESCRIPTION", "successful");
                                 }
 
                                 @Override
                                 public void onError(Throwable t) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEDESCRIPTION", t.getMessage());
                                 }
 
                                 @Override
                                 public void onFailure(JSONObject json) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Log.d("CHANGEDESCRIPTION", json.optString("message", "onFailure"));
                                 }
                             });

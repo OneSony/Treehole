@@ -93,7 +93,7 @@ public class FavouriteActivity extends AppCompatActivity {
         if(searchType==0) {
             //noDataTextView.setText("你还没有发表过树洞哦");
             final List<String>[] searchWords = new List[]{new ArrayList<>()};
-            searchWords[0].add(UserUtils.getUserid());
+            searchWords[0].add(UserUtils.getUsername());
 
             Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
             viewModel.getPaging("username", searchWords[0]).observe(this,
@@ -161,7 +161,8 @@ public class FavouriteActivity extends AppCompatActivity {
 
                 if(searchType==0) {
                     final List<String>[] searchWords = new List[]{new ArrayList<>()};
-                    searchWords[0].add(UserUtils.getUserid());
+                    Log.d("USERID",UserUtils.getUserid());
+                    searchWords[0].add(UserUtils.getUsername());
 
                     Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
                     viewModel.getPaging("username", searchWords[0]).observe(FavouriteActivity.this,
