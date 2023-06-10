@@ -100,6 +100,8 @@ public class EditActivity extends AppCompatActivity {
 
     private boolean markdownFlag = false;
 
+    private List<String> tags_recover=new ArrayList<>();
+
     private String locationName = "";
 
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
@@ -332,49 +334,6 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-
-        mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
-
-        if (mPreferences.getBoolean("SEND_EXIT", true) == false) {//异常退出恢复
-            String topic = mPreferences.getString("TOPIC_STR", "");
-            String text = mPreferences.getString("TEXT_STR", "");
-            String uris_str = mPreferences.getString("URIS", "");
-            selectFlag = mPreferences.getInt("SELECT_FLAG", 0);
-
-            if (!topic.equals("") || !text.equals("") || !uris_str.equals("")) {
-                topicInputLayout.getEditText().setText(topic);
-                textInputLayout.getEditText().setText(text);
-
-                if (!uris_str.equals("")) {
-                    List<String> uris_str_list = new ArrayList<>(Arrays.asList(uris_str.split(",")));
-
-                    List<Uri> uris = new ArrayList<>();
-
-                    for (String urlString : uris_str_list) {
-                        Uri uri = Uri.parse(urlString);
-                        uris.add(uri);
-                    }
-
-                    if (selectFlag == 1) {
-                        adapter.setUris(uris);//adapter会自动更新
-                    } else if (selectFlag == 2) {
-                        videoUri = uris.get(0);//video需要提醒
-                        player = new ExoPlayer.Builder(getApplicationContext()).build();
-                        videoView.setPlayer(player);
-                        MediaItem mediaItem = MediaItem.fromUri(videoUri);
-                        player.setMediaItem(mediaItem);
-                        player.prepare();
-                    }
-                }
-
-                Toast toast = Toast.makeText(this, "已恢复草稿", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-
-            setView(selectFlag);
-        }
-
-
         ImageButton markdown_button = findViewById(R.id.markdown_button);
         markdown_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -427,8 +386,71 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-
         edit_tag_layout=findViewById(R.id.edit_tag_layout);
+
+
+        mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+
+        if (mPreferences.getBoolean("SEND_EXIT", true) == false) {//异常退出恢复
+            String topic = mPreferences.getString("TOPIC_STR", "");
+            String text = mPreferences.getString("TEXT_STR", "");
+            String uris_str = mPreferences.getString("URIS", "");
+            selectFlag = mPreferences.getInt("SELECT_FLAG", 0);
+            String tags_recover_str= mPreferences.getString("TAGS","");
+            markdownFlag=mPreferences.getBoolean("MARKDOWN",false);
+
+
+            if (!topic.equals("") || !text.equals("") || !uris_str.equals("") || !tags_recover_str.equals("")||markdownFlag==true) {
+                topicInputLayout.getEditText().setText(topic);
+                textInputLayout.getEditText().setText(text);
+
+                if (!uris_str.equals("")) {
+                    List<String> uris_str_list = new ArrayList<>(Arrays.asList(uris_str.split(",")));
+
+                    List<Uri> uris = new ArrayList<>();
+
+                    for (String urlString : uris_str_list) {
+                        Uri uri = Uri.parse(urlString);
+                        uris.add(uri);
+                    }
+
+                    if (selectFlag == 1) {
+                        adapter.setUris(uris);//adapter会自动更新
+                    } else if (selectFlag == 2) {
+                        videoUri = uris.get(0);//video需要提醒
+                        player = new ExoPlayer.Builder(getApplicationContext()).build();
+                        videoView.setPlayer(player);
+                        MediaItem mediaItem = MediaItem.fromUri(videoUri);
+                        player.setMediaItem(mediaItem);
+                        player.prepare();
+                    }
+                }
+
+                Log.d("TAGS",tags_recover_str);
+
+
+                if(!tags_recover_str.equals("")){
+                    List<String> tags_str_list = new ArrayList<>(Arrays.asList(tags_recover_str.split(",")));
+                    for (String tagString : tags_str_list) {
+                        addTags(tagString);
+                    }
+                }
+
+                Log.d("MARKDOWN",String.valueOf(markdownFlag));
+
+                if(markdownFlag==true){
+                    markdown_button.callOnClick();
+                }
+
+
+
+                Toast toast = Toast.makeText(this, "已恢复草稿", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+
+            setView(selectFlag);
+        }
+
 
 
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
@@ -514,11 +536,15 @@ public class EditActivity extends AppCompatActivity {
 
         uris_str = TextUtils.join(",", getUris());
 
+        String tags_recover_str=TextUtils.join(",", getTags());
+
         SharedPreferences.Editor preferencesEditor = mPreferences.edit();
         preferencesEditor.putString("TOPIC_STR", topic);
         preferencesEditor.putString("TEXT_STR", text);
         preferencesEditor.putString("URIS", uris_str);
         preferencesEditor.putInt("SELECT_FLAG", selectFlag);
+        preferencesEditor.putString("TAGS", tags_recover_str);
+        preferencesEditor.putBoolean("MARKDOWN",markdownFlag);
 
         preferencesEditor.apply();
 

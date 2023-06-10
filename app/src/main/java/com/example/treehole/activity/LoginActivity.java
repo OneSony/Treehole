@@ -43,26 +43,79 @@ public class LoginActivity extends AppCompatActivity {
         new UserUtils.RegisterForPushNotificationsAsync(this).execute();
 
         setContentView(R.layout.loading_page);
-        ProgressBar progressBar = findViewById(R.id.progress_bar);
+        ProgressBar progressBar = findViewById(R.id.login_progress);
+        progressBar.setVisibility(View.VISIBLE);
+        TextView loginHint=findViewById(R.id.login_hint);
+        loginHint.setText("正在连接服务器");
+        Button button=findViewById(R.id.login_retry_button);
+        button.setVisibility(View.GONE);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                button.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
+
+                TextView loginHint=findViewById(R.id.login_hint);
+                loginHint.setText("正在连接服务器");
+                UserUtils.isLoggedIn(new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+                        runOnUiThread(() -> {
+                            progressBar.setVisibility(View.GONE);
+                            intent_to_main();
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        runOnUiThread(() -> {
+                            progressBar.setVisibility(View.GONE);
+                            TextView loginHint=findViewById(R.id.login_hint);
+                            button.setVisibility(View.VISIBLE);
+                            loginHint.setText("连接失败");
+                        });
+
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        runOnUiThread(() -> {
+                            progressBar.setVisibility(View.GONE);
+                            displayLogin();
+                        });
+                    }
+                });
+            }
+        });
+
 
 
         UserUtils.isLoggedIn(new WebUtils.WebCallback() {
             @Override
             public void onSuccess(JSONObject json) {
                 runOnUiThread(() -> {
-                    progressBar.setProgress(100);
+                    progressBar.setVisibility(View.GONE);
                     intent_to_main();
                 });
             }
 
             @Override
             public void onError(Throwable t) {
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    Button button=findViewById(R.id.login_retry_button);
+                    button.setVisibility(View.VISIBLE);
+
+                    TextView loginHint=findViewById(R.id.login_hint);
+                    loginHint.setText("连接失败");
+                });
 
             }
 
             @Override
             public void onFailure(JSONObject json) {
                 runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
                     displayLogin();
                 });
             }
@@ -197,7 +250,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(intent, 0);
     }
 
-    @Override
+     @Override
      protected void onActivityResult(int requestCode, int resultCode, Intent data) {
          super.onActivityResult(requestCode, resultCode, data);
          if(data!=null){
