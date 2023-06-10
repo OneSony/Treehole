@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,8 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import io.noties.markwon.Markwon;
 
 public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingViewHolder> {
 
@@ -378,6 +381,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
 
 
             holder.like_box.setText(String.valueOf(moment.getLikes_num()));
+            holder.comment_box.setText(String.valueOf(moment.getComment_num()));
             holder.collect_box.setText(String.valueOf(moment.getFavourite_num()));
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -395,6 +399,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                     context.startActivity(intent);
                 }
             });
+        }
+
+        if(moment.getText_type().equals("markdown")){
+            Markwon markwon = Markwon.create(context);
+            //markdownTextView.setMovementMethod(new ScrollingMovementMethod()); // 启用滚动
+            markwon.setMarkdown(holder.main_box,moment.getText());//先把已经有的放进去
         }
 
 

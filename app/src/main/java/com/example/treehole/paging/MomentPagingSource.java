@@ -131,8 +131,9 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
                         Moment tempMoment=new Moment(id,user_id,username,topic,text,date);
 
                         int likes_num = moment.getInt("likes");
+                        int comment_num = moment.getInt("comment_count");
                         int favourites_num = moment.getInt("favourites");
-                        tempMoment.setNum(likes_num,favourites_num);
+                        tempMoment.setNum(likes_num,comment_num,favourites_num);
 
                         {
                             Object imagesObject = moment.get("images");
