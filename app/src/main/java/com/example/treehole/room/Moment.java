@@ -244,6 +244,22 @@ public class Moment implements Serializable {
         return isFavourite;
     }
 
+    public void likes_num_add(){
+        likes_num++;
+    }
+
+    public void likes_num_minus(){
+        likes_num--;
+    }
+
+    public void favourite_num_add(){
+        favourite_num++;
+    }
+
+    public void favourite_num_minus() {
+        favourite_num--;
+    }
+
 
 }
 

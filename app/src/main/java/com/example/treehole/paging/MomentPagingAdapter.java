@@ -117,7 +117,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
         }else{
             String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+moment.getUser_id();
             Log.d("PROFILE URL",profile_photo_url);
-            Glide.with(holder.itemView.getContext()).load(profile_photo_url).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(holder.profile_box);
+            Glide.with(holder.itemView.getContext()).load(profile_photo_url).into(holder.profile_box);
             holder.auth_box.setText(moment.getUsername());
             holder.date_box.setText(moment.getDate());
             holder.topic_box.setText(moment.getTopic());
@@ -161,10 +161,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                     int like_num=Integer.parseInt(holder.like_box.getText().toString());
                     if(moment.isLiked()){
                         like_num--;
+                        moment.likes_num_minus();
                         moment.setLiked(false);
                         holder.like_icon.setImageResource(R.drawable.like_false);
                     }else{
                         like_num++;
+                        moment.likes_num_add();
                         moment.setLiked(true);
                         holder.like_icon.setImageResource(R.drawable.like_true);
                     }
@@ -211,10 +213,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                     int favourite_num=Integer.parseInt(holder.collect_box.getText().toString());
                     if(moment.isFavourite()){
                         favourite_num--;
+                        moment.favourite_num_minus();
                         moment.setFavourite(false);
                         holder.collect_icon.setImageResource(R.drawable.collect_false);
                     }else{
                         favourite_num++;
+                        moment.favourite_num_add();
                         moment.setFavourite(true);
                         holder.collect_icon.setImageResource(R.drawable.collect_true);
                     }

@@ -80,6 +80,12 @@ public class InfoActivity extends AppCompatActivity {
 
     TextView no_data;
 
+    private ImageView like_icon;
+    private ImageView favourite_icon;
+
+    private TextView like_box;
+    private TextView favourite_box;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,9 +160,141 @@ public class InfoActivity extends AppCompatActivity {
         photos=findViewById(R.id.info_photos);
         video=findViewById(R.id.info_video);
 
+        like_icon=findViewById(R.id.info_like_icon);
+        favourite_icon=findViewById(R.id.info_collect_icon);
+
+        like_box=findViewById(R.id.info_like_box);
+        favourite_box=findViewById(R.id.info_collect_box);
+
+
+        if(current_moment.isLiked()){
+            like_icon.setImageResource(R.drawable.like_true);
+        }else{
+            like_icon.setImageResource(R.drawable.like_false);
+        }
+
+        if(current_moment.isFavourite()){
+            favourite_icon.setImageResource(R.drawable.collect_true);
+        }else{
+            favourite_icon.setImageResource(R.drawable.collect_false);
+        }
+
+        like_box.setText(String.valueOf(current_moment.getLikes_num()));
+        favourite_box.setText(String.valueOf(current_moment.getFavourite_num()));
+
+
+        findViewById(R.id.info_like_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int like_num=Integer.parseInt(like_box.getText().toString());
+                if(current_moment.isLiked()){
+                    like_num--;
+                    current_moment.likes_num_minus();
+                    current_moment.setLiked(false);
+                    like_icon.setImageResource(R.drawable.like_false);
+                }else{
+                    like_num++;
+                    current_moment.likes_num_add();
+                    current_moment.setLiked(true);
+                    like_icon.setImageResource(R.drawable.like_true);
+                }
+                like_box.setText(String.valueOf(like_num));
+
+
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("id", current_moment.getId());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                WebUtils.sendPost("/posts/like/", true, json, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+                        try {
+                            Log.d("SUCCESS", json.getString("message"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        Log.e("ERROR", t.getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        try {
+                            Log.e("FAILURE", json.getString("message"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+        });
+
+        findViewById(R.id.info_collect_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int favourite_num=Integer.parseInt(favourite_box.getText().toString());
+                if(current_moment.isFavourite()){
+                    favourite_num--;
+                    current_moment.favourite_num_minus();
+                    current_moment.setFavourite(false);
+                    favourite_icon.setImageResource(R.drawable.collect_false);
+                }else{
+                    favourite_num++;
+                    current_moment.favourite_num_add();
+                    current_moment.setFavourite(true);
+                    favourite_icon.setImageResource(R.drawable.collect_true);
+                }
+                favourite_box.setText(String.valueOf(favourite_num));
+
+
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("id", current_moment.getId());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                WebUtils.sendPost("/posts/favourite/", true, json, new WebUtils.WebCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json) {
+                        try {
+                            Log.d("SUCCESS", json.getString("message"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        Log.e("ERROR", t.getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(JSONObject json) {
+                        try {
+                            Log.e("FAILURE", json.getString("message"));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+
+            }
+        });
+
+
+
+
+
+
+
         int photo_num=current_moment.getImages().size();
-
-
 
         if(photo_num==0){
             photos.setVisibility(View.GONE);
