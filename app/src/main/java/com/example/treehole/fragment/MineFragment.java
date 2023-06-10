@@ -40,6 +40,8 @@ public class MineFragment extends Fragment {
     String username;
 
     TextView username_text;
+    TextView follow_count;
+    TextView follower_count;
 
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -53,6 +55,16 @@ public class MineFragment extends Fragment {
                 case 10:
                     if(username_text!=null&&msg.obj!=null){
                         username_text.setText((String)msg.obj);
+                    }
+                    break;
+                case 40:
+                    if(follower_count !=null&&msg.obj!=null){
+                        follower_count.setText(String.valueOf(msg.obj));
+                    }
+                    break;
+                case 60:
+                    if(follow_count !=null&&msg.obj!=null){
+                        follow_count.setText(String.valueOf(msg.obj));
                     }
                     break;
             }
@@ -83,6 +95,12 @@ public class MineFragment extends Fragment {
 
         username_text = view.findViewById(R.id.mine_my_username);
         username_text.setText(username);
+
+        follow_count = view.findViewById(R.id.textView6);
+        follow_count.setText("-");
+
+        follower_count = view.findViewById(R.id.textView4);
+        follower_count.setText("-");
 
         user_id= UserUtils.getUserid();
         if (user_id != "") {
@@ -136,6 +154,75 @@ public class MineFragment extends Fragment {
             }
         });
 
+        WebUtils.sendGet("/users/follow_count/", false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    Integer follow_count = responseJson.optInt("count", 0);
+                    Log.d("SUCCESS", String.valueOf(follow_count));
+
+
+                    Message msg=new Message();
+                    msg.what=60;
+                    msg.obj=follow_count;
+                    handler.sendMessage(msg);
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        WebUtils.sendGet("/users/follower_count/", false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+                try {
+                    JSONObject responseJson=json.getJSONObject("message");
+                    Integer follower_count = responseJson.optInt("count", 0);
+                    Log.d("SUCCESS", String.valueOf(follower_count));
+
+
+                    Message msg=new Message();
+                    msg.what=40;
+                    msg.obj=follower_count;
+                    handler.sendMessage(msg);
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         Button exit_button = view.findViewById(R.id.exit_button);
         exit_button.setOnClickListener(new View.OnClickListener() {
