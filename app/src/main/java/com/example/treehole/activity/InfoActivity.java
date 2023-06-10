@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import io.noties.markwon.Markwon;
+
 public class InfoActivity extends AppCompatActivity {
     private TextView topic_box;
     private TextView main_box;
@@ -165,6 +167,13 @@ public class InfoActivity extends AppCompatActivity {
 
         like_box=findViewById(R.id.info_like_box);
         favourite_box=findViewById(R.id.info_collect_box);
+
+
+        if(current_moment.getText_type().equals("markdown")){
+            Markwon markwon = Markwon.create(getApplicationContext());
+            //markdownTextView.setMovementMethod(new ScrollingMovementMethod()); // 启用滚动
+            markwon.setMarkdown(main_box,current_moment.getText());
+        }
 
 
         if(current_moment.isLiked()){
