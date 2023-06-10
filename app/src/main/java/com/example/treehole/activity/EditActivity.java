@@ -157,6 +157,7 @@ public class EditActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.edit_toolbar));
         ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
+        bar.setTitle("发布动态");
 
         TextView locationTextView = findViewById(R.id.edit_location);
         locationTextView.setVisibility(View.GONE);

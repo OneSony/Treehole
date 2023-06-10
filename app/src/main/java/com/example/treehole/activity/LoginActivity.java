@@ -134,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         setSupportActionBar(findViewById(R.id.login_toolbar));
         ActionBar bar=getSupportActionBar();
-        bar.setTitle("Login");
+        bar.setTitle("登录");
         username_box = findViewById(R.id.username_box);
         password_box = findViewById(R.id.password_box);
 

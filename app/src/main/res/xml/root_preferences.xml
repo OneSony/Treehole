@@ -51,7 +51,7 @@
         <ListPreference
             android:defaultValue="text"
             app:iconSpaceReserved="false"
-            android:entries="@array/moment_search_type"
+            android:entries="@array/moment_search_type_name"
             android:entryValues="@array/moment_search_type"
             android:key="moment_search_type"
             android:title="选择默认动态搜索模式" />
@@ -59,7 +59,7 @@
         <ListPreference
             android:defaultValue="date"
             app:iconSpaceReserved="false"
-            android:entries="@array/main_sort_type"
+            android:entries="@array/main_sort_type_name"
             android:entryValues="@array/main_sort_type"
             android:key="main_sort_type"
             android:title="选择启动时默认主页排序" />

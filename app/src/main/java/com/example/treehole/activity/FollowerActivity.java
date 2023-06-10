@@ -60,7 +60,7 @@ public class FollowerActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.follower_toolbar));
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-        bar.setTitle("关注");
+        bar.setTitle("人际");
 
 
         TabLayout tabLayout = findViewById(R.id.follower_tab);

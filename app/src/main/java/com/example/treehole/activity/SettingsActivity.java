@@ -67,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         setSupportActionBar(findViewById(R.id.settings_toolbar));
         ActionBar bar=getSupportActionBar();
-        bar.setTitle("Settings");
+        bar.setTitle("设置");
         bar.setDisplayHomeAsUpEnabled(true);
 
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
