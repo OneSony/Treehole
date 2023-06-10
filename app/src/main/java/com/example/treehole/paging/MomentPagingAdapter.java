@@ -105,6 +105,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
     @Override
     public void onBindViewHolder(@NonNull MomentPagingViewHolder holder, int position) {
         Moment moment = getItem(position);
+
         // Note that item may be null. ViewHolder must support binding a
         // null item as a placeholder.
         if(moment==null){

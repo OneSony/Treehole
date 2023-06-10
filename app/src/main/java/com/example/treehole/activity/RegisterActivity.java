@@ -16,7 +16,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.treehole.R;
-import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -96,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.register_toolbar));
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-        bar.setTitle("Register");
+        bar.setTitle("注册");
 
         username_box = findViewById(R.id.r_username_box);
         password_box = findViewById(R.id.r_password_box);

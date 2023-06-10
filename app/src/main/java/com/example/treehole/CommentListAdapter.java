@@ -92,6 +92,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentViewHolder>{
 
         holder.text.setText(commentResults.get(position).getText());
         holder.username.setText(commentResults.get(position).getUsername());
+        holder.date.setText(commentResults.get(position).getDate());
 
 
         String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+commentResults.get(position).getUser_id();
@@ -140,6 +141,8 @@ class CommentViewHolder extends RecyclerView.ViewHolder{
     public TextView username;
 
     public TextView text;
+
+    public TextView date;
     public ImageView imageView;
 
 
@@ -149,5 +152,6 @@ class CommentViewHolder extends RecyclerView.ViewHolder{
         username=itemView.findViewById(R.id.comment_user_box);
         text=itemView.findViewById(R.id.comment_text_box);
         imageView=itemView.findViewById(R.id.comment_profile);
+        date=itemView.findViewById(R.id.comment_date_box);
     }
 }

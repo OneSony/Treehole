@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(1);
 
         BadgeDrawable badgeDrawable = bottomNavigationView.getOrCreateBadge(itemView.getId());
-        badgeDrawable.setVisible(true);
+        //badgeDrawable.setVisible(true);
         //badgeDrawable.setNumber(10); // 设置气泡的数字或文本内容
 
 /*

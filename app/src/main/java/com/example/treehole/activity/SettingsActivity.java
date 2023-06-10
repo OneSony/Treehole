@@ -67,7 +67,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         setSupportActionBar(findViewById(R.id.settings_toolbar));
         ActionBar bar=getSupportActionBar();
-        bar.setTitle("Settings");
+        bar.setTitle("设置");
         bar.setDisplayHomeAsUpEnabled(true);
 
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
@@ -447,6 +447,8 @@ public class SettingsActivity extends AppCompatActivity {
                                         @Override
                                         public void onSuccess(JSONObject json) {
                                             MessageDatabase.closeDatabase();
+                                            //application app = (application)getActivity().getApplication();
+                                            //app.clearMessageQueue();
                                             // 处理成功回调的逻辑
                                             // 关闭对话框
                                             dialog.dismiss();

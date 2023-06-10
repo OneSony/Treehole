@@ -57,7 +57,7 @@ public class FavouriteActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.favourite_toolbar));
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-        bar.setTitle("收藏");
+        bar.setTitle("发表和收藏");
 
 
         recyclerView=findViewById(R.id.favourite_recyclerview);

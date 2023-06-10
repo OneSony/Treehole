@@ -60,7 +60,7 @@ public class FollowerActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.follower_toolbar));
         ActionBar bar=getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
-        bar.setTitle("关注");
+        bar.setTitle("人际");
 
 
         TabLayout tabLayout = findViewById(R.id.follower_tab);
@@ -147,73 +147,16 @@ public class FollowerActivity extends AppCompatActivity {
     }
 
 
-    /*
-    //用searchtype调整搜索
-    private void searchAndInsert(int searchType,String query, List<SearchUserResult> listContainer, SearchUserListAdapter adapter) {
-        Log.d("GET", "HEERE");
-        WebUtils.sendGet("/users/find_users?username="+query, false, new WebUtils.WebCallback() {
-
-            @Override
-            public void onSuccess(JSONObject json) {
-                try {
-                    JSONArray users = json.getJSONArray("message");
-                    if (users.length() == 0) {
-                        Log.d("ADD","NODATA");
-
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                progressBar.setVisibility(View.GONE);
-
-                                noDataTextView.setVisibility(View.VISIBLE);
-                            }
-                        });
-
-                    }else {
-                        for (int i = 0; i < users.length(); i++) {
-                            JSONObject user = users.getJSONObject(i);
-                            String user_id = user.getString("user_id");
-                            String username = user.getString("username");
-                            listContainer.add(new SearchUserResult(user_id, username));
-                        }
-
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-
-                                progressBar.setVisibility(View.GONE);
-                                adapter.setSearchUserResults(listContainer);
-                                adapter.notifyDataSetChanged();
-                            }
-                        });
-                    }
-
-                } catch (JSONException e) {
-                    Log.e("SEARCHUSERACTIVITY", "ERROR: "+e.getMessage());
-                }
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                //progressBar.setVisibility(View.GONE);
-                Log.e("SEARCHUSERACTIVITY", "ERROR: "+t.getMessage());
-            }
-
-            @Override
-            public void onFailure(JSONObject json) {
-                //progressBar.setVisibility(View.GONE);
-                Log.e("SEARCHUSERACTIVITY", "FAILURE: "+json.optString("message", "onFailure"));
-            }
-        });
-    }*/
-
     private void sendGet(String user_id){
+        adapter.setSearchUserResults(new ArrayList<>());
+        adapter.notifyDataSetChanged();
 
         String api="";
 
         if(searchType==0){
             api="/users/follow?id=";
         }else if(searchType==1){
-            api="/users/follow?id=";
+            api="/users/follower?id=";
         }else if(searchType==2){
             api="/users/blacklist?id=";
         }else{
@@ -251,6 +194,12 @@ public class FollowerActivity extends AppCompatActivity {
                         }
                     }
                 } catch (JSONException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
                     throw new RuntimeException(e);
                 }
                 runOnUiThread(new Runnable() {
@@ -272,12 +221,24 @@ public class FollowerActivity extends AppCompatActivity {
 
             @Override
             public void onError(Throwable t) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
                 Log.e("ERROR", t.getMessage());
             }
 
             @Override
             public void onFailure(JSONObject json) {
                 try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
                     Log.e("FAILURE", json.getString("message"));
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
