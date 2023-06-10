@@ -301,6 +301,95 @@ public class WebUtils {
         getAction.onSuccess(null);
     }
 
+    public static void sendDelete(String apiPath, Boolean requireLogin, JSONObject postJson, WebCallback callback) {
+        // Create an implementation of the WebCallback interface
+        WebCallback postAction = new WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                final MediaType mediaType = MediaType.get("application/json; charset=utf-8");
+                RequestBody body = RequestBody.create(String.valueOf(postJson), mediaType);
+                String csrf_token = "";
+                try {
+                    csrf_token = json.getString("csrf_token");
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                Request request = new Request.Builder()
+                        .url(baseApiUrl+apiPath)
+                        .addHeader("Referer", baseApiUrl)
+                        .addHeader("X-CSRFToken", csrf_token)
+                        .delete(body)
+                        .build();
+
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        // Handle response
+                        String responseBody = response.body().string();
+                        Log.d("DELETE-RESPONSE", "Response body: " + responseBody);
+                        try {
+                            // Response is json object
+                            JSONObject jsonObject = new JSONObject(responseBody);
+                            if (!jsonObject.has("success") || jsonObject.getBoolean("success")){
+                                // success attribute is true
+                                if (callback!=null){ callback.onSuccess(jsonObject);}
+                            } else{
+                                // success attribute is false
+                                // response with unauthorized code
+                                if (response.code() == 401) {
+                                    Log.d("sendPost", "DELETE request failed due to unauthorized access");
+                                    WebUtils.jumpToLogin();
+                                } else {
+                                    if (callback!=null){ callback.onFailure(jsonObject);}
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            // Response is not json object
+                            Log.e("JSON-ERROR", "Error parsing JSON: " + e.getMessage());
+                            if (callback!=null){ callback.onError(e);}
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        // Handle request error
+                        Log.e("DELETE-ERROR", "Error making HTTP request: " + e.getMessage());
+                        if (callback!=null){ callback.onError(e);}
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                if (callback!=null) { callback.onError(t);}
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                if (callback!=null){ callback.onFailure(json);}
+            }
+        };
+
+        // Must wrap post action with get_csrf because every post requires new csrf token
+        WebUtils.WebCallback deleteWithCsrf = new WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                get_csrf(postAction);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                if (callback!=null) { callback.onError(t);}
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                if (callback!=null){ callback.onFailure(json);}
+            }
+        };
+        deleteWithCsrf.onSuccess(null);
+    }
+
     public static void get_csrf(WebCallback callback){
         // Create a Request object for the GET request
         Request request = new Request.Builder()
