@@ -70,7 +70,7 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
 
             ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,  LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.setMarginEnd(200);
-            lp.setMarginStart(20);
+            lp.setMarginStart(50);
             holder.constraintLayout.setLayoutParams(lp);
 
 
@@ -93,7 +93,7 @@ public class MsgListAdapter extends RecyclerView.Adapter<MsgViewHolder> {
         }else{//自己，右侧的
 
             ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,  LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.setMarginEnd(20);
+            lp.setMarginEnd(50);
             lp.setMarginStart(200);
 
             holder.constraintLayout.setLayoutParams(lp);

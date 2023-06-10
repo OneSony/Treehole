@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -31,7 +32,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.treehole.ChatViewModel;
 import com.example.treehole.FileUtils;
 import com.example.treehole.R;
@@ -114,10 +114,14 @@ public class SettingsActivity extends AppCompatActivity {
 
                     // Inflate the custom dialog layout
                     View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_change_profile_photo, null);
+                    builder.setView(dialogView);
+
+                    final AlertDialog dialog = builder.create();
+
                     Button button = dialogView.findViewById(R.id.dialog_profile_button);
 
                     changeProfilePictureImageView = dialogView.findViewById(R.id.change_profile_photo);
-                    Glide.with(getActivity()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+UserUtils.getUserid()).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(changeProfilePictureImageView);
+                    Glide.with(getActivity()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+UserUtils.getUserid()).into(changeProfilePictureImageView);
 
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -134,15 +138,13 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     });
 
-                    builder.setView(dialogView);
+                    Button uploadButton = dialogView.findViewById(R.id.dialog_upload_button);
 
-                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    uploadButton.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            // Handle OK button click
-
-                            // Do something with the entered text
+                        public void onClick(View v) {
+                            ProgressBar progressBar= dialogView.findViewById(R.id.dialog_change_photo_progress);
+                            progressBar.setVisibility(View.VISIBLE);
                             // ...
                             FileUtils.CompressionHandler.Builder compressionHandlerBuilder = new FileUtils.CompressionHandler.Builder(getContext());
                             compressionHandlerBuilder.add(newProfilePictureUri, FileUtils.MEDIA_TYPE.IMAGE).addCallback(new FileUtils.CompressionThreadCallback() {
@@ -163,7 +165,10 @@ public class SettingsActivity extends AppCompatActivity {
                                             Thread thread = new Thread(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    //Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
+                                                    Log.d("CHANGEPROFILE", "clearing glide cache");
                                                     Glide.get(getContext()).clearDiskCache();
+                                                    dialog.dismiss();
 
                                                 }
                                             });
@@ -175,6 +180,7 @@ public class SettingsActivity extends AppCompatActivity {
                                             getActivity().runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    progressBar.setVisibility(View.GONE);
                                                     Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
                                                 }
                                             });
@@ -187,6 +193,7 @@ public class SettingsActivity extends AppCompatActivity {
                                             getActivity().runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    progressBar.setVisibility(View.GONE);
                                                     Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
                                                 }
                                             });
@@ -200,50 +207,85 @@ public class SettingsActivity extends AppCompatActivity {
                             FileUtils.CompressionHandler compressionHandler = compressionHandlerBuilder.build();
                             compressionHandler.start();
 
+                        }
+                    });
+
+
+                    builder.setPositiveButton(null, null);
+
+                    builder.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
                             /*
-                            RequestBody imageBody = RequestBody.create(new File(getPathFromUri(getContext(),newProfilePictureUri)), MediaType.parse("image/jpeg"));
-                            MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
-                                    .setType(MultipartBody.FORM)
-                                    .addFormDataPart("image", "profile_picture", imageBody);
+                            // Handle OK button click
 
-                            //json.put("profile_picture", )
-                            WebUtils.sendPost("/users/change_profile_picture/", true, requestBodyBuilder, new WebUtils.WebCallback() {
+                            // Do something with the entered text
+
+                            ProgressBar progressBar= dialogView.findViewById(R.id.dialog_change_photo_progress);
+                            progressBar.setVisibility(View.VISIBLE);
+                            // ...
+                            FileUtils.CompressionHandler.Builder compressionHandlerBuilder = new FileUtils.CompressionHandler.Builder(getContext());
+                            compressionHandlerBuilder.add(newProfilePictureUri, FileUtils.MEDIA_TYPE.IMAGE).addCallback(new FileUtils.CompressionThreadCallback() {
                                 @Override
-                                public void onSuccess(JSONObject json) {
-                                    Log.d("CHANGEPROFILE", "successfully changed profile picture");
-                                    Thread thread = new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Glide.get(getContext()).clearDiskCache();
+                                public void onResult(List<File> imageFiles, List<File> videoFiles) {
 
+                                    MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
+                                            .setType(MultipartBody.FORM);
+
+
+                                    RequestBody imageBody = RequestBody.create(imageFiles.get(0), MediaType.parse("image/jpeg"));
+                                    requestBodyBuilder.addFormDataPart("image", imageFiles.get(0).getName(), imageBody);
+
+                                    WebUtils.sendPost("/users/change_profile_picture/", true, requestBodyBuilder, new WebUtils.WebCallback() {
+                                        @Override
+                                        public void onSuccess(JSONObject json) {
+                                            Log.d("CHANGEPROFILE", "successfully changed profile picture");
+                                            Thread thread = new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
+                                                    Log.d("CHANGEPROFILE", "clearing glide cache");
+                                                    //Glide.get(getContext()).clearDiskCache();
+                                                    //dialog.dismiss();
+
+                                                }
+                                            });
+                                            thread.start();
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable t) {
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                            Log.d("CHANGEPROFILE", t.getMessage());
+                                        }
+
+                                        @Override
+                                        public void onFailure(JSONObject json) {
+
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                            Log.d("CHANGEPROFILE", json.optString("message", "onFailure"));
                                         }
                                     });
-                                    thread.start();
-                                }
 
-                                @Override
-                                public void onError(Throwable t) {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                    Log.d("CHANGEPROFILE", t.getMessage());
                                 }
+                            });
 
-                                @Override
-                                public void onFailure(JSONObject json) {
-
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(getContext(),"修改失败",Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                    Log.d("CHANGEPROFILE", json.optString("message", "onFailure"));
-                                }
-                            });*/
+                            FileUtils.CompressionHandler compressionHandler = compressionHandlerBuilder.build();
+                            compressionHandler.start();
+*/
                         }
                     });
 
@@ -255,8 +297,8 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     });
 
-                    AlertDialog dialog = builder.create();
                     dialog.show();
+
                     return false;
                 }
             });

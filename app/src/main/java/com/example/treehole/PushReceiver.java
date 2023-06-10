@@ -1,7 +1,6 @@
 package com.example.treehole;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +10,6 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.example.treehole.activity.LoginActivity;
 
 import me.pushy.sdk.Pushy;
 //import android.support.v4.app.NotificationCompat;
@@ -44,7 +41,7 @@ public class PushReceiver extends BroadcastReceiver {
             message = "";
         }
 
-        String notificationTitle = "";
+        String notificationTitle = sender_username;
 
         // Attempt to extract the "message" property from the data payload: {"message":"Hello World!"}
         //String notificationText = intent.getStringExtra("message") != null ? intent.getStringExtra("message") : "Test notification";
@@ -68,8 +65,8 @@ public class PushReceiver extends BroadcastReceiver {
                 .setLights(Color.RED, 1000, 1000)
                 .setVibrate(new long[]{0, 400, 250, 400})
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, LoginActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
-
+                .setContentIntent(null);
+        //.setContentIntent(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class)
         // Automatically configure a Notification Channel for devices running Android O+
         Pushy.setNotificationChannel(builder, context);
 

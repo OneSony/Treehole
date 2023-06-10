@@ -27,10 +27,12 @@
     <string-array name="main_sort_type">
         <item>date</item>
         <item>likes</item>
+        <item>follow</item>
     </string-array>
 
     <string-array name="main_sort_type_name">
         <item>日期排序</item>
         <item>热度排序</item>
+        <item>只看关注</item>
     </string-array>
 </resources>

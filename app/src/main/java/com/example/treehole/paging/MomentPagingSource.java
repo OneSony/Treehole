@@ -58,6 +58,7 @@ public class MomentPagingSource extends ListenableFuturePagingSource<String, Mom
         this.searchType=searchType;
     }
 
+
     @NotNull
     @Override
     public ListenableFuture<LoadResult<String, Moment>> loadFuture(@NotNull LoadParams<String> params) {

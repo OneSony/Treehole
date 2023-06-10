@@ -22,7 +22,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.treehole.R;
 import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
@@ -136,7 +135,7 @@ public class MineFragment extends Fragment {
         user_id= UserUtils.getUserid();
         if (user_id != "") {
             String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+user_id;
-            Glide.with(getContext()).load(profile_photo_url).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(user_image);
+            Glide.with(getContext()).load(profile_photo_url).into(user_image);
         }
 
         JSONObject json = new JSONObject();

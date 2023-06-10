@@ -78,6 +78,16 @@ public class MainViewModel extends AndroidViewModel {
         return paging;
     }
 
+    public LiveData<PagingData<Moment>> getNewPaging(String sortType,String filter){
+        CoroutineScope viewModelScope= ViewModelKt.getViewModelScope(this);
+
+        //MomentPagingSource pagingSource = new MomentPagingSource(sortType);
+        Pager<String, Moment> pager = new Pager<String, Moment>(pagingConfig, ()->new MomentPagingSource(filter,""));//构造函数根据自己的需要来调整
+
+        paging=PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager),viewModelScope);
+        return paging;
+    }
+
 
 
 

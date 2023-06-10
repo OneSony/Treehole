@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.Glide;
 import com.example.treehole.MainViewModel;
 import com.example.treehole.R;
 import com.example.treehole.activity.EditActivity;
@@ -227,62 +226,6 @@ public class MainFragment extends Fragment {
         Log.d("UPDATE","UPDATA!");
     }
 
-    /*
-    private void showSortDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Select an option");
-
-        // Inflate the dialog layout
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_main_sort, null);
-        builder.setView(dialogView);
-
-        // Set up the radio button group
-        RadioGroup radioGroup = dialogView.findViewById(R.id.sort_radio_group);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // Handle radio button selection
-                switch (checkedId) {
-                    case R.id.time_sort:
-                        // Option 1 selected
-                        //modifyData("Option 1");
-                        viewModel.getNewPaging("date").observe(getViewLifecycleOwner(),
-                                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
-                        //update_data_live();
-                        break;
-                    case R.id.hot_sort:
-                        // Option 2 selected
-                        //modifyData("Option 2");
-                        viewModel.getNewPaging("likes").observe(getViewLifecycleOwner(),
-                                dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
-                        //update_data_live();
-                        break;
-                    // Handle other radio button selections as needed
-                }
-            }
-        });
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Handle OK button click
-                Toast.makeText(getContext(), "OK clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Handle Cancel button click
-                Toast.makeText(getContext(), "Cancel clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-    */
 
 
     // 在你的 Activity 或 Fragment 中创建对话框
@@ -295,10 +238,12 @@ public class MainFragment extends Fragment {
             defaultSortOption = 0;
         } else if (sortType.equals("likes")) {
             defaultSortOption = 1;
+        } else if(sortType.equals("follow")) {
+            defaultSortOption = 2;
         }
 
         // 选项列表
-        final String[] sortOptions = {"时间排序", "热度排序"};
+        final String[] sortOptions = {"时间排序", "热度排序","只看关注"};
 
         // 构建对话框
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -338,7 +283,10 @@ public class MainFragment extends Fragment {
                 sortType="likes";
                 break;
             case 2:
-                // 执行 Option 3 的操作
+                viewModel.getNewPaging("date","follow").observe(getViewLifecycleOwner(),
+                        dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
+                //update_data_live();
+                sortType="follow";
                 break;
             default:
                 break;
