@@ -59,6 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        // Do nothing to disable the back button
+    }
+
     /*public void edit_click(View view) {
 
         Intent intent = new Intent(this, EditActivity.class);

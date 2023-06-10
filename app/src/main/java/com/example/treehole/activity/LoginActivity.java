@@ -245,4 +245,9 @@ public class LoginActivity extends AppCompatActivity {
     public void temp_click(View view) {
         intent_to_main();
     }
+
+    @Override
+    public void onBackPressed() {
+        // Do nothing to disable the back button
+    }
 }
