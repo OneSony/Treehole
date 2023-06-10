@@ -26,7 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:text="receive msg from test_user" />
+        android:text="receive msg from test_user"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/chat_no_data"

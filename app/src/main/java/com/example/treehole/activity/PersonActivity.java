@@ -1,11 +1,14 @@
 package com.example.treehole.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,8 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
 import com.example.treehole.SearchViewModel;
+import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
 import com.example.treehole.paging.MomentPagingAdapter;
 
@@ -28,6 +33,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PersonActivity extends AppCompatActivity {
 
@@ -155,6 +161,21 @@ public class PersonActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
         updateUsername();
+
+
+        if(user_id.equals(UserUtils.getUserid())){//我自己
+            Button msgButton=findViewById(R.id.person_msg_button);
+            //msgButton.setClickable(false);
+            msgButton.setEnabled(false);
+
+            Button followButton=findViewById(R.id.person_follow_button);
+            //followButton.setClickable(false);
+            followButton.setEnabled(false);
+
+            Button blacklistButton=findViewById(R.id.person_blacklist_button);
+            //blacklistButton.setClickable(false);
+            blacklistButton.setEnabled(false);
+        }
     }
 
     @Override
@@ -210,5 +231,23 @@ public class PersonActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    public void person_msg_click(View view) throws ExecutionException, InterruptedException {
+
+        Intent intent = new Intent(PersonActivity.this, MsgActivity.class);
+        Bundle bundle = new Bundle();
+
+        ChatViewModel viewModel = new ViewModelProvider(PersonActivity.this).get(ChatViewModel.class);
+
+
+        bundle.putSerializable("DATA",viewModel.searchMessage(user_id,username));
+        intent.putExtra("BUNDLE_DATA",bundle);
+
+                /*
+                bundle.putString("USERNAME", user_id);
+                intent.putExtra("BUNDLE_DATA", bundle);*/
+        startActivity(intent);
+
     }
 }

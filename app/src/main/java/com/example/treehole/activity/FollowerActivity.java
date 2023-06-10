@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.treehole.R;
 import com.example.treehole.SearchUserListAdapter;
 import com.example.treehole.SearchUserResult;
+import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
 import com.google.android.material.tabs.TabLayout;
 
@@ -83,8 +84,7 @@ public class FollowerActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
                 noDataTextView.setVisibility(View.GONE);
 
-                List<SearchUserResult> searchUserResults=new ArrayList<>();
-                searchAndInsert(searchType,"yun", searchUserResults, adapter);
+                sendGet(UserUtils.getUserid());
             }
 
 
@@ -128,8 +128,10 @@ public class FollowerActivity extends AppCompatActivity {
         noDataTextView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
-        List<SearchUserResult> searchUserResults=new ArrayList<>();
-        searchAndInsert(searchType,"yun", searchUserResults, adapter);
+        //List<SearchUserResult> searchUserResults=new ArrayList<>();
+        //searchAndInsert(searchType,"yun", searchUserResults, adapter);
+
+        sendGet(UserUtils.getUserid());
 
 
     }
@@ -144,6 +146,8 @@ public class FollowerActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    /*
     //用searchtype调整搜索
     private void searchAndInsert(int searchType,String query, List<SearchUserResult> listContainer, SearchUserListAdapter adapter) {
         Log.d("GET", "HEERE");
@@ -198,6 +202,86 @@ public class FollowerActivity extends AppCompatActivity {
             public void onFailure(JSONObject json) {
                 //progressBar.setVisibility(View.GONE);
                 Log.e("SEARCHUSERACTIVITY", "FAILURE: "+json.optString("message", "onFailure"));
+            }
+        });
+    }*/
+
+    private void sendGet(String user_id){
+
+        String api="";
+
+        if(searchType==0){
+            api="/users/follow?id=";
+        }else if(searchType==1){
+            api="/users/follow?id=";
+        }else if(searchType==2){
+            api="/users/blacklist?id=";
+        }else{
+            return;
+        }
+        WebUtils.sendGet(api+user_id, false, new WebUtils.WebCallback() {
+            @Override
+            public void onSuccess(JSONObject json) {
+
+
+
+                List<SearchUserResult> newUsers=new ArrayList<>();
+
+                Log.d("COMMENT SUCC",json.toString());
+
+                try {
+
+                    Object msg=json.get("message");
+
+                    if (msg instanceof JSONArray) {
+                        JSONArray nestedArray = (JSONArray) msg;
+
+                        // 处理列表中的数据
+                        for (int ii = 0; ii < nestedArray.length(); ii++) {
+                            Object listItem = nestedArray.get(ii);
+                            if(listItem instanceof JSONObject){
+                                JSONObject comment=(JSONObject)listItem;
+                                String user_id=comment.getString("user_id");
+                                String username=comment.getString("username");
+                                String profile_picture=comment.getString("profile_picture");
+                                newUsers.add(new SearchUserResult(user_id,username));
+
+                                Log.d("COMMENT GET",user_id+" "+"username");
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if(newUsers.size()==0) {
+                            progressBar.setVisibility(View.GONE);
+                            noDataTextView.setVisibility(View.VISIBLE);
+                        }else {
+                            progressBar.setVisibility(View.GONE);
+                            adapter.setSearchUserResults(newUsers);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+
+            @Override
+            public void onFailure(JSONObject json) {
+                try {
+                    Log.e("FAILURE", json.getString("message"));
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
