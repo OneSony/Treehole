@@ -610,6 +610,13 @@ public class EditActivity extends AppCompatActivity {
             public void onResult(List<File> imageFiles, List<File> videoFiles) {
                 Log.d("COMPRESSIONDONE", "RESULT: images:"+imageFiles.size()+"|videos:"+videoFiles.size());
 
+                // Check markdown flag
+                // request uses key "text_type", values can be 'string' or 'markdown'
+                String textType = "string";
+                if (markdownFlag){
+                    textType = "markdown";
+                }
+
                 // Setup a multipart body
                 MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM);
@@ -617,6 +624,7 @@ public class EditActivity extends AppCompatActivity {
                 // Add title and text to it
                 RequestBody titleBody = RequestBody.create(topicInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
                 RequestBody textBody = RequestBody.create(textInputLayout.getEditText().getText().toString(), MediaType.parse("text/plain"));
+                RequestBody textTypeBody = RequestBody.create(textType, MediaType.parse("text/plain"));
                 requestBodyBuilder.addFormDataPart("title", null, titleBody);
                 requestBodyBuilder.addFormDataPart("text_content", null, textBody);
 

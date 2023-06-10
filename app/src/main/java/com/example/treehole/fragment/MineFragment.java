@@ -42,6 +42,7 @@ public class MineFragment extends Fragment {
     TextView username_text;
     TextView follow_count;
     TextView follower_count;
+    ImageView user_image;
 
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -85,26 +86,11 @@ public class MineFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_mine, container, false);
-
-        user_id= UserUtils.getUserid();
-        username=UserUtils.getUsername();
-
-        username_text = view.findViewById(R.id.mine_my_username);
-        username_text.setText(username);
-
-        follow_count = view.findViewById(R.id.textView6);
-        follow_count.setText("-");
-
-        follower_count = view.findViewById(R.id.textView4);
-        follower_count.setText("-");
-
+    public void onResume() {
+        super.onResume();
+        Log.d("RESUME", "RESUME");
         user_id= UserUtils.getUserid();
         if (user_id != "") {
-            ImageView user_image = view.findViewById(R.id.mine_my_photo);
             String profile_photo_url = "https://rickyvu.pythonanywhere.com/users/profile_picture?id="+user_id;
             Glide.with(getContext()).load(profile_photo_url).into(user_image);
         }
@@ -223,6 +209,27 @@ public class MineFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_mine, container, false);
+
+        user_id= UserUtils.getUserid();
+        username=UserUtils.getUsername();
+
+        username_text = view.findViewById(R.id.mine_my_username);
+        username_text.setText(username);
+
+        follow_count = view.findViewById(R.id.textView6);
+        follow_count.setText("-");
+
+        follower_count = view.findViewById(R.id.textView4);
+        follower_count.setText("-");
+
+        user_image = view.findViewById(R.id.mine_my_photo);
 
         Button exit_button = view.findViewById(R.id.exit_button);
         exit_button.setOnClickListener(new View.OnClickListener() {
