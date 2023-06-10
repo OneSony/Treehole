@@ -628,6 +628,7 @@ public class EditActivity extends AppCompatActivity {
                 RequestBody textTypeBody = RequestBody.create(textType, MediaType.parse("text/plain"));
                 requestBodyBuilder.addFormDataPart("title", null, titleBody);
                 requestBodyBuilder.addFormDataPart("text_content", null, textBody);
+                requestBodyBuilder.addFormDataPart("text_type", null, textTypeBody);
 
 
 
