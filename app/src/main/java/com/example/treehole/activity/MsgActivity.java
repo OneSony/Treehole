@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,13 +24,16 @@ import com.example.treehole.ChatViewModel;
 import com.example.treehole.MsgListAdapter;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
+import com.example.treehole.application;
 import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageNode;
+import com.example.treehole.room.MessageQueueNode;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -54,6 +58,31 @@ public class MsgActivity extends AppCompatActivity {
         setContentView(R.layout.activity_msg);
 
         ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+
+        application myApplication = (application) getApplication();
+
+
+
+        Observer<ArrayList<MessageQueueNode>> unreadMessagesObserver = messageQueue -> {
+
+            ArrayList<MessageQueueNode> unreadMessages = new ArrayList<>();
+            unreadMessages.addAll(messageQueue);
+            messageQueue.clear();
+
+            Log.d("GOT IN chat",String.valueOf(messageQueue.size()));
+
+            // 处理未读消息
+            for (MessageQueueNode messageQueueNode : unreadMessages) {
+                viewModel.receiveMessageNode(messageQueueNode.getSenderId(), messageQueueNode.getSenderUsername(), messageQueueNode.getMessageNode());
+            }
+
+            unreadMessages.clear();
+        };
+
+        myApplication.getUnreadMessagesLiveData().observe(this, unreadMessagesObserver);
+
+
 
         setSupportActionBar(findViewById(R.id.chat_toolbar));
         ActionBar bar=getSupportActionBar();
@@ -88,6 +117,11 @@ public class MsgActivity extends AppCompatActivity {
                 adapter.setMessageNodes(messageNodes);
                 adapter.notifyDataSetChanged();
 
+
+                int lastItemPosition = adapter.getItemCount() - 1;
+                recyclerView.scrollToPosition(lastItemPosition);
+
+/*
                 if (isFirstLoad) { // 只在第一次加载数据时滑动到最下面
                     isFirstLoad = false; // 将标志设置为false，避免以后每次更新数据都滑动到最下面
 
@@ -96,7 +130,7 @@ public class MsgActivity extends AppCompatActivity {
                     recyclerView.scrollToPosition(lastItemPosition);
                     // 或者使用平滑滚动
                     // recyclerView.smoothScrollToPosition(lastItemPosition);
-                }
+                }*/
             }
         });
 
