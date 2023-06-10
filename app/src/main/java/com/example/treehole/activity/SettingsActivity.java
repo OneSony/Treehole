@@ -393,7 +393,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
                                     // 发起网络请求
-                                    WebUtils.WebCallback loginCallback = new WebUtils.WebCallback() {
+                                    WebUtils.WebCallback logoutCallback = new WebUtils.WebCallback() {
                                         @Override
                                         public void onSuccess(JSONObject json) {
                                             MessageDatabase.closeDatabase();
@@ -418,7 +418,7 @@ public class SettingsActivity extends AppCompatActivity {
                                         }
                                     };
 
-                                    UserUtils.logout(loginCallback);
+                                    UserUtils.logout(logoutCallback);
                                 }
                             })
                             .setNegativeButton("取消", new DialogInterface.OnClickListener() {

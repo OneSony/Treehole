@@ -1,21 +1,20 @@
 package com.example.treehole;
 
-import me.pushy.sdk.Pushy;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.content.Context;
-import android.app.PendingIntent;
 import android.media.RingtoneManager;
-import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.treehole.activity.LoginActivity;
-import com.example.treehole.activity.MsgActivity;
-import com.example.treehole.room.MessageNode;
+
+import me.pushy.sdk.Pushy;
 //import android.support.v4.app.NotificationCompat;
 
 public class PushReceiver extends BroadcastReceiver {
@@ -83,12 +82,19 @@ public class PushReceiver extends BroadcastReceiver {
         // notifications don't overwrite each other
         notificationManager.notify((int)(Math.random() * 100000), builder.build());
 
-        MsgActivity activity = (MsgActivity) context;
-        ChatViewModel viewModel = new ViewModelProvider(activity).get(ChatViewModel.class);
-        viewModel.receiveMessageNode(sender_id , sender_username, new MessageNode(0, message));
+        //MsgActivity activity = (MsgActivity) context;
+        //ChatViewModel viewModel = new ViewModelProvider((MsgActivity)context).get(ChatViewModel.class);
+        //viewModel.receiveMessageNode(sender_id , sender_username, new MessageNode(0, message));
 
+        //ChatViewModel viewModel = new ViewModelProvider().get(ChatViewModel.class);
 
+        Intent broadcastIntent = new Intent("com.example.treehole.NEW_MESSAGE_RECEIVED");
+        broadcastIntent.putExtra("senderId", sender_id);
+        broadcastIntent.putExtra("senderUsername", sender_username);
+        broadcastIntent.putExtra("message", message);
 
+        // 发送广播
+        LocalBroadcastManager.getInstance(context).sendBroadcast(broadcastIntent);
 
         // Write to database
         Log.d("MESSAGE RECEIVED", String.valueOf(id)+" "+type+""+message);

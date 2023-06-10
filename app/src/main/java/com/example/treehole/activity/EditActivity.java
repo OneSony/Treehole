@@ -397,7 +397,7 @@ public class EditActivity extends AppCompatActivity {
             String uris_str = mPreferences.getString("URIS", "");
             selectFlag = mPreferences.getInt("SELECT_FLAG", 0);
             String tags_recover_str= mPreferences.getString("TAGS","");
-            markdownFlag=mPreferences.getBoolean("MARKDOWN",false);
+            //markdownFlag=mPreferences.getBoolean("MARKDOWN",false);
 
 
             if (!topic.equals("") || !text.equals("") || !uris_str.equals("") || !tags_recover_str.equals("")||markdownFlag==true) {
@@ -438,9 +438,9 @@ public class EditActivity extends AppCompatActivity {
 
                 Log.d("MARKDOWN",String.valueOf(markdownFlag));
 
-                if(markdownFlag==true){
-                    markdown_button.callOnClick();
-                }
+                /*if(markdownFlag==true){
+                    markdown_button.performClick();
+                }*/
 
 
 

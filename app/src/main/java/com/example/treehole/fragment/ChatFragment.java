@@ -1,6 +1,9 @@
 package com.example.treehole.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,6 +23,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,6 +33,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.treehole.ChatListAdapter;
 import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
+import com.example.treehole.UserUtils;
 import com.example.treehole.WebUtils;
 import com.example.treehole.activity.MsgActivity;
 import com.example.treehole.activity.SearchUserActivity;
@@ -44,15 +49,36 @@ import java.util.List;
 
 public class ChatFragment extends Fragment {
 
+
     private RecyclerView recyclerView;
     private ChatListAdapter adapter;
 
     private TextView noDataTextView;
 
     private Menu menu;
+
+    private ChatViewModel viewModel;
+    //private ChatViewModel viewModel;
     public ChatFragment() {
         // Required empty public constructor
     }
+
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 处理收到的广播消息
+            String senderId = intent.getStringExtra("senderId");
+            String senderUsername = intent.getStringExtra("senderUsername");
+            String message = intent.getStringExtra("message");
+
+            Log.d("GOT IN CHAT",senderId);
+
+            if(viewModel!=null) {
+                viewModel.receiveMessageNode(senderId, senderUsername, new MessageNode(0, message));
+            }
+            // 执行相关操作...
+        }
+    };
 
 
     public static ChatFragment newInstance(String param1, String param2) {
@@ -73,7 +99,13 @@ public class ChatFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_chat, container, false);
         setHasOptionsMenu(true);
 
-        ChatViewModel viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+
+
+
+        IntentFilter filter = new IntentFilter("com.example.treehole.NEW_MESSAGE_RECEIVED");
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(messageReceiver, filter);
+
 
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.chatSwipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -148,7 +180,7 @@ public class ChatFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewModel.receiveMessageNode("2", "", new MessageNode(0, "hi"));
+                viewModel.receiveMessageNode(UserUtils.getUserid(), "", new MessageNode(0, "hi"));
             }
         });
 
@@ -325,6 +357,14 @@ public class ChatFragment extends Fragment {
             SearchView searchView = (SearchView) menuItem.getActionView();
             searchView.clearFocus();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // 在 onDestroyView 方法中注销广播接收器
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(messageReceiver);
     }
 
 }
