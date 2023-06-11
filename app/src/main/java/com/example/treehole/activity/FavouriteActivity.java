@@ -6,7 +6,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -95,7 +94,7 @@ public class FavouriteActivity extends AppCompatActivity {
             final List<String>[] searchWords = new List[]{new ArrayList<>()};
             searchWords[0].add(UserUtils.getUsername());
 
-            Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
             viewModel.getPaging("username", searchWords[0]).observe(this,
                     dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
 
@@ -164,7 +163,7 @@ public class FavouriteActivity extends AppCompatActivity {
                     Log.d("USERID",UserUtils.getUserid());
                     searchWords[0].add(UserUtils.getUsername());
 
-                    Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
                     viewModel.getPaging("username", searchWords[0]).observe(FavouriteActivity.this,
                             dataInfoPagingData -> adapter.submitData(getLifecycle(),dataInfoPagingData));//观察数据的更新
 

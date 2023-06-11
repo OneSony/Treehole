@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_toolbar"
-        app:layout_constraintVertical_bias="0.8" />
+        app:layout_constraintVertical_bias="0.78" />
 
     <Button
         android:id="@+id/button2"
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:onClick="temp_click"
         android:text="TEST"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,9 +46,9 @@
         android:id="@+id/to_register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:onClick="reg_click"
-        android:text="没有账户"
+        android:text="注册"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_button" />

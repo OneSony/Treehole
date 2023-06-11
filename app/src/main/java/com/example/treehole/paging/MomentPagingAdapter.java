@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +26,6 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.treehole.R;
 import com.example.treehole.WebUtils;
 import com.example.treehole.activity.InfoActivity;
@@ -393,7 +390,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                 public void onClick(View view) {
                     // 在这里处理项目点击事件
                     // 显示项目ID，可以通过Toast或者其他方式展示
-                    Toast.makeText(view.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(view.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(context, InfoActivity.class);
                     Bundle bundle=new Bundle();

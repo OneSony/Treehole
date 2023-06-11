@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -79,7 +78,7 @@ public class SearchMomentActivity extends AppCompatActivity {
             searchWords[0].add(word);
         }
 
-        Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),"searchWords="+ searchWords[0].get(0),Toast.LENGTH_SHORT).show();
 
         SearchViewModel viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
 
