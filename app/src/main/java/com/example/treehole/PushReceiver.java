@@ -24,6 +24,8 @@ public class PushReceiver extends BroadcastReceiver {
         String sender_id = String.valueOf(intent.getIntExtra("sender_id", 1));
         String type = intent.getStringExtra("type"); // string|image|video
         String message = intent.getStringExtra("message"); // String, or image/video url
+        String time = intent.getStringExtra("time");
+
 
         // Attempt to extract the "title" property from the data payload, or fallback to app shortcut label
         //String notificationTitle = intent.getStringExtra("title") != null ? intent.getStringExtra("info") : context.getPackageManager().getApplicationLabel(context.getApplicationInfo()).toString();
