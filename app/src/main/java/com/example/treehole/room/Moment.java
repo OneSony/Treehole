@@ -160,6 +160,11 @@ public class Moment implements Serializable {
             long millisecondsDifference = currentDate.getTime() - date.getTime();
 
             long minutesDifference = TimeUnit.MILLISECONDS.toMinutes(millisecondsDifference);
+
+            if (minutesDifference < 3) {
+                return "现在";
+            }
+
             if (minutesDifference < 60) {
                 return minutesDifference + "分钟前";
             }

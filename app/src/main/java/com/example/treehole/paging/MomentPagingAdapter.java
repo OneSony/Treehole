@@ -385,6 +385,12 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
             holder.comment_box.setText(String.valueOf(moment.getComment_num()));
             holder.collect_box.setText(String.valueOf(moment.getFavourite_num()));
 
+            if(moment.getText_type().equals("markdown")){
+                Markwon markwon = Markwon.create(context);
+                //markdownTextView.setMovementMethod(new ScrollingMovementMethod()); // 启用滚动
+                markwon.setMarkdown(holder.main_box,moment.getText());//先把已经有的放进去
+            }
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -400,12 +406,6 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
                     context.startActivity(intent);
                 }
             });
-        }
-
-        if(moment.getText_type().equals("markdown")){
-            Markwon markwon = Markwon.create(context);
-            //markdownTextView.setMovementMethod(new ScrollingMovementMethod()); // 启用滚动
-            markwon.setMarkdown(holder.main_box,moment.getText());//先把已经有的放进去
         }
 
 
