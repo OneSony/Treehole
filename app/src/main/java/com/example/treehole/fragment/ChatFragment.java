@@ -342,6 +342,7 @@ public class ChatFragment extends Fragment {
         Bundle bundle=new Bundle();
         bundle.putSerializable("DATA",index);
         intent.putExtra("BUNDLE_DATA",bundle);
+        intent.putExtra("FROM",0);
 
         startActivity(intent);
     }

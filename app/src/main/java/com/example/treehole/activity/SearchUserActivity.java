@@ -75,6 +75,7 @@ public class SearchUserActivity extends AppCompatActivity {
 
                 bundle.putSerializable("DATA",viewModel.searchMessage(user_id,username));
                 intent.putExtra("BUNDLE_DATA",bundle);
+                intent.putExtra("FROM",0);
 
                 /*
                 bundle.putString("USERNAME", user_id);

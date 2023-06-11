@@ -579,18 +579,21 @@ public class EditActivity extends AppCompatActivity {
         if (topic.equals("") && text.equals("")) {
             Toast toast = Toast.makeText(this, "请输入内容", Toast.LENGTH_SHORT);
             toast.show();
+            edit_progress.setVisibility(View.GONE);
             return false;
         }
 
         if (topic.equals("")) {
             Toast toast = Toast.makeText(this, "请输入主题", Toast.LENGTH_SHORT);
             toast.show();
+            edit_progress.setVisibility(View.GONE);
             return false;
         }
 
         if (text.equals("")) {
             Toast toast = Toast.makeText(this, "请输入正文", Toast.LENGTH_SHORT);
             toast.show();
+            edit_progress.setVisibility(View.GONE);
             return false;
         }
 

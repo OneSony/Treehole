@@ -78,6 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
         static ImageView changeProfilePictureImageView;
+        static ImageView changeProfilePictureImageViewOld;
         static private ActivityResultLauncher<PickVisualMediaRequest> pickImage;
         static Uri newProfilePictureUri;
 
@@ -92,7 +93,9 @@ public class SettingsActivity extends AppCompatActivity {
                     getContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                     newProfilePictureUri = uri;
+
                     changeProfilePictureImageView.setImageURI(uri);
+                    changeProfilePictureImageView.setVisibility(View.VISIBLE);
                     //Log.d("PhotoPicker", "PATH: " + getRealPathFromUri(getApplicationContext(),uris.get(0)));
                     Log.d("PhotoPicker", "Selected URI: " + uri);
                 }
@@ -119,8 +122,15 @@ public class SettingsActivity extends AppCompatActivity {
                     Button button = dialogView.findViewById(R.id.dialog_profile_button);
 
                     changeProfilePictureImageView = dialogView.findViewById(R.id.change_profile_photo);
+                    changeProfilePictureImageViewOld=dialogView.findViewById(R.id.change_profile_photo_old);
+
+                    changeProfilePictureImageView.setVisibility(View.GONE);
+
+
+
+                    Glide.with(getActivity()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+UserUtils.getUserid()).into(changeProfilePictureImageViewOld);
+
                     Log.d("CHANGE","FOUND");
-                    Glide.with(getActivity()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+UserUtils.getUserid()).into(changeProfilePictureImageView);
                     final AlertDialog dialog = builder.create();
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override

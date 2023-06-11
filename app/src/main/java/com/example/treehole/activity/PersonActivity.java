@@ -409,7 +409,7 @@ public class PersonActivity extends AppCompatActivity {
 
         bundle.putSerializable("DATA",viewModel.searchMessage(user_id,username));
         intent.putExtra("BUNDLE_DATA",bundle);
-
+        intent.putExtra("FROM",1);
                 /*
                 bundle.putString("USERNAME", user_id);
                 intent.putExtra("BUNDLE_DATA", bundle);*/
@@ -472,6 +472,40 @@ public class PersonActivity extends AppCompatActivity {
                                 isFollowed=true;
                                 followButton.setText("已关注");
                                 followButton.setEnabled(true);
+                                WebUtils.sendGet("/users/follower_count?id="+user_id, false, new WebUtils.WebCallback() {
+                                    @Override
+                                    public void onSuccess(JSONObject json) {
+
+                                        try {
+                                            JSONObject responseJson=json.getJSONObject("message");
+                                            Integer follower_count = responseJson.optInt("count", 0);
+                                            Log.d("SUCCESS", String.valueOf(follower_count));
+
+
+                                            Message msg=new Message();
+                                            msg.what=70;
+                                            msg.obj=follower_count;
+                                            handler.sendMessage(msg);
+
+                                        } catch (JSONException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable t) {
+                                        Log.e("ERROR", t.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onFailure(JSONObject json) {
+                                        try {
+                                            Log.e("FAILURE", json.getString("message"));
+                                        } catch (JSONException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+                                });
                             }else{
                                 return;
                             }
@@ -537,6 +571,40 @@ public class PersonActivity extends AppCompatActivity {
                                 isFollowed=false;
                                 followButton.setText("关注");
                                 followButton.setEnabled(true);
+                                WebUtils.sendGet("/users/follower_count?id="+user_id, false, new WebUtils.WebCallback() {
+                                    @Override
+                                    public void onSuccess(JSONObject json) {
+
+                                        try {
+                                            JSONObject responseJson=json.getJSONObject("message");
+                                            Integer follower_count = responseJson.optInt("count", 0);
+                                            Log.d("SUCCESS", String.valueOf(follower_count));
+
+
+                                            Message msg=new Message();
+                                            msg.what=70;
+                                            msg.obj=follower_count;
+                                            handler.sendMessage(msg);
+
+                                        } catch (JSONException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable t) {
+                                        Log.e("ERROR", t.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onFailure(JSONObject json) {
+                                        try {
+                                            Log.e("FAILURE", json.getString("message"));
+                                        } catch (JSONException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+                                });
                             }else{
                                 return;
                             }

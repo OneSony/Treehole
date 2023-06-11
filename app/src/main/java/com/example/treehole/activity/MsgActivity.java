@@ -52,6 +52,8 @@ public class MsgActivity extends AppCompatActivity {
     boolean isFirstLoad = true;
 
     private LiveData<Message> message= null;
+
+    private int from_index;//从消息界面来，1从个人页面来
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +106,7 @@ public class MsgActivity extends AppCompatActivity {
             message_index = (int) bundle.getSerializable("DATA");
             viewModel.cleanMessageUnread(message_index);
         }
+        from_index = getIntent().getIntExtra("FROM",0);
 
         try {
             message = viewModel.getMessageByIndex(message_index);
@@ -266,10 +269,15 @@ public class MsgActivity extends AppCompatActivity {
                 //this.finish();
                 // 结束
 
-                intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                return true;
+                if(from_index==0) {
+                    intent = new Intent(this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    return true;
+                }else{
+                    finish();
+                    return true;
+                }
 
             case R.id.action_person_page:
 
