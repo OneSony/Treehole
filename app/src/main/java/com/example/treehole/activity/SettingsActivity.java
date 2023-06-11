@@ -119,6 +119,7 @@ public class SettingsActivity extends AppCompatActivity {
                     Button button = dialogView.findViewById(R.id.dialog_profile_button);
 
                     changeProfilePictureImageView = dialogView.findViewById(R.id.change_profile_photo);
+                    Log.d("CHANGE","FOUND");
                     Glide.with(getActivity()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+UserUtils.getUserid()).into(changeProfilePictureImageView);
                     final AlertDialog dialog = builder.create();
                     button.setOnClickListener(new View.OnClickListener() {
@@ -165,12 +166,21 @@ public class SettingsActivity extends AppCompatActivity {
                                                 public void run() {
                                                     //Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
                                                     Log.d("CHANGEPROFILE", "clearing glide cache");
-                                                    Glide.get(getContext()).clearDiskCache();
                                                     dialog.dismiss();
+                                                    Glide.get(getContext()).clearDiskCache();
 
                                                 }
                                             });
                                             thread.start();
+
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Toast.makeText(getContext(),"修改成功",Toast.LENGTH_SHORT).show();
+                                                    Glide.get(getContext()).clearMemory();
+                                                }
+                                            });
                                         }
 
                                         @Override
@@ -317,7 +327,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             String enteredText = editText.getText().toString();
                             // 在这里获取到文本框的字符串 enteredText，并进行相应的操作
-                            Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
                             //连接服务器！！！
                             JSONObject jsonObject = new JSONObject();
                             try {
@@ -394,7 +404,7 @@ public class SettingsActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             String enteredText = editText.getText().toString();
                             // 在这里获取到文本框的字符串 enteredText，并进行相应的操作
-                            Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "输入的文本：" + enteredText, Toast.LENGTH_SHORT).show();
                             //连接服务器！！！
                             JSONObject jsonObject = new JSONObject();
                             try {
@@ -608,7 +618,54 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             });
 
+            findPreference("delete_profile_photo").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("CHANGEPROFILE", "clearing glide cache");
+                            Glide.get(getContext()).clearDiskCache();
+
+                        }
+                    });
+                    thread.start();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.get(getContext()).clearMemory();
+                            Toast.makeText(getContext(),"清空成功",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+
+                    /*
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("清空头像缓存")
+                            .setMessage("确定要清空所有聊天记录吗？")
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    viewModel.deleteAllMessage();
+                                }
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 处理点击取消按钮的逻辑
+                                }
+                            })
+                            .show();
+*/
+                    return false;
+                }
+            });
+
         }
+
+
 
         /*
         private String getPathFromUri(Uri uri) {
