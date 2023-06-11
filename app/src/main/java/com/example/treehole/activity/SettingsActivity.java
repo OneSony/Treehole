@@ -116,13 +116,11 @@ public class SettingsActivity extends AppCompatActivity {
                     View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_change_profile_photo, null);
                     builder.setView(dialogView);
 
-                    final AlertDialog dialog = builder.create();
-
                     Button button = dialogView.findViewById(R.id.dialog_profile_button);
 
                     changeProfilePictureImageView = dialogView.findViewById(R.id.change_profile_photo);
                     Glide.with(getActivity()).load("https://rickyvu.pythonanywhere.com/users/profile_picture?id="+UserUtils.getUserid()).into(changeProfilePictureImageView);
-
+                    final AlertDialog dialog = builder.create();
                     button.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

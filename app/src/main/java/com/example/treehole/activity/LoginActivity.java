@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         WebUtils.init(getApplicationContext());
         UserUtils.init(this);
         Pushy.listen(this);
-        new UserUtils.RegisterForPushNotificationsAsync(this).execute();
+        //new UserUtils.RegisterForPushNotificationsAsync(this).execute();
 
         Thread thread = new Thread(new Runnable() {
             @Override

@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
@@ -175,7 +174,7 @@ public class MainFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // 处理搜索提交事件
-                Toast.makeText(getContext(), query, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), query, Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(getActivity(), SearchMomentActivity.class);
                 intent.putExtra("QUERY",query);
