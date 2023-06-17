@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.utils;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -10,8 +10,6 @@ import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.net.URL;
 
 import me.pushy.sdk.Pushy;
 

@@ -1,16 +1,10 @@
-package com.example.treehole;
+package com.example.treehole.room;
 
 import android.app.Application;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-
-import com.example.treehole.room.Message;
-import com.example.treehole.room.MessageDao;
-import com.example.treehole.room.MessageDatabase;
-import com.example.treehole.room.MessageNode;
-import com.example.treehole.room.UserInfo;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -65,9 +59,6 @@ public class ChatRepository {
         new deleteAllAsyncTask(messageDao).execute();
     }
 
-    public LiveData<List<UserInfo>> getAllUserInfo() throws ExecutionException, InterruptedException {
-        return new getAllUserInfoAsyncTask(messageDao).execute().get();
-    }
 
     public void updateUserInfo(String user_id,String username){
         new updateUserInfoAsyncTask(messageDao,user_id,username).execute();
@@ -231,17 +222,6 @@ public class ChatRepository {
         }
     }
 
-    private static class getAllUserInfoAsyncTask extends AsyncTask<Integer, Void, LiveData<List<UserInfo>>> {
-        private MessageDao mAsyncTaskDao;
-        getAllUserInfoAsyncTask(MessageDao dao){
-            mAsyncTaskDao=dao;
-        }
-
-        @Override
-        protected LiveData<List<UserInfo>> doInBackground(Integer... integers) {
-            return mAsyncTaskDao.getAllUserInfos();
-        }
-    }
 
     private static class updateUserInfoAsyncTask extends AsyncTask<Void,Void,Void> {
         private MessageDao mAsyncTaskDao;

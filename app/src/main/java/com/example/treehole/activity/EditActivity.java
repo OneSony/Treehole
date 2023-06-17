@@ -56,10 +56,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.treehole.FileUtils;
-import com.example.treehole.PhotoListAdapter;
+import com.example.treehole.utils.FileUtils;
+import com.example.treehole.adapter.PhotoListAdapter;
 import com.example.treehole.R;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.WebUtils;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -244,7 +244,7 @@ public class EditActivity extends AppCompatActivity {
                     if (childView != null) {
                         int position = recyclerView.getChildAdapterPosition(childView);
                         // 处理双击位置的操作
-                        Toast.makeText(EditActivity.this, "双击了第" + position + "个项目", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(EditActivity.this, "双击了第" + position + "个项目", Toast.LENGTH_SHORT).show();
                         adapter.deleteItem(position);
                         if (adapter.getItemCount() == 0) {
                             setView(0);

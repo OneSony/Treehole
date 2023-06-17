@@ -32,9 +32,6 @@
             android:name=".activity.SearchMomentActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.CreateChatActivity"
-            android:exported="false" />
-        <activity
             android:name=".activity.FollowerActivity"
             android:exported="false" />
         <activity
@@ -81,7 +78,7 @@
         <!-- Pushy Notification Receiver -->
         <!-- Incoming push notifications will invoke the following BroadcastReceiver -->
         <receiver
-            android:name=".PushReceiver"
+            android:name=".utils.PushReceiver"
             android:exported="false">
             <intent-filter>
 

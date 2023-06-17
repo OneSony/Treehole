@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -15,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.treehole.R;
 import com.example.treehole.room.MessageNode;
 
 import java.util.List;

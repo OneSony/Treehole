@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.app.Application;
 
@@ -6,10 +6,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.example.treehole.room.ChatRepository;
 import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageNode;
 import com.example.treehole.room.MessageQueueNode;
-import com.example.treehole.room.UserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,9 +69,6 @@ public class ChatViewModel extends AndroidViewModel {
         mRepository.deleteAllMessage();
     }
 
-    public LiveData<List<UserInfo>> getAllUserInfo() throws ExecutionException, InterruptedException {
-        return mRepository.getAllUserInfo();
-    }
 
     public void updateUserInfo(String user_id,String username){
         mRepository.updateUserInfo(user_id,username);

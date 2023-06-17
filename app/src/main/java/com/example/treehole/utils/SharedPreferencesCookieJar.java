@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

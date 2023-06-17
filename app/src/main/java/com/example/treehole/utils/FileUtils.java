@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.utils;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;

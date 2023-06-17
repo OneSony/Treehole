@@ -20,10 +20,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.treehole.ChatViewModel;
-import com.example.treehole.MsgListAdapter;
+import com.example.treehole.adapter.MsgListAdapter;
 import com.example.treehole.R;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.application;
 import com.example.treehole.room.Message;
 import com.example.treehole.room.MessageNode;

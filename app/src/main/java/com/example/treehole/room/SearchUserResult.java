@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.room;
 
 public class SearchUserResult {
     private String user_id;

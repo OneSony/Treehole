@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.activity;
 
 import android.app.Application;
 

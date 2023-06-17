@@ -32,11 +32,10 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.bumptech.glide.Glide;
-import com.example.treehole.ChatViewModel;
-import com.example.treehole.FileUtils;
+import com.example.treehole.utils.FileUtils;
 import com.example.treehole.R;
-import com.example.treehole.UserUtils;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.UserUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.room.MessageDatabase;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -58,7 +57,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.activity_settings);
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()

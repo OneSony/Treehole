@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.adapter;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.treehole.R;
 import com.example.treehole.room.Message;
 
 import java.util.List;

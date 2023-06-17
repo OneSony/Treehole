@@ -17,11 +17,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
-import com.example.treehole.SearchUserListAdapter;
-import com.example.treehole.SearchUserResult;
-import com.example.treehole.WebUtils;
+import com.example.treehole.adapter.SearchUserListAdapter;
+import com.example.treehole.room.SearchUserResult;
+import com.example.treehole.utils.WebUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;

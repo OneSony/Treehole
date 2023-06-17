@@ -100,9 +100,6 @@ public interface MessageDao {
     @Query("DELETE FROM message_table")
     void deleteAllMessages();
 
-    @Query("SELECT user_id, username FROM message_table")
-    LiveData<List<UserInfo>> getAllUserInfos();
-
     @Transaction
     default void updateUsernameByUserId(String userId, String newUsername) {
         Message existingMessage = getMessageByUserId(userId);

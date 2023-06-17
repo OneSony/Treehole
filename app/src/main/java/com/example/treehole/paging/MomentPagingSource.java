@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.paging.ListenableFuturePagingSource;
 import androidx.paging.PagingState;
 
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.room.Moment;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;

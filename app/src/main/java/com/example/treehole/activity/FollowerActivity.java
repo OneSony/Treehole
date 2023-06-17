@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.R;
-import com.example.treehole.SearchUserListAdapter;
-import com.example.treehole.SearchUserResult;
-import com.example.treehole.UserUtils;
-import com.example.treehole.WebUtils;
+import com.example.treehole.adapter.SearchUserListAdapter;
+import com.example.treehole.room.SearchUserResult;
+import com.example.treehole.utils.UserUtils;
+import com.example.treehole.utils.WebUtils;
 import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;

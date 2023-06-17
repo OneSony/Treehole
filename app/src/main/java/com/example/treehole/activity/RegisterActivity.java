@@ -16,7 +16,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.treehole.R;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.WebUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;

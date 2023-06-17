@@ -32,10 +32,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
-import com.example.treehole.CommentListAdapter;
+import com.example.treehole.adapter.CommentListAdapter;
 import com.example.treehole.R;
-import com.example.treehole.UserUtils;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.UserUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.room.Comment;
 import com.example.treehole.room.Moment;
 import com.github.chrisbanes.photoview.PhotoView;

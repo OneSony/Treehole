@@ -16,8 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
-import com.example.treehole.UserUtils;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.UserUtils;
+import com.example.treehole.utils.WebUtils;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;

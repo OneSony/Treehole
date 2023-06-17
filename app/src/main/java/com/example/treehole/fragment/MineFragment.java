@@ -23,8 +23,8 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
-import com.example.treehole.UserUtils;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.UserUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.activity.FavouriteActivity;
 import com.example.treehole.activity.FollowerActivity;
 import com.example.treehole.activity.LoginActivity;

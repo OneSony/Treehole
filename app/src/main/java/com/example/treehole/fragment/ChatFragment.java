@@ -27,11 +27,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.treehole.ChatListAdapter;
-import com.example.treehole.ChatViewModel;
+import com.example.treehole.adapter.ChatListAdapter;
+import com.example.treehole.activity.ChatViewModel;
 import com.example.treehole.R;
-import com.example.treehole.UserUtils;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.UserUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.activity.MsgActivity;
 import com.example.treehole.activity.SearchUserActivity;
 import com.example.treehole.application;

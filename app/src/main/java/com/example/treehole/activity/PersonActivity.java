@@ -21,11 +21,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.treehole.ChatViewModel;
 import com.example.treehole.R;
-import com.example.treehole.SearchViewModel;
-import com.example.treehole.UserUtils;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.UserUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.paging.MomentPagingAdapter;
 
 import org.json.JSONException;

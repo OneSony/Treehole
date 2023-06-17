@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.example.treehole.UserUtils;
+import com.example.treehole.utils.UserUtils;
 
 @Database(entities = {Message.class},version = 1,exportSchema = false)
 @TypeConverters(MessageNodeConverter.class)

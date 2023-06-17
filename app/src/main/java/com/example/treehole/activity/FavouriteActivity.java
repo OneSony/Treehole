@@ -16,8 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.treehole.R;
-import com.example.treehole.SearchViewModel;
-import com.example.treehole.UserUtils;
+import com.example.treehole.utils.UserUtils;
 import com.example.treehole.paging.MomentPagingAdapter;
 import com.google.android.material.tabs.TabLayout;
 

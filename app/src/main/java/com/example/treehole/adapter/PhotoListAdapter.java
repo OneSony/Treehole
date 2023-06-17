@@ -1,4 +1,4 @@
-package com.example.treehole;
+package com.example.treehole.adapter;
 
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.treehole.R;
 
 import java.util.ArrayList;
 import java.util.List;

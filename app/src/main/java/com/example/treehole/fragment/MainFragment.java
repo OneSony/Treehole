@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.treehole.MainViewModel;
+import com.example.treehole.activity.MainViewModel;
 import com.example.treehole.R;
 import com.example.treehole.activity.EditActivity;
 import com.example.treehole.activity.SearchMomentActivity;

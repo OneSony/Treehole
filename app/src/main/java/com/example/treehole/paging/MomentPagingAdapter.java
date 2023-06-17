@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.treehole.R;
-import com.example.treehole.WebUtils;
+import com.example.treehole.utils.WebUtils;
 import com.example.treehole.activity.InfoActivity;
 import com.example.treehole.activity.PersonActivity;
 import com.example.treehole.room.Moment;
@@ -98,7 +98,7 @@ public class MomentPagingAdapter extends PagingDataAdapter<Moment, MomentPagingV
     @Override
     public MomentPagingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View mItemView=inflater.inflate(R.layout.item,parent,false);
+        View mItemView=inflater.inflate(R.layout.moment_item,parent,false);
         return new MomentPagingViewHolder(mItemView);
     }
 
